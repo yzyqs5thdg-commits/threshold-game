@@ -1,0 +1,1641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2212%22%20fill%3D%22%2315264a%22%2F%3E%3Cpath%20d%3D%22M16%2020h32v7H36v20h-8V27H16z%22%20fill%3D%22%23a9c4ff%22%2F%3E%3C%2Fsvg%3E%0A">
+<title>THRESHOLD — Decision-Making in Organizational Risk Scenarios</title>
+<style>
+/* THRESHOLD — single calm theme so every participant sees the same visual environment.
+   No colour coding is attached to any decision option. */
+
+:root {
+  --bg: #f1f4f8;
+  --surface: #ffffff;
+  --surface-2: #f7f9fc;
+  --ink: #16202e;
+  --ink-2: #4a5567;
+  --ink-3: #74809a;
+  --line: #d9dfe8;
+  --line-2: #c4ccd8;
+  --navy: #15264a;
+  --navy-2: #1f3666;
+  --steel: #3b5b8c;
+  --steel-2: #2f4a73;
+  --focus: #7aa7ff;
+  --danger: #8a3b3b;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(22, 32, 46, 0.06), 0 8px 24px rgba(22, 32, 46, 0.06);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.skip { position: absolute; left: -999px; top: 0; background: var(--navy); color: #fff; padding: 8px 12px; z-index: 10; }
+.skip:focus { left: 8px; top: 8px; }
+
+/* ---------- top bar ---------- */
+.topbar { background: var(--navy); color: #fff; }
+.topbar__inner { max-width: 760px; margin: 0 auto; padding: 14px 16px 0; }
+.brand { display: flex; align-items: center; gap: 10px; font-size: 14px; letter-spacing: 0.02em; }
+.brand__mark { width: 14px; height: 14px; border-radius: 3px; background: linear-gradient(135deg, #8fb3ff, #d4e2ff); display: inline-block; }
+.brand__name { font-weight: 600; }
+.brand__sep { opacity: 0.5; }
+.brand__app { opacity: 0.85; letter-spacing: 0.12em; font-weight: 500; }
+.progress { height: 4px; background: rgba(255, 255, 255, 0.18); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+.progress__fill { height: 100%; width: 0; background: #a9c4ff; transition: width 400ms ease; }
+
+/* ---------- layout ---------- */
+.app { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 24px 16px 40px; outline: none; }
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 28px 24px;
+}
+.card + .card { margin-top: 16px; }
+.card--center { text-align: center; }
+@media (max-width: 520px) { .card { padding: 22px 18px 20px; } body { font-size: 16px; } }
+
+.footer { text-align: center; font-size: 13px; color: var(--ink-3); padding: 12px 16px 28px; }
+.footer a { color: var(--ink-2); }
+
+/* ---------- type ---------- */
+h1, h2, h3 { line-height: 1.25; margin: 0 0 10px; color: var(--navy); }
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
+h1 { font-size: 1.55rem; font-weight: 650; }
+h2 { font-size: 1.25rem; font-weight: 650; }
+h3 { font-size: 1.02rem; font-weight: 650; margin-top: 18px; }
+p { margin: 0 0 12px; }
+.muted { color: var(--ink-2); }
+.small { font-size: 0.9rem; }
+.kicker { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin-bottom: 6px; }
+.eyebrow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.tag { display: inline-block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--steel); background: #e9effa; padding: 4px 10px; border-radius: 999px; }
+.counter { font-size: 0.85rem; color: var(--ink-3); }
+.lead { font-size: 1.05rem; }
+
+/* ---------- consent ---------- */
+.consent-doc { max-height: 46vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; background: var(--surface-2); margin: 14px 0 18px; }
+.consent-doc h3 { margin-top: 14px; font-size: 0.98rem; }
+.consent-doc h3:first-child { margin-top: 0; }
+.consent-doc p { font-size: 0.95rem; }
+.statement { font-size: 0.95rem; background: #fbfcfe; border-left: 3px solid var(--steel); padding: 10px 14px; margin-bottom: 16px; }
+
+/* ---------- forms ---------- */
+.field { margin-bottom: 16px; }
+.field label, .field .label { display: block; font-weight: 600; margin-bottom: 6px; }
+.field select, .field input[type="text"], .field input[type="date"] {
+  width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--line-2); border-radius: 10px; background: #fff; color: var(--ink);
+}
+.field select:focus, .field input:focus { outline: 3px solid var(--focus); outline-offset: 1px; border-color: var(--steel); }
+.field--invalid select, .field--invalid input, .field--invalid .likert, .field--invalid .choices { border-color: var(--danger); box-shadow: 0 0 0 2px rgba(138, 59, 59, 0.15); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+@media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+fieldset { border: 0; padding: 0; margin: 0 0 18px; min-width: 0; }
+legend { font-weight: 600; padding: 0; margin-bottom: 8px; }
+
+/* Likert 1–5 */
+.likert { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; border: 1px solid transparent; border-radius: 10px; }
+.likert label { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 10px 4px; border: 1px solid var(--line-2); border-radius: 10px; background: #fff; cursor: pointer; text-align: center; font-size: 0.9rem; user-select: none; }
+.likert label span.n { font-weight: 700; font-size: 1.05rem; }
+.likert label span.t { font-size: 0.72rem; color: var(--ink-3); line-height: 1.2; }
+.likert input { position: absolute; opacity: 0; inset: 0; margin: 0; }
+.likert input:focus-visible + .n, .likert label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; }
+.likert label:has(input:checked) { background: var(--navy); border-color: var(--navy); color: #fff; }
+.likert label:has(input:checked) span.t { color: #d6e2ff; }
+@media (max-width: 420px) { .likert label span.t { display: none; } .likert label span.n { font-size: 1rem; } }
+
+/* Vertical radio choices (manipulation check) */
+.choices { display: flex; flex-direction: column; gap: 8px; border: 1px solid transparent; border-radius: 10px; }
+.choices label { position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; background: #fff; cursor: pointer; }
+.choices input { margin-top: 4px; flex: none; accent-color: var(--navy); }
+.choices label:has(input:checked) { border-color: var(--navy); background: #f2f5fb; }
+.choices label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; }
+
+/* ---------- scenario ---------- */
+.scenario__body p { font-size: 1.05rem; }
+.decision { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.options { display: grid; gap: 10px; }
+.option {
+  font: inherit; font-size: 1rem; font-weight: 600; text-align: left; width: 100%;
+  padding: 14px 16px; border: 1.5px solid var(--line-2); border-radius: 12px; background: #fff; color: var(--ink); cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.option:hover { border-color: var(--steel); background: var(--surface-2); }
+.option:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.option[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.confidence { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); animation: fade 220ms ease; }
+.confidence[hidden] { display: none; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ---------- analyst briefing ---------- */
+.analyst { display: flex; gap: 16px; align-items: flex-start; }
+.avatar { flex: none; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--steel)); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.02em; }
+.analyst__meta { font-size: 0.9rem; color: var(--ink-3); margin-bottom: 8px; }
+.analyst__name { font-weight: 650; color: var(--ink); }
+.speech { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; font-size: 1.05rem; }
+
+/* ---------- buttons ---------- */
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; align-items: center; }
+.actions--end { justify-content: flex-end; }
+.btn {
+  font: inherit; font-weight: 600; font-size: 1rem; padding: 12px 20px; border-radius: 10px; cursor: pointer;
+  border: 1.5px solid var(--steel); background: var(--steel); color: #fff; min-width: 140px;
+}
+.btn:hover { background: var(--steel-2); border-color: var(--steel-2); }
+.btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn--secondary { background: #fff; color: var(--navy); border-color: var(--line-2); }
+.btn--secondary:hover { background: var(--surface-2); border-color: var(--steel); }
+.btn--quiet { background: transparent; border-color: transparent; color: var(--ink-2); min-width: 0; padding-left: 8px; padding-right: 8px; }
+.btn--quiet:hover { background: var(--surface-2); border-color: transparent; }
+.btn--block { width: 100%; }
+@media (max-width: 520px) { .btn { width: 100%; } .actions { flex-direction: column; align-items: stretch; } }
+
+/* ---------- misc ---------- */
+.alert { border-radius: 10px; padding: 12px 14px; font-size: 0.95rem; margin: 0 0 14px; }
+.alert--error { background: #fbf0f0; color: var(--danger); border: 1px solid #ecd4d4; }
+.alert--info { background: #eef3fb; color: var(--navy-2); border: 1px solid #d6e0f2; }
+.notice { font-size: 0.92rem; color: var(--ink-2); }
+.divider { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
+.contact { font-size: 0.88rem; color: var(--ink-2); }
+.status-list { list-style: none; padding: 0; margin: 0; }
+.mt-8 { margin-top: 8px; }
+.mt-14 { margin-top: 14px; }
+.mt-18 { margin-top: 18px; }
+.progress__fill--full { width: 100%; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- admin ---------- */
+.admin table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 0.95rem; }
+.admin th, .admin td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.admin th:first-child, .admin td:first-child { text-align: left; }
+.admin thead th { color: var(--ink-3); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.admin tfoot td { font-weight: 700; }
+.admin code { background: var(--surface-2); padding: 2px 6px; border-radius: 6px; font-size: 0.9em; }
+
+
+/* standalone preview additions */
+.preview { background: #fff7e6; border-bottom: 1px solid #f0dcb0; color: #5a4a1e; font-size: 0.88rem; }
+.preview__inner { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.preview__inner strong { font-weight: 650; }
+.preview label { display: inline-flex; align-items: center; gap: 6px; }
+.preview select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1px solid #d8c48f; background: #fff; color: inherit; }
+.record { margin-top: 16px; }
+.record table { width: 100%; border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.record th, .record td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.record th { color: var(--ink-3); font-weight: 600; width: 42%; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.82rem; }
+.record__wrap { overflow-x: auto; }
+.record .pill { display: inline-block; background: #e9effa; color: var(--steel); border-radius: 999px; padding: 2px 10px; font-weight: 600; font-size: 0.85rem; }
+
+</style>
+</head>
+<body>
+<a class="skip" href="#app">Skip to content</a>
+<header class="topbar">
+  <div class="topbar__inner">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">Meridian Group</span>
+      <span class="brand__sep" aria-hidden="true">·</span>
+      <span class="brand__app">THRESHOLD</span>
+    </div>
+    <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="progress__fill" id="progress-fill"></div>
+    </div>
+  </div>
+</header>
+<div class="preview" role="region" aria-label="Researcher preview controls">
+  <div class="preview__inner">
+    <span><strong>Researcher preview.</strong> Runs entirely in your browser; nothing is recorded or sent.</span>
+    <label for="preview-condition">Condition for the next session
+      <select id="preview-condition">
+        <option value="random" selected>Random (as in the study)</option>
+        <option value="A">A · Epistemic + Gain</option>
+        <option value="B">B · Epistemic + Loss</option>
+        <option value="C">C · Aleatory + Gain</option>
+        <option value="D">D · Aleatory + Loss</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="preview-debrief"> Show immediate debrief (Appendix C.2) on the closing screen</label>
+  </div>
+</div>
+<main id="app" class="app" tabindex="-1">
+  <div class="card card--center"><p class="muted">Loading…</p></div>
+</main>
+<footer class="footer">
+  <p>Columbia University IRB-ACYY3579 · Questions: CU_ERM_Research@columbia.edu</p>
+</footer>
+<script type="module">
+// Study instrument text. Source: Stand-Alone Research Protocol v1.3 (28 Sept 2026),
+// Appendix B (study instrument) and Appendix C (closing screen). Text is reproduced
+// verbatim; the only edit is a typo fix in Scenario 3, condition D ("due non-compliance"
+// -> "due to non-compliance"), noted in docs/BUILD_DECISIONS.md.
+//
+// Everything that varies by condition is kept here, server-side, and is only ever sent
+// to a participant for the condition they were assigned.
+
+const INSTRUMENT_VERSION = 'protocol-v1.3-appendixB';
+const CONSENT_VERSION = 'consent-draft-2026-09-28';
+
+const CONDITIONS = {
+  A: { uncertainty: 'epistemic', framing: 'gain' },
+  B: { uncertainty: 'epistemic', framing: 'loss' },
+  C: { uncertainty: 'aleatory', framing: 'gain' },
+  D: { uncertainty: 'aleatory', framing: 'loss' },
+};
+
+const ORGANISATION = {
+  name: 'Meridian Group',
+  role: 'Chief Risk Officer',
+  analyst: 'Dr. Vale',
+  analystTitle: 'Strategy Analyst, Meridian Group',
+};
+
+// ---------------------------------------------------------------------------
+// Screen 2: CRO profile (onboarding items). Gender, age and country are not collected.
+// ---------------------------------------------------------------------------
+const PROFILE_ITEMS = [
+  {
+    id: 'education',
+    label: 'Highest education completed',
+    options: ['High school', "Bachelor's", "Master's", 'Doctorate', 'Other / Prefer not to say'],
+  },
+  {
+    id: 'job_function',
+    label: 'Job function',
+    options: [
+      'ERM',
+      'Operational risk',
+      'Financial risk',
+      'Credit or market risk',
+      'Compliance',
+      'Internal audit',
+      'Internal controls',
+      'IT or cyber risk',
+      'Business continuity',
+      'GRC',
+      'Other',
+      'Prefer not to say',
+    ],
+  },
+  {
+    id: 'years_experience',
+    label: 'Years of professional work experience',
+    options: ['2–4', '5–9', '10–14', '15+', 'Prefer not to say'],
+  },
+  {
+    id: 'seniority',
+    label: 'Seniority',
+    options: [
+      'Analyst or associate',
+      'Manager',
+      'Senior manager or director',
+      'Executive',
+      'Other',
+      'Prefer not to say',
+    ],
+  },
+  {
+    id: 'industry',
+    label: 'Industry',
+    options: [
+      'Financial services',
+      'Consulting',
+      'Technology',
+      'Manufacturing',
+      'Energy',
+      'Healthcare',
+      'Government or non-profit',
+      'Other / Prefer not to say',
+    ],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Screen 3: Decision-making style (risk propensity; DOSPERT-adapted, 1–5).
+// Items 2 and 3 are reverse-scored at analysis time.
+// ---------------------------------------------------------------------------
+const STYLE_HEADING = 'Decision-making style';
+const STYLE_INSTRUCTION = 'Rate your agreement with each statement (1 = strongly disagree, 5 = strongly agree).';
+const STYLE_ITEMS = [
+  { id: 'rp_1', text: 'I generally enjoy taking calculated risks.', reverse: false },
+  { id: 'rp_2', text: 'I prefer certainty over chasing upside.', reverse: true },
+  { id: 'rp_3', text: 'I tend to avoid situations with unclear outcomes.', reverse: true },
+];
+
+// ---------------------------------------------------------------------------
+// Screen 4: Analyst briefing (varies by uncertainty condition only).
+// ---------------------------------------------------------------------------
+const BRIEFING = {
+  epistemic:
+    'Welcome to your first day. I’ll be direct: the crises you are about to face are the kind where our analysts cannot put a reliable number on the odds. The data we have is thin, the situations are new, and the honest answer to ‘how likely is this?’ is that we do not yet know.',
+  aleatory:
+    'Welcome to your first day. I’ll be direct: for the crises you are about to face, our analysts have good historical data and can estimate the odds. But these are situations driven by chance — more monitoring will not change the number, and the outcome could still go either way.',
+};
+
+// ---------------------------------------------------------------------------
+// Screen 5: Crisis scenarios. Context is identical across conditions; the framing
+// paragraph varies by condition (A–D). Presentation order is fixed (1–4) with the
+// data-quality item between scenarios 2 and 3.
+// ---------------------------------------------------------------------------
+const DECISION_OPTIONS = [
+  { value: 'increase', label: 'Increase risk exposure', score: 1 },
+  { value: 'maintain', label: 'Maintain current level', score: 0 },
+  { value: 'decrease', label: 'Decrease risk exposure', score: -1 },
+];
+
+const CONFIDENCE_QUESTION = 'How confident are you in this decision?';
+const CONFIDENCE_ANCHORS = { low: 'Not at all confident', high: 'Very confident' };
+
+const SCENARIOS = [
+  {
+    id: 1,
+    key: 'data_breach',
+    title: 'Data Breach Exposure',
+    domain: 'Cybersecurity',
+    context:
+      'Your organization stores significant customer and financial data across distributed systems.',
+    framing: {
+      A: 'Security analysts cannot determine the precise breach probability — threat patterns are evolving rapidly and historical data is insufficient. Maintaining current practices may enable faster digital product rollout and first-mover advantage if a breach does not occur.',
+      B: 'Security analysts cannot determine the precise breach probability — threat patterns are evolving rapidly and historical data is insufficient. If a breach occurs, the organization could face material regulatory fines and lasting reputational harm.',
+      C: 'Industry-wide data places the annual breach probability at approximately 12%, driven by unpredictable adversarial behavior that cannot be controlled. If no breach occurs this year, the organization will retain a strong competitive position in digital services.',
+      D: 'Industry-wide data places the annual breach probability at approximately 12%, driven by unpredictable adversarial behavior that cannot be controlled. If a breach occurs, the organization could face material regulatory fines and lasting reputational harm.',
+    },
+  },
+  {
+    id: 2,
+    key: 'supplier_concentration',
+    title: 'Supplier Concentration Risk',
+    domain: 'Supply chain',
+    context: 'Over 60% of critical components are sourced from a single geographic region.',
+    framing: {
+      A: 'Analysts cannot model the probability of a major supply disruption — geopolitical signals are mixed and macroeconomic forecasts diverge. Maintaining this concentration preserves strong unit economics and preferred supplier pricing that are difficult to replicate.',
+      B: 'Analysts cannot model the probability of a major supply disruption — geopolitical signals are mixed and macroeconomic forecasts diverge. A disruption could halt production for 6+ months and result in material contract penalties.',
+      C: 'Historical data suggests a 10% annual probability of significant regional disruption, driven by random weather, political, and logistical events outside the firm’s control. If no disruption occurs, the concentrated model yields superior margins and faster time-to-market.',
+      D: 'Historical data suggests a 10% annual probability of significant regional disruption, driven by random weather, political, and logistical events outside the firm’s control. A disruption could halt production for 6+ months and result in material contract penalties.',
+    },
+  },
+  {
+    id: 3,
+    key: 'compliance_gap',
+    title: 'Compliance Gap in Emerging Regulation',
+    domain: 'Regulatory',
+    context:
+      'A new regulatory framework is being finalized that may affect core operations. Legal counsel has identified a compliance gap that would take 18 months to close.',
+    framing: {
+      A: 'Regulators have not clarified enforcement priorities, and the probability of formal action is unknown. Delaying investment in compliance frees capital for higher-return initiatives if enforcement remains lenient.',
+      B: 'Regulators have not clarified enforcement priorities, and the probability of formal action is unknown. If an enforcement action is taken due to non-compliance, penalties and operational restrictions could severely impact business continuity.',
+      C: 'Enforcement data across peer firms places the probability of regulatory action at 18% over 24 months, driven by unpredictable regulatory cycles independent of the firm’s actual compliance posture. If no action is taken, delayed investment in compliance could be redeployed into higher-return initiatives.',
+      D: 'Enforcement data across peer firms places the probability of action at 18% over 24 months, driven by unpredictable regulatory cycles independent of the firm’s actual compliance posture. If an enforcement action is taken due to non-compliance, penalties and operational restrictions could severely impact business continuity.',
+    },
+  },
+  {
+    id: 4,
+    key: 'political_instability',
+    title: 'Political Instability in Operational Regions',
+    domain: 'Geopolitical',
+    context:
+      'Significant operational and commercial exposure exists in three emerging-market countries currently experiencing political tension.',
+    framing: {
+      A: 'Political analysts cannot assign reliable probabilities to escalation scenarios — government behavior is unpredictable and intelligence is incomplete. Maintaining regional presence preserves first-mover advantage and hard-to-replicate local relationships.',
+      B: 'Political analysts cannot assign reliable probabilities to escalation scenarios — government behavior is unpredictable and intelligence is incomplete. Escalation could result in asset seizure, forced exit, or operational shutdown with limited legal recourse.',
+      C: 'Country risk models estimate a 16% annual disruption probability based on historical base rates for similar regimes — a figure that cannot meaningfully be reduced through monitoring. If stability holds, regional revenues are projected to grow at above average rates this year.',
+      D: 'Country risk models estimate a 16% annual disruption probability based on historical base rates for similar regimes — a figure that cannot meaningfully be reduced through monitoring. Escalation could result in asset seizure or operational shutdown with limited legal recourse.',
+    },
+  },
+];
+
+// Data quality item (attention check). Shown between scenarios 2 and 3, all conditions.
+// Styled identically to a scenario. Not scored. Correct response: "maintain".
+const ATTENTION_CHECK = {
+  key: 'internal_review',
+  title: 'Internal Review',
+  domain: 'Internal audit',
+  context:
+    'The internal audit team has completed its routine quarterly review. No material findings were identified and all controls operate as designed.',
+  framing: 'For this item, please select “Maintain current level.”',
+  correct: 'maintain',
+};
+
+// ---------------------------------------------------------------------------
+// Screen 6: Manipulation check, embedded in the closing narrative.
+// The two framing sentences below are the only text on this screen that is not in
+// Appendix B; they exist to keep the items inside the game's narrative.
+// ---------------------------------------------------------------------------
+const MANIPULATION_CHECK = {
+  heading: 'End of day one',
+  intro:
+    'Before you leave, Dr. Vale asks for a quick read on how today’s briefings came across to you.',
+  items: [
+    {
+      id: 'mc_uncertainty',
+      question: 'In the crises you faced, how would you describe the nature of the uncertainty?',
+      options: [
+        { value: 1, label: 'The probability was unknown or could not be estimated' },
+        { value: 2, label: 'The probability was estimated from data, but the outcomes were inherently random' },
+        { value: 3, label: 'Not sure' },
+      ],
+    },
+    {
+      id: 'mc_framing',
+      question: 'How were the potential outcomes described?',
+      options: [
+        { value: 1, label: 'As opportunities / upside' },
+        { value: 2, label: 'As threats / downside' },
+        { value: 3, label: 'About equally both ways' },
+      ],
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Screen 7: Closing screen (Appendix C.1) and optional immediate debrief (C.2).
+// ---------------------------------------------------------------------------
+const CLOSING = {
+  paragraphs: [
+    'Thank you for playing THRESHOLD and for taking part in this research.',
+    'Meridian Group and the situations in the game are fictional, though based on situations risk professionals commonly face. Your decisions have no effect on you or anyone else, and there were no right or wrong answers.',
+    'As explained in the consent form, some details of what we are studying were not described during the study. We will explain the study in full in the summary of findings once the study is complete. If you would like early access to that summary, you can leave your email on the next screen.',
+    'Because other people may still take part, please do not discuss the game or your choices with others until the study is complete. Thank you for helping keep the results accurate.',
+  ],
+  decision:
+    'Please choose whether we may use your responses. Your responses are stored under a random code and are not linked to your name. If you choose “Withdraw my responses,” they will be deleted and not used. Because your responses are not linked to your name, we cannot remove them after you leave this page.',
+  submitLabel: 'Submit my responses',
+  withdrawLabel: 'Withdraw my responses',
+  contact:
+    'Questions about the study: Jana Chamsi Bacha and Meher Jain at CU_ERM_Research@columbia.edu. Questions about your rights as a research participant: Columbia University Institutional Review Board, askirb@columbia.edu or (212) 851-7040.',
+  followupPrompt:
+    'Want early access to the findings? Leave your email here and we will send you a summary of the results, including a full explanation of the study, once it is complete. This form is not connected to your game responses.',
+};
+
+// Appendix C.2: used only when IMMEDIATE_DEBRIEF=true (if the IRB requires it).
+const IMMEDIATE_DEBRIEF = {
+  heading: 'About this study',
+  paragraphs: [
+    'Thank you again for taking part in THRESHOLD. Here is the full picture.',
+    'This study looked at how the wording of risk information affects decisions. Every participant saw the same four business situations, but there were four versions of the game, and each participant was assigned to one of them at random. The versions differed in two ways: (1) whether the uncertainty was described as something nobody could put a number on, or as a known probability driven by chance; and (2) whether what was at stake was described as a possible gain or a possible loss. We did not describe this during the study because knowing it could have changed how people answered.',
+    'If you have any questions, please contact Jana Chamsi Bacha (jc6471@columbia.edu) or Meher Jain (mj3266@columbia.edu). Questions about your rights as a research participant may be directed to the Columbia University Institutional Review Board at askirb@columbia.edu or (212) 851-7040.',
+  ],
+};
+
+/** Materials for one assigned condition: the only condition-specific text a client ever receives. */
+function materialsFor(condition) {
+  const spec = CONDITIONS[condition];
+  if (!spec) throw new Error(`Unknown condition ${condition}`);
+  return {
+    organisation: ORGANISATION,
+    briefing: BRIEFING[spec.uncertainty],
+    scenarios: SCENARIOS.map((s) => ({
+      id: s.id,
+      key: s.key,
+      title: s.title,
+      domain: s.domain,
+      context: s.context,
+      framing: s.framing[condition],
+    })),
+    attentionCheck: {
+      key: ATTENTION_CHECK.key,
+      title: ATTENTION_CHECK.title,
+      domain: ATTENTION_CHECK.domain,
+      context: ATTENTION_CHECK.context,
+      framing: ATTENTION_CHECK.framing,
+    },
+    decisionOptions: DECISION_OPTIONS.map(({ value, label }) => ({ value, label })),
+    confidence: { question: CONFIDENCE_QUESTION, anchors: CONFIDENCE_ANCHORS },
+    manipulationCheck: MANIPULATION_CHECK,
+    closing: CLOSING,
+  };
+}
+
+/** Condition-independent materials, safe to send before assignment. */
+function publicMaterials() {
+  return {
+    organisation: ORGANISATION,
+    profileItems: PROFILE_ITEMS,
+    style: { heading: STYLE_HEADING, instruction: STYLE_INSTRUCTION, items: STYLE_ITEMS.map(({ id, text }) => ({ id, text })) },
+  };
+}
+
+// Electronic informed consent form shown on Screen 1.
+//
+// DRAFT. The protocol (v1.3, §7) describes the content of the consent form and states that
+// the approved form is "attached separately" to the IRB submission. That attachment was not
+// available when this build was made, so the text below was drafted from Protocol §§7, 11,
+// 12, 13 and the September 2026 working draft. Replace it with the IRB-approved wording
+// before data collection and bump CONSENT_VERSION in content.js when you do.
+//
+// Served (a) inside the app on the consent screen and (b) as a printable page at /consent.
+
+const CONSENT_TITLE = 'Decision-Making in Organizational Risk Scenarios';
+const CONSENT_SUBTITLE = 'Informed consent to take part in a research study';
+
+const CONSENT_SECTIONS = [
+  {
+    heading: 'Who is doing this study',
+    body: [
+      'This research is conducted by Jana Chamsi Bacha and Meher Jain, M.S. in Enterprise Risk Management, Columbia University School of Professional Studies, under the supervision of Principal Investigator Richard J. Lauria. Columbia University IRB protocol IRB-ACYY3579.',
+    ],
+  },
+  {
+    heading: 'Why we are doing this study',
+    body: [
+      'We are studying how people with work experience make decisions about business risks. The results will help us understand how risk information is used in organizations and how it might be communicated better.',
+    ],
+  },
+  {
+    heading: 'What you will do',
+    body: [
+      'You will play THRESHOLD, a short online decision simulation. You will take the role of the Chief Risk Officer of a fictional company and respond to four short business scenarios, choosing one of three actions for each and rating how confident you are. You will also answer a few short questions about your professional background and your general approach to decisions, and two brief questions at the end. The session takes about 6–10 minutes and is completed in one sitting. There are no right or wrong answers.',
+    ],
+  },
+  {
+    heading: 'Important information about the design of this study',
+    body: [
+      'For scientific reasons, this form does not describe every detail of what is being studied, and those details will not be described during the study. Nothing you are told during the session is untrue. The study will be explained in full in the summary of findings provided once the study is complete, which you can choose to receive by email.',
+    ],
+  },
+  {
+    heading: 'What we record',
+    body: [
+      'We record your answers, the decisions you make, how confident you are in each decision, and how long you take to make each decision. We do not record your name, email address, employer, IP address or any device identifier with your responses. Your responses are stored under a randomly generated session code.',
+    ],
+  },
+  {
+    heading: 'Risks and benefits',
+    body: [
+      'This study involves no more than minimal risk. The scenarios are fictional and have no consequences for you. Some people may find making decisions in hypothetical risk situations mildly stressful; you may stop at any time by closing the browser. The main residual risk is a breach of confidentiality, which we minimize by collecting no identifiers with your responses and by restricting access to the study team.',
+      'There is no direct benefit to you from taking part. If you choose, you will receive early access to a plain-language summary of the findings, including a full explanation of the study, before it is published. Participation is voluntary and unpaid.',
+    ],
+  },
+  {
+    heading: 'Confidentiality',
+    body: [
+      'Your typed name and the date on this form are stored in a separate consent log that contains no link to your responses, so your responses cannot be traced back to you, including by the investigators. Data are transmitted over an encrypted connection and stored in an access-controlled database available only to the Principal Investigator and the two co-investigators. Anonymous response data (without the consent log) may be shared publicly on the Open Science Framework and used in future research. Records are retained for at least three years after the study closes.',
+    ],
+  },
+  {
+    heading: 'Your participation is voluntary',
+    body: [
+      'You may stop at any time by closing the browser; incomplete sessions are not used. At the end of the session you will choose whether to submit or withdraw your responses. Because your responses are not linked to your name, they cannot be withdrawn after you leave that final screen.',
+      'If you were invited by someone at Columbia University, your decision to take part or not has no effect on your grades, student status, employment or your relationship with Columbia or with anyone who invited you.',
+    ],
+  },
+  {
+    heading: 'Questions',
+    body: [
+      'Questions about the study: Jana Chamsi Bacha and Meher Jain, CU_ERM_Research@columbia.edu. Questions about your rights as a research participant: Columbia University Institutional Review Board, askirb@columbia.edu or (212) 851-7040.',
+    ],
+  },
+];
+
+const CONSENT_STATEMENT =
+  'By typing my full name and the date below and selecting “I agree,” I confirm that I am 18 years of age or older, that I have read this consent form, that my questions (if any) have been answered, and that I agree to take part in this study. I understand that some details of the study are not described here and will be explained in the summary of findings.';
+
+const CONSENT_AGREE_LABEL = 'I agree';
+const CONSENT_DECLINE_LABEL = 'I do not agree';
+
+const escConsent = (s) =>
+  String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+/** Consent as a JSON-serialisable object for the app. */
+function consentPayload() {
+  return {
+    title: CONSENT_TITLE,
+    subtitle: CONSENT_SUBTITLE,
+    sections: CONSENT_SECTIONS,
+    statement: CONSENT_STATEMENT,
+    agreeLabel: CONSENT_AGREE_LABEL,
+    declineLabel: CONSENT_DECLINE_LABEL,
+  };
+}
+
+/** Stand-alone printable HTML page for /consent. */
+function consentPrintHtml(version) {
+  const sections = CONSENT_SECTIONS.map(
+    (s) => `<h2>${escConsent(s.heading)}</h2>${s.body.map((p) => `<p>${escConsent(p)}</p>`).join('')}`,
+  ).join('');
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escConsent(CONSENT_TITLE)} — Consent form</title>
+<style>
+body{font-family:Georgia,"Times New Roman",serif;max-width:46rem;margin:2rem auto;padding:0 1rem;line-height:1.55;color:#111}
+h1{font-size:1.5rem;margin-bottom:.25rem}h2{font-size:1.05rem;margin:1.4rem 0 .3rem}
+.sub{color:#444;margin-top:0}.stmt{border-top:1px solid #999;margin-top:2rem;padding-top:1rem}
+.sig{margin-top:1.5rem}.sig div{margin:.8rem 0}.line{display:inline-block;border-bottom:1px solid #000;min-width:18rem}
+.ver{color:#666;font-size:.8rem;margin-top:2rem}
+@media print{button{display:none}}
+</style></head><body>
+<button onclick="window.print()">Print or save as PDF</button>
+<h1>${escConsent(CONSENT_TITLE)}</h1>
+<p class="sub">${escConsent(CONSENT_SUBTITLE)} · Columbia University IRB-ACYY3579</p>
+${sections}
+<div class="stmt"><p>${escConsent(CONSENT_STATEMENT)}</p></div>
+<div class="sig"><div>Full name: <span class="line"></span></div><div>Date: <span class="line"></span></div></div>
+<p class="ver">Consent form version ${escConsent(version)}</p>
+</body></html>`;
+}
+
+// Server-side validation and normalisation of a submitted session.
+// Everything is checked against the allowed values in content.js; anything else is rejected.
+
+
+
+const SCORE = Object.fromEntries(DECISION_OPTIONS.map((o) => [o.value, o.score]));
+const MAX_LATENCY_SEC = 7 * 24 * 3600; // anything beyond a week is a client bug, not a participant
+const MAX_DURATION_SEC = 7 * 24 * 3600;
+
+const isInt = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+const isFiniteNum = (v) => typeof v === 'number' && Number.isFinite(v);
+const parseIso = (s) => (typeof s === 'string' && !Number.isNaN(Date.parse(s)) ? new Date(s) : null);
+
+function validateConsent(body) {
+  const errors = [];
+  const fullName = typeof body?.fullName === 'string' ? body.fullName.trim().replace(/\s+/g, ' ') : '';
+  const consentDate = typeof body?.consentDate === 'string' ? body.consentDate.trim() : '';
+  if (fullName.length < 2 || fullName.length > 200) errors.push('fullName must be 2–200 characters');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(consentDate) || Number.isNaN(Date.parse(consentDate))) errors.push('consentDate must be YYYY-MM-DD');
+  return { ok: errors.length === 0, errors, fullName, consentDate };
+}
+
+/**
+ * Validate a submission payload. Returns { ok, errors, row } where row has the column names
+ * used in db.js. Latencies are in seconds (client measures with performance.now()).
+ */
+function validateSubmission(payload) {
+  const errors = [];
+  const row = {};
+  if (!payload || typeof payload !== 'object') return { ok: false, errors: ['payload must be an object'], row };
+
+  // Timing
+  const consentAt = parseIso(payload.clientConsentAt);
+  const mcAt = parseIso(payload.clientMcAt);
+  if (!consentAt) errors.push('clientConsentAt missing or invalid');
+  if (!mcAt) errors.push('clientMcAt missing or invalid');
+  if (consentAt && mcAt) {
+    const dur = (mcAt - consentAt) / 1000;
+    if (!(dur > 0 && dur < MAX_DURATION_SEC)) errors.push('duration out of range');
+    row.client_consent_at = consentAt.toISOString();
+    row.client_mc_at = mcAt.toISOString();
+    row.duration_sec = Math.round(dur * 1000) / 1000;
+  }
+
+  // Profile
+  const profile = payload.profile ?? {};
+  for (const item of PROFILE_ITEMS) {
+    const v = profile[item.id];
+    if (!item.options.includes(v)) errors.push(`profile.${item.id} invalid`);
+    else row[item.id] = v;
+  }
+
+  // Risk propensity (raw)
+  const style = payload.style ?? {};
+  for (const item of STYLE_ITEMS) {
+    const v = style[item.id];
+    if (!isInt(v, 1, 5)) errors.push(`style.${item.id} must be an integer 1–5`);
+  }
+  row.rp_1 = style.rp_1;
+  row.rp_2_raw = style.rp_2;
+  row.rp_3_raw = style.rp_3;
+
+  // Decisions
+  const decisions = Array.isArray(payload.decisions) ? payload.decisions : [];
+  if (decisions.length !== SCENARIOS.length) errors.push(`decisions must have ${SCENARIOS.length} entries`);
+  const seen = new Set();
+  const order = [];
+  for (const d of decisions) {
+    const id = d?.scenarioId;
+    if (!isInt(id, 1, SCENARIOS.length) || seen.has(id)) {
+      errors.push('decisions.scenarioId invalid or duplicated');
+      continue;
+    }
+    seen.add(id);
+    order.push(id);
+    if (!(d.choice in SCORE)) errors.push(`decision ${id}: choice invalid`);
+    if (!isInt(d.confidence, 1, 5)) errors.push(`decision ${id}: confidence must be 1–5`);
+    if (!(isFiniteNum(d.latency) && d.latency > 0 && d.latency < MAX_LATENCY_SEC)) errors.push(`decision ${id}: latency out of range`);
+    if (!(isFiniteNum(d.latencyFirst) && d.latencyFirst > 0 && d.latencyFirst <= (d.latency ?? Infinity) + 1e-6)) errors.push(`decision ${id}: latencyFirst out of range`);
+    row[`dec_${id}`] = SCORE[d.choice];
+    row[`conf_${id}`] = d.confidence;
+    row[`lat_${id}`] = round3(d.latency);
+    row[`lat_first_${id}`] = round3(d.latencyFirst);
+    row[`hidden_${id}`] = d.hidden ? 1 : 0;
+  }
+  row.scenario_order = order.join(',');
+
+  // Attention check
+  const attn = payload.attention ?? {};
+  if (!(attn.choice in SCORE)) errors.push('attention.choice invalid');
+  else row.attn_response = SCORE[attn.choice];
+  if (!(isFiniteNum(attn.latency) && attn.latency > 0 && attn.latency < MAX_LATENCY_SEC)) errors.push('attention.latency out of range');
+  else row.attn_latency = round3(attn.latency);
+
+  // Manipulation checks
+  const mc = payload.manipulation ?? {};
+  for (const item of MANIPULATION_CHECK.items) {
+    const allowed = item.options.map((o) => o.value);
+    if (!allowed.includes(mc[item.id])) errors.push(`manipulation.${item.id} invalid`);
+    else row[item.id] = mc[item.id];
+  }
+
+  row.raw_json = JSON.stringify(payload);
+  return { ok: errors.length === 0, errors, row };
+}
+
+function round3(x) {
+  return Math.round(x * 1000) / 1000;
+}
+
+// Derived variables (Data Dictionary, Development Record Part VI) and CSV export.
+// Raw columns are stored; everything below is computed at export time so the rule set
+// is in one place and can be checked against the pre-registration.
+
+
+
+const ATTN_CORRECT_SCORE = DECISION_OPTIONS.find((o) => o.value === ATTENTION_CHECK.correct).score;
+const MIN_DURATION_SEC = 90; // pre-registered exclusion: session completion time under 90 seconds
+
+const mean = (xs) => {
+  const v = xs.filter((x) => x !== null && x !== undefined);
+  return v.length ? round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+};
+const round = (x, d = 3) => (x === null || x === undefined ? null : Math.round(x * 10 ** d) / 10 ** d);
+const bool = (b) => (b === null || b === undefined ? null : b ? 'TRUE' : 'FALSE');
+
+/** Compute every derived variable for one stored session row. */
+function derive(row) {
+  const spec = CONDITIONS[row.condition];
+  const submitted = row.status === 'submitted';
+
+  const decs = [1, 2, 3, 4].map((i) => row[`dec_${i}`]);
+  const confs = [1, 2, 3, 4].map((i) => row[`conf_${i}`]);
+  const lats = [1, 2, 3, 4].map((i) => row[`lat_${i}`]);
+  const nDecisions = decs.filter((d) => d !== null && d !== undefined).length;
+  const riskTakingScore = nDecisions === 4 ? decs.reduce((a, b) => a + b, 0) : null;
+
+  const rp2 = row.rp_2_raw == null ? null : 6 - row.rp_2_raw;
+  const rp3 = row.rp_3_raw == null ? null : 6 - row.rp_3_raw;
+  const riskPropensity = row.rp_1 != null && rp2 != null && rp3 != null ? round((row.rp_1 + rp2 + rp3) / 3) : null;
+
+  const demographicsComplete = submitted
+    ? ['education', 'job_function', 'years_experience', 'seniority', 'industry'].every((k) => row[k] != null && row[k] !== '')
+    : null;
+
+  const attnPass = row.attn_response == null ? null : row.attn_response === ATTN_CORRECT_SCORE;
+
+  const mcUncCorrect =
+    row.mc_uncertainty == null ? null : (spec.uncertainty === 'epistemic' && row.mc_uncertainty === 1) || (spec.uncertainty === 'aleatory' && row.mc_uncertainty === 2);
+  const mcFrmCorrect =
+    row.mc_framing == null ? null : (spec.framing === 'gain' && row.mc_framing === 1) || (spec.framing === 'loss' && row.mc_framing === 2);
+
+  const latencyMean = mean(lats);
+  const confidenceMean = mean(confs);
+
+  // Exclusion flags only apply to submitted sessions; started/withdrawn rows carry NULLs.
+  let excl = { excl_duration: null, excl_attention: null, excl_incomplete: null, excl_demographics: null };
+  let excludedAny = null;
+  let reason = null;
+  if (submitted) {
+    excl = {
+      excl_duration: row.duration_sec != null && row.duration_sec < MIN_DURATION_SEC,
+      excl_attention: attnPass === false,
+      excl_incomplete: nDecisions < 4,
+      excl_demographics: demographicsComplete === false,
+    };
+    const reasons = Object.entries(excl).filter(([, v]) => v).map(([k]) => k.replace('excl_', ''));
+    excludedAny = reasons.length > 0;
+    reason = reasons.length ? reasons.join(';') : 'none';
+  }
+
+  const completionStatus = row.status === 'submitted' ? 'complete' : row.status === 'withdrawn' ? 'withdrawn' : 'abandoned';
+
+  return {
+    session_uuid: row.session_uuid,
+    condition: row.condition,
+    uncertainty_type: spec.uncertainty,
+    framing: spec.framing,
+    status: row.status,
+    completion_status: completionStatus,
+    started_at: row.started_at,
+    ended_at: row.ended_at,
+    client_consent_at: row.client_consent_at,
+    client_mc_at: row.client_mc_at,
+    duration_sec: row.duration_sec,
+    instrument_version: row.instrument_version,
+    consent_version: row.consent_version,
+    randomisation: row.randomisation,
+
+    education: row.education,
+    job_function: row.job_function,
+    years_experience: row.years_experience,
+    seniority: row.seniority,
+    industry: row.industry,
+    demographics_complete: bool(demographicsComplete),
+
+    rp_1: row.rp_1,
+    rp_2_raw: row.rp_2_raw,
+    rp_3_raw: row.rp_3_raw,
+    rp_2: rp2,
+    rp_3: rp3,
+    risk_propensity: riskPropensity,
+
+    dec_1: decs[0], dec_2: decs[1], dec_3: decs[2], dec_4: decs[3],
+    n_decisions: submitted ? nDecisions : null,
+    risk_taking_score: riskTakingScore,
+    pct_increase: nDecisions === 4 ? (decs.filter((d) => d === 1).length / 4) * 100 : null,
+    pct_maintain: nDecisions === 4 ? (decs.filter((d) => d === 0).length / 4) * 100 : null,
+    pct_decrease: nDecisions === 4 ? (decs.filter((d) => d === -1).length / 4) * 100 : null,
+    scenario_order: row.scenario_order,
+
+    conf_1: confs[0], conf_2: confs[1], conf_3: confs[2], conf_4: confs[3],
+    confidence_mean: confidenceMean,
+
+    lat_1: lats[0], lat_2: lats[1], lat_3: lats[2], lat_4: lats[3],
+    lat_first_1: row.lat_first_1, lat_first_2: row.lat_first_2, lat_first_3: row.lat_first_3, lat_first_4: row.lat_first_4,
+    hidden_1: row.hidden_1, hidden_2: row.hidden_2, hidden_3: row.hidden_3, hidden_4: row.hidden_4,
+    latency_mean: latencyMean,
+    log_latency: latencyMean != null && latencyMean > 0 ? round(Math.log(latencyMean), 4) : null,
+
+    attn_response: row.attn_response,
+    attn_latency: row.attn_latency,
+    attn_pass: bool(attnPass),
+
+    mc_uncertainty: row.mc_uncertainty,
+    mc_framing: row.mc_framing,
+    mc_uncertainty_correct: bool(mcUncCorrect),
+    mc_framing_correct: bool(mcFrmCorrect),
+    mc_both_correct: bool(mcUncCorrect == null || mcFrmCorrect == null ? null : mcUncCorrect && mcFrmCorrect),
+
+    excl_duration: bool(excl.excl_duration),
+    excl_attention: bool(excl.excl_attention),
+    excl_incomplete: bool(excl.excl_incomplete),
+    excl_demographics: bool(excl.excl_demographics),
+    excluded_any: bool(excludedAny),
+    exclusion_reason: reason,
+    analysis_sample: bool(excludedAny == null ? null : !excludedAny),
+  };
+}
+
+const EXPORT_COLUMNS = Object.keys(
+  derive({ session_uuid: 'x', condition: 'A', status: 'started', started_at: '', rp_2_raw: null, rp_3_raw: null }),
+);
+
+function toCsv(objects, columns = EXPORT_COLUMNS) {
+  const escape = (v) => {
+    if (v === null || v === undefined) return '';
+    const s = String(v);
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [columns.join(',')];
+  for (const o of objects) lines.push(columns.map((c) => escape(o[c])).join(','));
+  return lines.join('\r\n') + '\r\n';
+}
+
+function consentCsv(records) {
+  return toCsv(records, ['id', 'full_name', 'consent_date', 'recorded_at', 'consent_version']);
+}
+
+
+// ---------------------------------------------------------------------------
+// Standalone glue: in-browser replacement for the server
+// ---------------------------------------------------------------------------
+const CONDITION_NAMES = { A: 'Epistemic + Gain', B: 'Epistemic + Loss', C: 'Aleatory + Gain', D: 'Aleatory + Loss' };
+const store = { sessions: new Map(), consentLog: [] };
+let lastRecord = null;
+
+const localConfig = {
+  studyClosed: false,
+  followupFormUrl: '',
+  immediateDebrief: false,
+  immediateDebriefText: null,
+  versions: { instrument: INSTRUMENT_VERSION + '+standalone', consent: CONSENT_VERSION },
+  consent: consentPayload(),
+  ...publicMaterials(),
+};
+
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = (Math.random() * 16) | 0; return (c === 'x' ? r : (r & 3) | 8).toString(16); }));
+const fail = (status, message, details) => { const e = new Error(message); e.status = status; e.details = details; throw e; };
+
+function pickCondition() {
+  const sel = document.getElementById('preview-condition');
+  const v = sel ? sel.value : 'random';
+  if (['A', 'B', 'C', 'D'].includes(v)) return v;
+  const a = new Uint32Array(1); crypto.getRandomValues(a);
+  return ['A', 'B', 'C', 'D'][a[0] % 4];
+}
+
+window.__THRESHOLD_HOOKS__ = {
+  async api(path, { method = 'GET', body } = {}) {
+    await new Promise((r) => setTimeout(r, 120)); // a little network latency, for realism
+    if (path === '/api/config') return localConfig;
+    if (path === '/api/sessions' && method === 'POST') {
+      const v = validateConsent(body);
+      if (!v.ok) fail(400, 'Invalid consent record', v.errors);
+      store.consentLog.push({ full_name: v.fullName, consent_date: v.consentDate, recorded_at: new Date().toISOString(), consent_version: CONSENT_VERSION });
+      const sessionUuid = uuid();
+      const condition = pickCondition();
+      store.sessions.set(sessionUuid, { session_uuid: sessionUuid, condition, status: 'started', started_at: new Date().toISOString(), instrument_version: localConfig.versions.instrument, consent_version: CONSENT_VERSION, randomisation: 'simple' });
+      return { sessionId: sessionUuid, materials: materialsFor(condition) };
+    }
+    const m = path.match(/^\/api\/sessions\/([^/]+)\/(materials|submit|withdraw)$/);
+    if (m) {
+      const s = store.sessions.get(m[1]);
+      if (!s) fail(404, 'Unknown session');
+      if (s.status !== 'started') fail(409, 'This session has already ended.');
+      if (m[2] === 'materials') return { materials: materialsFor(s.condition) };
+      if (m[2] === 'submit') {
+        const v = validateSubmission(body);
+        if (!v.ok) fail(400, 'Invalid submission', v.errors);
+        Object.assign(s, v.row, { status: 'submitted', ended_at: new Date().toISOString() });
+        lastRecord = derive(s);
+        return { status: 'submitted' };
+      }
+      if (m[2] === 'withdraw') { Object.assign(s, { status: 'withdrawn', ended_at: new Date().toISOString() }); lastRecord = null; return { status: 'withdrawn' }; }
+    }
+    fail(404, 'Not found');
+  },
+
+  afterRender(screen, appEl) {
+    if (screen === 'submitted' && lastRecord) {
+      const r = lastRecord;
+      const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+      const rows = EXPORT_COLUMNS.filter((k) => r[k] !== null && r[k] !== undefined && r[k] !== '')
+        .map((k) => '<tr><th>' + escapeHtml(k) + '</th><td>' + escapeHtml(r[k]) + '</td></tr>').join('');
+      const card = document.createElement('div');
+      card.className = 'card record';
+      card.innerHTML =
+        '<p class="kicker">Researcher preview</p>' +
+        '<h2>Session record</h2>' +
+        '<p class="muted small">This is what the server would have stored for this session, with the derived variables from the data dictionary. Nothing was sent anywhere. You played condition <span class="pill">' + r.condition + ' · ' + CONDITION_NAMES[r.condition] + '</span></p>' +
+        '<div class="record__wrap"><table><tbody>' + rows + '</tbody></table></div>' +
+        '<div class="actions"><button type="button" class="btn" id="play-again">Play again</button></div>';
+      appEl.appendChild(card);
+      document.getElementById('play-again').addEventListener('click', restart);
+    }
+    if (screen === 'withdrawn' || screen === 'declined') {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = '<p class="kicker">Researcher preview</p><p class="muted small">Nothing was recorded for this session.</p><div class="actions"><button type="button" class="btn" id="play-again">Play again</button></div>';
+      appEl.appendChild(div);
+      document.getElementById('play-again').addEventListener('click', restart);
+    }
+  },
+};
+
+function restart() {
+  try { sessionStorage.removeItem('threshold.session.v1'); } catch {}
+  location.reload();
+}
+
+document.getElementById('preview-debrief').addEventListener('change', (e) => {
+  localConfig.immediateDebrief = e.target.checked;
+  localConfig.immediateDebriefText = e.target.checked ? IMMEDIATE_DEBRIEF : null;
+});
+
+// THRESHOLD client. Plain ES module, no build step, no third-party requests.
+//
+// Flow (Protocol v1.3 §6):
+//   consent -> profile -> decision-making style -> analyst briefing ->
+//   scenario 1 -> scenario 2 -> internal review (data-quality item) -> scenario 3 -> scenario 4 ->
+//   end-of-day questions (manipulation check) -> closing screen (submit / withdraw) -> done
+//
+// All responses are held in this tab (sessionStorage) until the participant chooses
+// "Submit my responses" on the closing screen. Only then is anything beyond the session's
+// existence sent to the server. Choosing "Withdraw" discards everything.
+
+const STORAGE_KEY = 'threshold.session.v1';
+const app = document.getElementById('app');
+const progressFill = document.getElementById('progress-fill');
+const progressBar = document.querySelector('.progress');
+
+const TOTAL_STEPS = 11; // consent, profile, style, briefing, 5 items, end-of-day, closing
+
+// Optional hooks used by the standalone (no-server) build: a replacement for the network
+// layer and a callback after each screen renders. Absent in the normal deployment.
+const hooks = window.__THRESHOLD_HOOKS__ || {};
+
+let config = null;
+let state = loadState() || freshState();
+
+// Per-screen volatile timing (never persisted; reset whenever an item is (re)rendered).
+let itemShownAt = null;
+let itemHidden = false;
+let firstChoiceAt = null;
+let lastChoiceAt = null;
+
+function freshState() {
+  return {
+    screen: 'consent',
+    sessionId: null,
+    materials: null,
+    clientConsentAt: null,
+    profile: {},
+    style: {},
+    itemIndex: 0,
+    decisions: [], // { scenarioId, choice, confidence, latency, latencyFirst, hidden }
+    attention: null, // { choice, latency }
+    manipulation: {},
+    clientMcAt: null,
+  };
+}
+
+function loadState() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || typeof s !== 'object' || !s.screen) return null;
+    if (['submitted', 'withdrawn', 'declined'].includes(s.screen)) return null;
+    return s;
+  } catch {
+    return null;
+  }
+}
+
+function saveState() {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    /* storage unavailable: the session simply cannot survive a refresh */
+  }
+}
+
+function clearState() {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Utilities
+// ---------------------------------------------------------------------------
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const paragraphs = (arr, cls = '') => arr.map((p) => `<p${cls ? ` class="${cls}"` : ''}>${esc(p)}</p>`).join('');
+const todayIso = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+async function api(path, { method = 'GET', body } = {}) {
+  if (hooks.api) return hooks.api(path, { method, body });
+  const res = await fetch(path, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+    credentials: 'omit',
+    cache: 'no-store',
+  });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* non-JSON */
+  }
+  if (!res.ok) {
+    const err = new Error(data?.error || `Request failed (${res.status})`);
+    err.status = res.status;
+    err.details = data?.details;
+    throw err;
+  }
+  return data;
+}
+
+function setProgress(step) {
+  const pct = Math.round((step / TOTAL_STEPS) * 100);
+  progressFill.style.width = `${pct}%`;
+  progressBar.setAttribute('aria-valuenow', String(pct));
+}
+
+function render(html, { step, focus = true } = {}) {
+  app.innerHTML = html;
+  if (typeof step === 'number') setProgress(step);
+  window.scrollTo(0, 0);
+  if (focus) {
+    const h = app.querySelector('h1, h2');
+    if (h) {
+      h.setAttribute('tabindex', '-1');
+      h.focus({ preventScroll: true });
+    }
+  }
+  hooks.afterRender?.(state.screen, app, state);
+}
+
+function go(screen, patch = {}) {
+  Object.assign(state, patch, { screen });
+  saveState();
+  show();
+}
+
+function showError(container, message) {
+  let box = container.querySelector('.alert--error');
+  if (!box) {
+    box = document.createElement('div');
+    box.className = 'alert alert--error';
+    box.setAttribute('role', 'alert');
+    container.prepend(box);
+  }
+  box.textContent = message;
+}
+
+// ---------------------------------------------------------------------------
+// Item sequence: scenarios 1–2, data-quality item, scenarios 3–4
+// ---------------------------------------------------------------------------
+function itemSequence() {
+  const m = state.materials;
+  const [s1, s2, s3, s4] = m.scenarios;
+  return [
+    { kind: 'scenario', data: s1 },
+    { kind: 'scenario', data: s2 },
+    { kind: 'attention', data: m.attentionCheck },
+    { kind: 'scenario', data: s3 },
+    { kind: 'scenario', data: s4 },
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// Screens
+// ---------------------------------------------------------------------------
+function show() {
+  switch (state.screen) {
+    case 'consent': return renderConsent();
+    case 'declined': return renderDeclined();
+    case 'profile': return renderProfile();
+    case 'style': return renderStyle();
+    case 'briefing': return renderBriefing();
+    case 'item': return renderItem();
+    case 'manipulation': return renderManipulation();
+    case 'closing': return renderClosing();
+    case 'submitted': return renderSubmitted();
+    case 'withdrawn': return renderWithdrawn();
+    default:
+      state = freshState();
+      saveState();
+      return renderConsent();
+  }
+}
+
+function renderClosed() {
+  render(`
+    <div class="card">
+      <h1>This study is now closed</h1>
+      <p>Thank you for your interest. Data collection for this study has finished and no new sessions can be started.</p>
+      <p class="contact">Questions: Jana Chamsi Bacha and Meher Jain, CU_ERM_Research@columbia.edu.</p>
+    </div>`, { step: 0 });
+}
+
+function renderConsent() {
+  const c = config.consent;
+  render(`
+    <div class="card">
+      <p class="kicker">Research study · Columbia University IRB-ACYY3579</p>
+      <h1>${esc(c.title)}</h1>
+      <p class="muted">${esc(c.subtitle)}. Please read the information below before deciding whether to take part. You can also <a href="/consent" target="_blank" rel="noopener">open a printable copy</a>.</p>
+
+      <div class="consent-doc" tabindex="0" aria-label="Consent form text">
+        ${c.sections.map((s) => `<h3>${esc(s.heading)}</h3>${paragraphs(s.body)}`).join('')}
+      </div>
+
+      <p class="statement">${esc(c.statement)}</p>
+
+      <form id="consent-form" novalidate>
+        <div class="grid-2">
+          <div class="field">
+            <label for="fullName">Full name (your electronic signature)</label>
+            <input id="fullName" name="fullName" type="text" autocomplete="name" required maxlength="200">
+          </div>
+          <div class="field">
+            <label for="consentDate">Date</label>
+            <input id="consentDate" name="consentDate" type="date" required value="${todayIso()}">
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn" id="agree">${esc(c.agreeLabel)}</button>
+          <button type="button" class="btn btn--secondary" id="decline">${esc(c.declineLabel)}</button>
+        </div>
+      </form>
+    </div>`, { step: 0 });
+
+  const form = document.getElementById('consent-form');
+  document.getElementById('decline').addEventListener('click', () => go('declined'));
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fullName = form.fullName.value.trim();
+    const consentDate = form.consentDate.value;
+    let bad = false;
+    for (const [el, ok] of [[form.fullName, fullName.length >= 2], [form.consentDate, /^\d{4}-\d{2}-\d{2}$/.test(consentDate)]]) {
+      el.closest('.field').classList.toggle('field--invalid', !ok);
+      if (!ok) bad = true;
+    }
+    if (bad) return showError(form, 'Please type your full name and the date to sign the consent form.');
+
+    const agree = document.getElementById('agree');
+    agree.disabled = true;
+    agree.textContent = 'Starting…';
+    const clientConsentAt = new Date().toISOString(); // start of the 90-second clock
+    try {
+      const data = await api('/api/sessions', { method: 'POST', body: { fullName, consentDate } });
+      go('profile', { sessionId: data.sessionId, materials: data.materials, clientConsentAt });
+    } catch (err) {
+      agree.disabled = false;
+      agree.textContent = c.agreeLabel;
+      if (err.status === 403) return renderClosed();
+      showError(form, 'We could not start your session. Please check your connection and try again.');
+    }
+  });
+}
+
+function renderDeclined() {
+  clearState();
+  render(`
+    <div class="card">
+      <h1>Thank you</h1>
+      <p>You have chosen not to take part. No information has been recorded. You may close this window.</p>
+      <p class="contact">Questions about the study: Jana Chamsi Bacha and Meher Jain, CU_ERM_Research@columbia.edu.</p>
+    </div>`, { step: 0 });
+}
+
+function renderProfile() {
+  const items = config.profileItems;
+  render(`
+    <div class="card">
+      <p class="kicker">Meridian Group · Executive onboarding</p>
+      <h1>Your CRO profile</h1>
+      <p class="muted">Welcome to Meridian Group. Before your first day begins, please complete your profile. These questions describe participants in aggregate only.</p>
+      <form id="profile-form" novalidate>
+        ${items.map((it) => `
+          <div class="field" data-field="${esc(it.id)}">
+            <label for="${esc(it.id)}">${esc(it.label)}</label>
+            <select id="${esc(it.id)}" name="${esc(it.id)}" required>
+              <option value="">Select…</option>
+              ${it.options.map((o) => `<option value="${esc(o)}" ${state.profile[it.id] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+            </select>
+          </div>`).join('')}
+        <div class="actions actions--end">
+          <button type="submit" class="btn">Continue</button>
+        </div>
+      </form>
+    </div>`, { step: 1 });
+
+  const form = document.getElementById('profile-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const profile = {};
+    let bad = false;
+    for (const it of items) {
+      const v = form[it.id].value;
+      const ok = it.options.includes(v);
+      form.querySelector(`[data-field="${it.id}"]`).classList.toggle('field--invalid', !ok);
+      if (!ok) bad = true;
+      else profile[it.id] = v;
+    }
+    if (bad) return showError(form, 'Please answer every question to continue.');
+    go('style', { profile });
+  });
+}
+
+function likert(name, selected) {
+  const labels = ['Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree'];
+  return `<div class="likert">${[1, 2, 3, 4, 5].map((n) => `
+    <label><input type="radio" name="${esc(name)}" value="${n}" ${selected === n ? 'checked' : ''}><span class="n">${n}</span><span class="t">${labels[n - 1]}</span></label>`).join('')}</div>`;
+}
+
+function renderStyle() {
+  const s = config.style;
+  render(`
+    <div class="card">
+      <p class="kicker">Meridian Group · Executive onboarding</p>
+      <h1>${esc(s.heading)}</h1>
+      <p class="muted">${esc(s.instruction)}</p>
+      <form id="style-form" novalidate>
+        ${s.items.map((it) => `
+          <fieldset class="field" data-field="${esc(it.id)}">
+            <legend>${esc(it.text)}</legend>
+            ${likert(it.id, state.style[it.id])}
+          </fieldset>`).join('')}
+        <div class="actions actions--end">
+          <button type="submit" class="btn">Continue</button>
+        </div>
+      </form>
+    </div>`, { step: 2 });
+
+  const form = document.getElementById('style-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const style = {};
+    let bad = false;
+    for (const it of s.items) {
+      const v = Number(form.querySelector(`input[name="${it.id}"]:checked`)?.value);
+      const ok = Number.isInteger(v) && v >= 1 && v <= 5;
+      form.querySelector(`[data-field="${it.id}"]`).classList.toggle('field--invalid', !ok);
+      if (!ok) bad = true;
+      else style[it.id] = v;
+    }
+    if (bad) return showError(form, 'Please rate every statement to continue.');
+    go('briefing', { style });
+  });
+}
+
+function renderBriefing() {
+  const m = state.materials;
+  const initials = m.organisation.analyst.replace(/^Dr\.\s*/, '').slice(0, 1).toUpperCase();
+  render(`
+    <div class="card">
+      <p class="kicker">Meridian Group · Day one</p>
+      <h1>Briefing from the strategy desk</h1>
+      <div class="analyst">
+        <div class="avatar" aria-hidden="true">${esc(initials)}</div>
+        <div>
+          <div class="analyst__meta"><span class="analyst__name">${esc(m.organisation.analyst)}</span> · ${esc(m.organisation.analystTitle)}</div>
+          <div class="speech">${esc(m.briefing)}</div>
+        </div>
+      </div>
+      <p class="muted mt-18">Over the course of today you will face a series of situations from across the group. For each one, decide how Meridian Group’s risk exposure should change.</p>
+      <div class="actions actions--end">
+        <button type="button" class="btn" id="begin">Begin the day</button>
+      </div>
+    </div>`, { step: 3 });
+  document.getElementById('begin').addEventListener('click', () => go('item', { itemIndex: 0 }));
+}
+
+function onVisibility() {
+  if (document.visibilityState === 'hidden') itemHidden = true;
+}
+
+function renderItem() {
+  const seq = itemSequence();
+  const idx = state.itemIndex;
+  if (idx >= seq.length) return go('manipulation');
+  const { kind, data } = seq[idx];
+  const m = state.materials;
+
+  render(`
+    <div class="card scenario">
+      <div class="eyebrow"><span class="tag">${esc(data.domain)}</span><span class="counter">${idx + 1} of ${seq.length}</span></div>
+      <h1>${esc(data.title)}</h1>
+      <div class="scenario__body">
+        <p>${esc(data.context)}</p>
+        <p>${esc(data.framing)}</p>
+      </div>
+      <div class="decision">
+        <h2 class="small" id="decision-label">Your decision</h2>
+        <div class="options" role="group" aria-labelledby="decision-label">
+          ${m.decisionOptions.map((o) => `<button type="button" class="option" data-value="${esc(o.value)}" aria-pressed="false">${esc(o.label)}</button>`).join('')}
+        </div>
+      </div>
+      <form id="confidence" class="confidence" hidden novalidate>
+        <fieldset class="field" data-field="confidence">
+          <legend>${esc(m.confidence.question)}</legend>
+          <div class="likert">${[1, 2, 3, 4, 5].map((n) => `
+            <label><input type="radio" name="confidence" value="${n}"><span class="n">${n}</span><span class="t">${n === 1 ? esc(m.confidence.anchors.low) : n === 5 ? esc(m.confidence.anchors.high) : ''}</span></label>`).join('')}</div>
+        </fieldset>
+        <div class="actions actions--end">
+          <button type="submit" class="btn">Continue</button>
+        </div>
+      </form>
+    </div>`, { step: 4 + idx });
+
+  // Latency clock starts when the scenario is painted.
+  itemShownAt = performance.now();
+  itemHidden = document.visibilityState === 'hidden';
+  firstChoiceAt = null;
+  lastChoiceAt = null;
+  document.removeEventListener('visibilitychange', onVisibility);
+  document.addEventListener('visibilitychange', onVisibility);
+
+  let choice = null;
+  const options = [...app.querySelectorAll('.option')];
+  const confidenceForm = document.getElementById('confidence');
+
+  for (const btn of options) {
+    btn.addEventListener('click', () => {
+      const t = performance.now();
+      if (firstChoiceAt === null) firstChoiceAt = t;
+      lastChoiceAt = t;
+      choice = btn.dataset.value;
+      for (const b of options) b.setAttribute('aria-pressed', String(b === btn));
+      if (confidenceForm.hidden) {
+        confidenceForm.hidden = false;
+        confidenceForm.querySelector('legend').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  }
+
+  confidenceForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const conf = Number(confidenceForm.querySelector('input[name="confidence"]:checked')?.value);
+    const ok = Number.isInteger(conf) && conf >= 1 && conf <= 5 && choice;
+    confidenceForm.querySelector('[data-field="confidence"]').classList.toggle('field--invalid', !ok);
+    if (!ok) return showError(confidenceForm, 'Please rate your confidence to continue.');
+
+    const latency = (lastChoiceAt - itemShownAt) / 1000;
+    const latencyFirst = (firstChoiceAt - itemShownAt) / 1000;
+    document.removeEventListener('visibilitychange', onVisibility);
+
+    if (kind === 'scenario') {
+      const decisions = state.decisions.filter((d) => d.scenarioId !== data.id);
+      decisions.push({ scenarioId: data.id, choice, confidence: conf, latency, latencyFirst, hidden: itemHidden });
+      go('item', { decisions, itemIndex: idx + 1 });
+    } else {
+      // Data-quality item: response recorded, confidence not analysed, not scored.
+      go('item', { attention: { choice, latency, confidence: conf }, itemIndex: idx + 1 });
+    }
+  });
+}
+
+function renderManipulation() {
+  const mc = state.materials.manipulationCheck;
+  render(`
+    <div class="card">
+      <p class="kicker">Meridian Group · Day one</p>
+      <h1>${esc(mc.heading)}</h1>
+      <p class="muted">${esc(mc.intro)}</p>
+      <form id="mc-form" novalidate>
+        ${mc.items.map((it) => `
+          <fieldset class="field" data-field="${esc(it.id)}">
+            <legend>${esc(it.question)}</legend>
+            <div class="choices">
+              ${it.options.map((o) => `<label><input type="radio" name="${esc(it.id)}" value="${o.value}" ${state.manipulation[it.id] === o.value ? 'checked' : ''}><span>${esc(o.label)}</span></label>`).join('')}
+            </div>
+          </fieldset>`).join('')}
+        <div class="actions actions--end">
+          <button type="submit" class="btn">Continue</button>
+        </div>
+      </form>
+    </div>`, { step: 9 });
+
+  const form = document.getElementById('mc-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const manipulation = {};
+    let bad = false;
+    for (const it of mc.items) {
+      const v = Number(form.querySelector(`input[name="${it.id}"]:checked`)?.value);
+      const ok = it.options.some((o) => o.value === v);
+      form.querySelector(`[data-field="${it.id}"]`).classList.toggle('field--invalid', !ok);
+      if (!ok) bad = true;
+      else manipulation[it.id] = v;
+    }
+    if (bad) return showError(form, 'Please answer both questions to continue.');
+    go('closing', { manipulation, clientMcAt: new Date().toISOString() }); // end of the 90-second clock
+  });
+}
+
+function renderClosing() {
+  const c = state.materials.closing;
+  const debrief = config.immediateDebrief ? config.immediateDebriefText : null;
+  const [p1, p2, p3, p4] = c.paragraphs;
+  render(`
+    <div class="card">
+      <h1>Thank you</h1>
+      ${paragraphs([p1, p2], 'lead')}
+      ${debrief
+        ? `<h2>${esc(debrief.heading)}</h2>${paragraphs(debrief.paragraphs)}`
+        : `<p>${esc(p3)}</p>`}
+      <p>${esc(p4)}</p>
+      <hr class="divider">
+      <h2 class="small">Your responses</h2>
+      <p>${esc(c.decision)}</p>
+      <div id="closing-actions" class="actions">
+        <button type="button" class="btn" id="submit">${esc(c.submitLabel)}</button>
+        <button type="button" class="btn btn--secondary" id="withdraw">${esc(c.withdrawLabel)}</button>
+      </div>
+      <div id="withdraw-confirm" class="alert alert--info" hidden role="region" aria-live="polite">
+        <p><strong>Withdraw your responses?</strong> They will be deleted and cannot be recovered.</p>
+        <div class="actions mt-8">
+          <button type="button" class="btn btn--secondary" id="withdraw-yes">Yes, withdraw and delete</button>
+          <button type="button" class="btn btn--quiet" id="withdraw-no">Go back</button>
+        </div>
+      </div>
+      <hr class="divider">
+      <p class="contact">${esc(c.contact)}</p>
+    </div>`, { step: 10 });
+
+  const actions = document.getElementById('closing-actions');
+  const confirmBox = document.getElementById('withdraw-confirm');
+  const submitBtn = document.getElementById('submit');
+  const withdrawBtn = document.getElementById('withdraw');
+
+  const busy = (on) => {
+    submitBtn.disabled = on;
+    withdrawBtn.disabled = on;
+  };
+
+  submitBtn.addEventListener('click', async () => {
+    busy(true);
+    submitBtn.textContent = 'Submitting…';
+    try {
+      await api(`/api/sessions/${state.sessionId}/submit`, { method: 'POST', body: buildPayload() });
+      go('submitted');
+    } catch (err) {
+      if (err.status === 409) return go('submitted'); // already recorded (e.g. double click after a slow network)
+      busy(false);
+      submitBtn.textContent = c.submitLabel;
+      showError(actions.parentElement, err.status === 400
+        ? 'Your responses could not be submitted because some answers were missing. Please contact the study team at CU_ERM_Research@columbia.edu.'
+        : 'We could not reach the server. Please check your connection and try again. Your responses are still on this page.');
+    }
+  });
+
+  withdrawBtn.addEventListener('click', () => {
+    confirmBox.hidden = false;
+    document.getElementById('withdraw-yes').focus();
+  });
+  document.getElementById('withdraw-no').addEventListener('click', () => {
+    confirmBox.hidden = true;
+    withdrawBtn.focus();
+  });
+  document.getElementById('withdraw-yes').addEventListener('click', async () => {
+    busy(true);
+    try {
+      await api(`/api/sessions/${state.sessionId}/withdraw`, { method: 'POST', body: {} });
+    } catch {
+      /* Even if the server is unreachable, nothing has been submitted: the responses are discarded locally. */
+    }
+    go('withdrawn');
+  });
+}
+
+function buildPayload() {
+  return {
+    clientConsentAt: state.clientConsentAt,
+    clientMcAt: state.clientMcAt,
+    profile: state.profile,
+    style: state.style,
+    decisions: [...state.decisions].sort((a, b) => a.scenarioId - b.scenarioId),
+    attention: state.attention ? { choice: state.attention.choice, latency: state.attention.latency } : null,
+    manipulation: state.manipulation,
+    client: { instrument: config.versions.instrument, consent: config.versions.consent },
+  };
+}
+
+function renderSubmitted() {
+  const c = state.materials?.closing;
+  clearState();
+  render(`
+    <div class="card">
+      <h1>Your responses have been submitted</h1>
+      <p class="lead">Thank you for taking part. Your session is complete and you may close this window.</p>
+      ${config.followupFormUrl
+        ? `<hr class="divider"><h2 class="small">Early access to the findings</h2>
+           <p>${esc(c?.followupPrompt ?? '')}</p>
+           <div class="actions"><a class="btn" href="${esc(config.followupFormUrl)}" target="_blank" rel="noopener noreferrer">Leave my email (separate form)</a></div>`
+        : ''}
+      <hr class="divider">
+      <p class="contact">${esc(c?.contact ?? '')}</p>
+    </div>`, { step: 11 });
+}
+
+function renderWithdrawn() {
+  const c = state.materials?.closing;
+  clearState();
+  render(`
+    <div class="card">
+      <h1>Your responses have been withdrawn</h1>
+      <p class="lead">Your responses were deleted and will not be used. Thank you for your time. You may close this window.</p>
+      <hr class="divider">
+      <p class="contact">${esc(c?.contact ?? '')}</p>
+    </div>`, { step: 11 });
+}
+
+// ---------------------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------------------
+(async function boot() {
+  try {
+    config = await api('/api/config');
+  } catch {
+    render(`<div class="card"><h1>Unable to load</h1><p>The study page could not be loaded. Please refresh or try again later.</p></div>`, { step: 0 });
+    return;
+  }
+  if (config.studyClosed && state.screen === 'consent') return renderClosed();
+  // A resumed session must still have its materials; otherwise start over.
+  if (state.screen !== 'consent' && (!state.sessionId || !state.materials)) {
+    state = freshState();
+    saveState();
+  }
+  show();
+})();
+
+</script>
+
+</body>
+</html>
