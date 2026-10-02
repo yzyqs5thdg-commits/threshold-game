@@ -16,6 +16,10 @@ const progressBar = document.querySelector('.progress');
 
 const TOTAL_STEPS = 11; // consent, profile, style, briefing, 5 items, end-of-day, closing
 
+// Optional hooks used by the standalone (no-server) build: a replacement for the network
+// layer and a callback after each screen renders. Absent in the normal deployment.
+const hooks = window.__THRESHOLD_HOOKS__ || {};
+
 let config = null;
 let state = loadState() || freshState();
 
@@ -82,6 +86,7 @@ const todayIso = () => {
 };
 
 async function api(path, { method = 'GET', body } = {}) {
+  if (hooks.api) return hooks.api(path, { method, body });
   const res = await fetch(path, {
     method,
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
@@ -113,7 +118,7 @@ function setProgress(step) {
 function render(html, { step, focus = true } = {}) {
   app.innerHTML = html;
   if (typeof step === 'number') setProgress(step);
-  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+  window.scrollTo(0, 0);
   if (focus) {
     const h = app.querySelector('h1, h2');
     if (h) {
@@ -121,6 +126,7 @@ function render(html, { step, focus = true } = {}) {
       h.focus({ preventScroll: true });
     }
   }
+  hooks.afterRender?.(state.screen, app, state);
 }
 
 function go(screen, patch = {}) {

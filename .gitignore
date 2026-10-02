@@ -7,3 +7,6 @@ data/
 .env
 exports/
 .DS_Store
+
+# built standalone preview (regenerate with npm run build:standalone)
+dist/
