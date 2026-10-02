@@ -1,0 +1,38 @@
+# Render Blueprint for THRESHOLD.
+# Deploy: https://dashboard.render.com/blueprints -> New Blueprint Instance -> pick this repo.
+# A persistent disk is required (the study database lives on it), and Render only attaches
+# disks to paid instances: Starter is about $7/month plus $0.25/GB/month for the disk.
+services:
+  - type: web
+    name: threshold
+    runtime: node
+    plan: starter
+    region: ohio
+    branch: claude/build-threshold-game   # change to master once the branch is merged
+    buildCommand: "echo 'no build step'"
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    disk:
+      name: threshold-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      - key: DATA_DIR
+        value: /var/data
+      - key: ADMIN_TOKEN
+        generateValue: true          # read it from the service's Environment tab
+      - key: CONSENT_TOKEN
+        generateValue: true          # PI-only token for the consent-log export
+      - key: RANDOMISATION
+        value: simple                # or "block" (see docs/BUILD_DECISIONS.md, item 9)
+      - key: CONSENT_TIMESTAMP_PRECISION
+        value: exact
+      - key: FOLLOWUP_FORM_URL
+        sync: false                  # you are asked for the Google Form link when creating the service
+      - key: IMMEDIATE_DEBRIEF
+        value: "false"
+      - key: STUDY_CLOSED
+        value: "false"

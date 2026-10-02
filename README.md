@@ -53,6 +53,8 @@ Tests: `npm test`. Export from the command line without the server running: `npm
 
 ## Deploying
 
+For Render, see [`docs/DEPLOY_RENDER.md`](docs/DEPLOY_RENDER.md) (one-click Blueprint in `render.yaml`).
+
 The server needs a persistent disk for `DATA_DIR` and must sit behind HTTPS. Any host that runs a Node process with a volume works (Render, Railway, Fly.io, a Columbia-managed VM, Docker anywhere). Serverless platforms (Vercel, Netlify functions) will not work because they have no persistent local disk.
 
 Docker:
