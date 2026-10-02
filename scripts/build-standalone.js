@@ -191,6 +191,23 @@ ${appJs}
 `;
 
 mkdirSync(resolve(root, 'dist'), { recursive: true });
+// Fragment (no document skeleton) for hosts that wrap the page themselves.
 const out = resolve(root, 'dist/threshold-standalone.html');
 writeFileSync(out, html);
-process.stdout.write(`${out} (${(Buffer.byteLength(html) / 1024).toFixed(0)} KB)\n`);
+// Complete document for static hosting (GitHub Pages) or opening from disk / an email attachment.
+const favicon = 'data:image/svg+xml,' + encodeURIComponent(read('public/favicon.svg'));
+const full = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="${favicon}">
+${html}
+</body>
+</html>
+`.replace('<title>THRESHOLD</title>\n<style>', '<title>THRESHOLD — Decision-Making in Organizational Risk Scenarios</title>\n<style>').replace('</style>\n<a class="skip"', '</style>\n</head>\n<body>\n<a class="skip"');
+const outFull = resolve(root, 'dist/index.html');
+writeFileSync(outFull, full);
+process.stdout.write(`${out} (${(Buffer.byteLength(html) / 1024).toFixed(0)} KB)\n${outFull} (${(Buffer.byteLength(full) / 1024).toFixed(0)} KB)\n`);
