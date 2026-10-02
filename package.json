@@ -1,0 +1,17 @@
+{
+  "name": "threshold-game",
+  "version": "1.0.0",
+  "description": "THRESHOLD: a browser-based decision simulation for the Columbia SPS study 'Decision-Making in Organizational Risk Scenarios' (IRB-ACYY3579). 2x2 between-subjects experiment on uncertainty type and outcome framing.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/**/*.test.js\"",
+    "export": "node --disable-warning=ExperimentalWarning server/cli-export.js"
+  },
+  "license": "UNLICENSED"
+}

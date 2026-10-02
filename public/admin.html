@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>THRESHOLD — Study team</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">THRESHOLD</span>
+        <span class="brand__sep" aria-hidden="true">·</span>
+        <span class="brand__app">Study team</span>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="progress__fill progress__fill--full"></div></div>
+    </div>
+  </header>
+
+  <main id="app" class="app admin">
+    <div class="card">
+      <h1>Study team access</h1>
+      <p class="muted">Enter the admin token configured on the server. It is kept in this tab only.</p>
+      <form id="token-form" class="field">
+        <label for="token">Admin token</label>
+        <input id="token" type="password" autocomplete="off" required>
+        <div class="actions actions--end"><button class="btn" type="submit">Open dashboard</button></div>
+      </form>
+      <div id="error" class="alert alert--error" hidden role="alert"></div>
+    </div>
+
+    <div id="dash" hidden>
+      <div class="card">
+        <h2>Sessions by condition</h2>
+        <p class="muted small">“Started” sessions consented and were assigned a condition but have not reached the closing screen (or left before choosing). Only “submitted” sessions carry responses.</p>
+        <table id="table"></table>
+        <p class="small muted" id="meta"></p>
+      </div>
+      <div class="card">
+        <h2>Exports</h2>
+        <p class="small muted">Sessions export contains raw and derived variables named as in the data dictionary. The consent log is a separate file with no session identifiers. Keep the two in separate locations.</p>
+        <div class="actions">
+          <button class="btn" id="dl-sessions">Download sessions (CSV)</button>
+          <button class="btn btn--secondary" id="dl-submitted">Submitted only (CSV)</button>
+          <button class="btn btn--secondary" id="dl-consent">Consent log (CSV, PI only)</button>
+        </div>
+        <p class="small muted mt-14">From the command line: <code>npm run export</code> (add <code>-- --consent</code> for the consent log).</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/admin.js"></script>
+</body>
+</html>
