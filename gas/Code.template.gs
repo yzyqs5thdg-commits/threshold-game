@@ -12,6 +12,8 @@
  *
  * Script properties (Project Settings → Script properties):
  *   ADMIN_TOKEN                 required for the 'summary' action (study team only)
+ *   SESSIONS_SPREADSHEET_ID     optional; write sessions into this spreadsheet instead of the one the
+ *                               script is bound to (use when deploying from a different account)
  *   CONSENT_SPREADSHEET_ID      optional; a separate spreadsheet for the consent log. If absent, the
  *                               script creates "THRESHOLD consent log (PI only)" in the deployer's Drive
  *                               on first use and remembers its id in CONSENT_SPREADSHEET_ID_AUTO.
@@ -61,7 +63,11 @@ function consentTimestamp_(precision) {
 
 /* ---------- sheets ---------- */
 function sessionsSheet_() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  // SESSIONS_SPREADSHEET_ID lets the script run from one account (e.g. a personal Gmail that is
+  // allowed to publish a web app to "Anyone") while writing into a spreadsheet owned by another
+  // (e.g. the study's Columbia-managed sheet, shared with the deploying account as editor).
+  var id = PropertiesService.getScriptProperties().getProperty('SESSIONS_SPREADSHEET_ID');
+  var ss = id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActiveSpreadsheet();
   var sh = ss.getSheetByName(SESSIONS_SHEET);
   if (!sh) {
     sh = ss.insertSheet(SESSIONS_SHEET);

@@ -4,6 +4,16 @@ This option runs the game as a static site on GitHub Pages and stores responses 
 
 Where the spreadsheet lives matters: create it (or move it) in the Columbia Google Workspace account that the protocol names as the study's storage, share it only with the PI and co-investigators, and deploy the script from that account.
 
+## If your Google Workspace blocks "Anyone" web apps (Columbia does)
+
+Columbia's LionMail accounts can only publish Apps Script web apps to other LionMail users, so external participants cannot reach a script deployed there. Keep the data in the Columbia sheet but run the script elsewhere:
+
+1. Share the Columbia sessions spreadsheet (and the consent-log spreadsheet) with a personal Gmail account as **Editor**. Copy each spreadsheet's id from its URL (`/spreadsheets/d/<id>/edit`).
+2. Signed in as that Gmail account, go to <https://script.google.com> → **New project**, paste `dist/gas/Code.gs`, and add the script properties `SESSIONS_SPREADSHEET_ID` and `CONSENT_SPREADSHEET_ID` with those ids (plus `ADMIN_TOKEN`).
+3. Run `setup` once, approve permissions, then deploy as a web app with **Who has access: Anyone**.
+
+The script executes under the Gmail account but reads and writes only the Columbia-owned spreadsheets; no study data is stored in the Gmail account. Record this arrangement in the data-security section for the IRB.
+
 ## 1. Build the script
 
 From the repository:
