@@ -12,7 +12,7 @@ name: Publish site to GitHub Pages
 on:
   push:
     branches: [claude/build-threshold-game, master, main]
-    paths: [server/**, public/**, scripts/**, gas/**, .github/workflows/pages.yml]
+    paths: [server/**, public/**, scripts/**, gas/**, deploy/**, .github/workflows/pages.yml]
   workflow_dispatch:
 
 permissions:
