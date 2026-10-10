@@ -25,9 +25,11 @@ The script prints the service URL and the generated tokens once. The repository 
 
 ## After deploying
 
+- **Verify it stores data**: `node scripts/verify-deployment.mjs https://<your-service>.onrender.com <ADMIN_TOKEN>` from any machine with Node 22. All checks must pass before the first participant. It leaves one withdrawn test session and one consent-log line named "DEPLOYMENT TEST".
+
 - **Custom domain** (optional): service → Settings → Custom Domains. Render issues the certificate.
 - **Pilot first**: run 5–10 sessions, download the export from `/admin`, check the columns against the analysis script, then **delete the pilot data** before recruitment: service → Shell, then `rm /var/data/*.db*` and restart the service.
-- **Nightly export** to the PI's Columbia Google Drive: download from `/admin` (sessions CSV with the admin token; consent log separately with the PI token), or run `npm run export -- --consent` from the service's Shell tab and copy the files out.
+- **Nightly export** to the PI's Columbia Google Drive: the service writes dated snapshots to `/var/data/exports/sessions/` and `/var/data/exports/consent-log/` every 24 hours (`SNAPSHOT_HOURS`). Copy the newest sessions file to the Drive folder from the service's Shell tab, or download from `/admin` (sessions with the admin token; consent log separately with the PI-only token). Render's paid plans can also take disk snapshots (Disks → Snapshots) as a second backup.
 - **Closing the study**: set `STUDY_CLOSED=true` in the Environment tab. Export, copy to Columbia storage, then delete the service and disk.
 - **Logs**: Render's own HTTP logs include request IPs. The application never stores them, but Render retains its logs for a limited period (7 days on Starter). Mention this in the data-protection section if the IRB asks about hosting-platform identifiers.
 - **Changing text or settings**: push to the deployed branch; `autoDeploy` redeploys automatically. Environment changes also trigger a redeploy. The database on the disk survives both.

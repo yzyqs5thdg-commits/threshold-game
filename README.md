@@ -50,6 +50,8 @@ Tests: `npm test`. Export from the command line without the server running: `npm
 | `FOLLOWUP_FORM_URL` | *(none)* | Link to the separate Google Form for early access to findings, shown after submit. |
 | `IMMEDIATE_DEBRIEF` | `false` | `true` shows the Appendix C.2 explanation on the closing screen (only if the IRB requires it). |
 | `STUDY_CLOSED` | `false` | `true` stops new sessions and shows a "study closed" notice. |
+| `SNAPSHOT_HOURS` | `24` | Interval for automatic dated CSV snapshots written to `DATA_DIR/exports/` (sessions and consent log in separate folders). `0` disables. |
+| `RATE_SESSIONS_PER_MIN` / `RATE_SUBMITS_PER_MIN` | `60` / `120` | Global flood limits. Exceeding them returns a "server busy, try again" message; no client address is ever read. |
 
 ## Deploying
 
@@ -71,8 +73,10 @@ Before go-live:
 3. Decide `RANDOMISATION` (see `docs/BUILD_DECISIONS.md`) and record the choice in the pre-registration.
 4. Run a 5–10 session pilot, export, and check the columns against the pre-registered analysis script. Delete pilot data (`DATA_DIR`) before recruitment.
 5. Confirm the hosting platform's own access logs are either disabled or retained separately and briefly: the application never records IP addresses or user agents, but a reverse proxy might.
+6. Run `node scripts/verify-deployment.mjs https://<your-service> <ADMIN_TOKEN>` against the live site. It checks health, the instrument, HTTPS, session creation, withdrawal, persistence, the snapshot export and that the sessions export contains no names. It leaves one consent-log line named "DEPLOYMENT TEST" and one withdrawn session; delete the consent line from any export you keep.
+7. Send participants the plain `https://<your-service>/` link (the Google Form sends it automatically). The last screen they see says thank you and, if `FOLLOWUP_FORM_URL` is set, offers the separate findings form.
 
-Nightly export to the PI's Columbia Google Drive: schedule `npm run export` (or download from `/admin`) and copy the CSV. Export the consent log separately with `CONSENT_TOKEN` and store it in a different folder with different access.
+Nightly export to the PI's Columbia Google Drive: the server writes a dated snapshot of both datasets every `SNAPSHOT_HOURS` to `DATA_DIR/exports/sessions/` and `DATA_DIR/exports/consent-log/`; copy the newest sessions file to the study's Drive folder (from the host's shell, or download from `/admin`). The consent log stays in its own folder with PI-only access; never store the two together.
 
 ## Privacy properties of this build
 

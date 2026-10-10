@@ -7,6 +7,7 @@ let server, base, dbs;
 
 const config = {
   port: 0,
+  dataDir: process.env.TEST_DATA_DIR || '/tmp/threshold-test-data',
   adminToken: 'admin-secret',
   consentToken: 'consent-secret',
   randomisation: 'block',
@@ -171,4 +172,34 @@ test('a closed study refuses new sessions', async () => {
   const res = await fetch(`http://127.0.0.1:${closed.address().port}/api/sessions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: 'Late Comer', consentDate: '2026-10-02' }) });
   assert.equal(res.status, 403);
   closed.close();
+});
+
+test('session creation and submission are rate limited globally, never by address', async () => {
+  const limitedDbs = openInMemory();
+  const limited = http.createServer(createApp({ ...config, rateSessionsPerMin: 3, rateSubmitsPerMin: 1000 }, limitedDbs));
+  await new Promise((r) => limited.listen(0, r));
+  const b = `http://127.0.0.1:${limited.address().port}`;
+  const make = () => fetch(`${b}/api/sessions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: 'Rate Tester', consentDate: '2026-10-02' }) });
+  const statuses = [];
+  for (let i = 0; i < 5; i++) statuses.push((await make()).status);
+  assert.deepEqual(statuses.slice(0, 3), [201, 201, 201]);
+  assert.equal(statuses[3], 429);
+  assert.equal(limitedDbs.consent.prepare('SELECT COUNT(*) n FROM consent_log').get().n, 3, 'rejected requests write nothing');
+  limited.close();
+});
+
+test('snapshot writes dated session and consent exports into separate folders', async () => {
+  const { mkdtempSync, readFileSync, existsSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { writeSnapshot } = await import('../server/index.js');
+  const dir = mkdtempSync(join(tmpdir(), 'threshold-snap-'));
+  const written = writeSnapshot(dbs, dir);
+  assert.ok(existsSync(written.sessionsPath) && written.sessionsPath.includes('/exports/sessions/'));
+  assert.ok(existsSync(written.consentPath) && written.consentPath.includes('/exports/consent-log/'));
+  assert.ok(readFileSync(written.sessionsPath, 'utf8').startsWith('session_uuid,'));
+  assert.ok(readFileSync(written.consentPath, 'utf8').startsWith('id,full_name,'));
+  const snap = await req('/api/admin/snapshot', { token: 'admin-secret' });
+  assert.equal(snap.status, 200);
+  assert.ok(snap.json.sessionsPath);
 });

@@ -332,7 +332,9 @@ function renderConsent() {
       agree.disabled = false;
       agree.textContent = c.agreeLabel;
       if (err.status === 403) return renderClosed();
-      showError(form, 'We could not start your session. Please check your connection and try again.');
+      showError(form, err.status === 429
+        ? 'The study server is busy right now. Please wait a moment and select “I agree” again.'
+        : 'We could not start your session. Please check your connection and try again.');
     }
   });
 }
@@ -704,7 +706,9 @@ function renderClosing() {
       submitBtn.textContent = c.submitLabel;
       showError(actions.parentElement, err.status === 400
         ? 'Your responses could not be submitted because some answers were missing. Please contact the study team at CU_ERM_Research@columbia.edu.'
-        : 'We could not reach the server. Please check your connection and try again. Your responses are still on this page.');
+        : err.status === 429
+          ? 'The study server is busy right now. Please wait a moment and press Submit again. Your responses are still on this page.'
+          : 'We could not reach the server. Please check your connection and try again. Your responses are still on this page.');
     }
   });
 
@@ -745,31 +749,27 @@ function renderSubmitted() {
   clearState();
   render(`
     <div class="panel">
-      <div class="stamp">Session closed</div>
-      <h1>Your responses have been submitted</h1>
-      <p class="lead">Thank you for taking part. Your session is complete and you may close this window.</p>
+      <div class="stamp">Session complete</div>
+      <h1>Thank you</h1>
+      <p class="lead">Your responses have been submitted. You may now close this window.</p>
       ${config.followupFormUrl
-        ? `<hr class="divider"><h2 class="small">Early access to the findings</h2>
+        ? `<hr class="divider">
            <p>${esc(c?.followupPrompt ?? '')}</p>
            <div class="actions"><a class="btn" href="${esc(config.followupFormUrl)}" target="_blank" rel="noopener noreferrer">Leave my email (separate form)</a></div>`
         : ''}
-      <hr class="divider">
-      <p class="contact">${esc(c?.contact ?? '')}</p>
     </div>`, { step: 11 });
   fx(stampIn, app.querySelector('.stamp'));
 }
 
 function renderWithdrawn() {
-  const c = state.materials?.closing;
   clearState();
   render(`
     <div class="panel">
       <div class="stamp">Session closed</div>
-      <h1>Your responses have been withdrawn</h1>
-      <p class="lead">Your responses were deleted and will not be used. Thank you for your time. You may close this window.</p>
-      <hr class="divider">
-      <p class="contact">${esc(c?.contact ?? '')}</p>
+      <h1>Thank you</h1>
+      <p class="lead">Your responses have been withdrawn and deleted. You may now close this window.</p>
     </div>`, { step: 11 });
+  fx(stampIn, app.querySelector('.stamp'));
 }
 
 // ---------------------------------------------------------------------------

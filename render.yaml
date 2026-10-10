@@ -36,3 +36,5 @@ services:
         value: "false"
       - key: STUDY_CLOSED
         value: "false"
+      - key: SNAPSHOT_HOURS
+        value: "24"

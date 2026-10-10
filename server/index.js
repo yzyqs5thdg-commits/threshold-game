@@ -8,7 +8,7 @@
 //    exported by different endpoints.
 
 import http from 'node:http';
-import { readFileSync, existsSync, statSync } from 'node:fs';
+import { readFileSync, existsSync, statSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, extname, normalize, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID, createHash, timingSafeEqual } from 'node:crypto';
@@ -50,15 +50,55 @@ export function configFromEnv(env = process.env) {
     immediateDebrief: bool(env.IMMEDIATE_DEBRIEF),
     studyClosed: bool(env.STUDY_CLOSED),
     quiet: bool(env.QUIET),
+    snapshotHours: env.SNAPSHOT_HOURS === undefined ? 24 : Number(env.SNAPSHOT_HOURS),
+    // Flood protection. Global token buckets (the server never reads client addresses).
+    rateSessionsPerMin: Number(env.RATE_SESSIONS_PER_MIN) || 60,
+    rateSubmitsPerMin: Number(env.RATE_SUBMITS_PER_MIN) || 120,
   };
+}
+
+/** Simple global token bucket: `perMinute` tokens, refilled continuously. */
+export function createBucket(perMinute) {
+  let tokens = perMinute;
+  let last = Date.now();
+  return {
+    take() {
+      const now = Date.now();
+      tokens = Math.min(perMinute, tokens + ((now - last) / 60000) * perMinute);
+      last = now;
+      if (tokens < 1) return false;
+      tokens -= 1;
+      return true;
+    },
+  };
+}
+
+/**
+ * Daily snapshot of both datasets to DATA_DIR/exports (sessions and consent log in separate
+ * folders), so the persistent disk always holds a dated copy for the nightly transfer to the
+ * PI's Columbia storage. Returns the paths written.
+ */
+export function writeSnapshot(dbs, dataDir) {
+  const day = new Date().toISOString().slice(0, 10);
+  const sessionsDir = resolve(dataDir, 'exports', 'sessions');
+  const consentDir = resolve(dataDir, 'exports', 'consent-log');
+  mkdirSync(sessionsDir, { recursive: true });
+  mkdirSync(consentDir, { recursive: true });
+  const sessionsPath = join(sessionsDir, `threshold_sessions_${day}.csv`);
+  const consentPath = join(consentDir, `threshold_consent_log_${day}.csv`);
+  writeFileSync(sessionsPath, toCsv(allSessions(dbs).map(derive)));
+  writeFileSync(consentPath, consentCsv(allConsentRecords(dbs)));
+  return { sessionsPath, consentPath };
 }
 
 export function createApp(config, dbs) {
   const log = config.quiet ? () => {} : (line) => process.stdout.write(line + '\n');
+  const sessionBucket = createBucket(config.rateSessionsPerMin);
+  const submitBucket = createBucket(config.rateSubmitsPerMin);
 
   // --- helpers -------------------------------------------------------------
   const send = (res, status, body, headers = {}) => {
-    const h = { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', ...headers };
+    const h = { 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer', 'X-Robots-Tag': 'noindex, nofollow', ...headers };
     res.writeHead(status, h);
     res.end(body);
   };
@@ -129,6 +169,7 @@ export function createApp(config, dbs) {
     // different databases; the response carries only the session UUID and materials.
     if (req.method === 'POST' && path === '/api/sessions') {
       if (config.studyClosed) return error(res, 403, 'The study is closed to new participants.');
+      if (!sessionBucket.take()) return error(res, 429, 'The study server is busy. Please try again in a moment.');
       const body = await readJson(req);
       const v = validateConsent(body);
       if (!v.ok) return error(res, 400, 'Invalid consent record', v.errors);
@@ -162,6 +203,7 @@ export function createApp(config, dbs) {
       }
       if (action === 'submit' && req.method === 'POST') {
         if (session.status !== 'started') return error(res, 409, 'This session has already ended.');
+        if (!submitBucket.take()) return error(res, 429, 'The study server is busy. Please try again in a moment.');
         const body = await readJson(req);
         const v = validateSubmission(body);
         if (!v.ok) return error(res, 400, 'Invalid submission', v.errors);
@@ -182,6 +224,10 @@ export function createApp(config, dbs) {
       if (!tokenOk(req, wantsConsent ? config.consentToken : config.adminToken)) return error(res, 401, 'Unauthorized');
       if (req.method !== 'GET') return error(res, 405, 'Method not allowed');
 
+      if (path === '/api/admin/snapshot') {
+        const written = writeSnapshot(dbs, config.dataDir);
+        return json(res, 200, { ok: true, ...written });
+      }
       if (path === '/api/admin/summary') {
         return json(res, 200, { ...summary(dbs), config: { randomisation: config.randomisation, immediateDebrief: config.immediateDebrief, studyClosed: config.studyClosed, consentTimestampPrecision: config.consentTimestampPrecision }, versions: { instrument: INSTRUMENT_VERSION, consent: CONSENT_VERSION } });
       }
@@ -285,6 +331,18 @@ if (isMain) {
   const dbs = openDatabases(config.dataDir);
   const server = await startServer(config, dbs);
   process.stdout.write(`THRESHOLD listening on http://localhost:${server.address().port}  (data: ${resolve(config.dataDir)}, randomisation: ${config.randomisation})\n`);
+  if (config.snapshotHours > 0) {
+    const snap = () => {
+      try {
+        const w = writeSnapshot(dbs, config.dataDir);
+        process.stdout.write(`${new Date().toISOString()} snapshot written: ${w.sessionsPath}\n`);
+      } catch (e) {
+        process.stderr.write(`${new Date().toISOString()} snapshot failed: ${e.message}\n`);
+      }
+    };
+    snap();
+    setInterval(snap, config.snapshotHours * 3600 * 1000).unref();
+  }
   const shutdown = () => {
     server.close(() => {
       dbs.study.close();
