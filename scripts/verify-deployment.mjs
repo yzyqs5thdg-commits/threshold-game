@@ -11,10 +11,16 @@
 //
 // Afterwards delete the "DEPLOYMENT TEST" row from the consent log export if you keep that file.
 
-const base = (process.argv[2] || '').replace(/\/$/, '');
-const token = process.argv[3] || process.env.ADMIN_TOKEN || '';
+//   Google Sheets backend (Apps Script web app):
+//   node scripts/verify-deployment.mjs --gas https://script.google.com/macros/s/.../exec [ADMIN_TOKEN]
+
+const args = process.argv.slice(2);
+const gasMode = args[0] === '--gas';
+if (gasMode) args.shift();
+const base = (args[0] || '').replace(/\/$/, '');
+const token = args[1] || process.env.ADMIN_TOKEN || '';
 if (!base) {
-  console.error('usage: node scripts/verify-deployment.mjs <base-url> [admin-token]');
+  console.error('usage: node scripts/verify-deployment.mjs [--gas] <url> [admin-token]');
   process.exit(2);
 }
 
@@ -29,6 +35,49 @@ const getJson = async (path, opts = {}) => {
   try { body = await res.json(); } catch { /* not json */ }
   return { status: res.status, body, headers: res.headers };
 };
+
+if (gasMode) {
+  const call = async (payload) => {
+    const res = await fetch(base, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload), redirect: 'follow' });
+    let body = null;
+    try { body = await res.json(); } catch { /* not json */ }
+    return { status: res.status, body };
+  };
+  try {
+    const h = await call({ action: 'health' });
+    check('web app answers', h.status === 200 && h.body?.ok === true, `instrument ${h.body?.versions?.instrument ?? '?'}`);
+    check('HTTPS in use', base.startsWith('https://script.google.com/'), base.startsWith('https://') ? '' : 'the /exec URL must be https');
+    let before = null;
+    if (token) {
+      const s = await call({ action: 'summary', token });
+      check('admin token accepted', s.status === 200 && !s.body?.error, s.body?.error || `study closed: ${s.body?.config?.studyClosed}`);
+      before = s.body;
+      check('study open', before?.config?.studyClosed === false);
+    }
+    const created = await call({ action: 'session', fullName: 'DEPLOYMENT TEST', consentDate: new Date().toISOString().slice(0, 10) });
+    const sid = created.body?.sessionId;
+    check('session created after consent', !!sid && !created.body?.error, created.body?.error || '');
+    check('materials delivered for one condition only', Array.isArray(created.body?.materials?.scenarios) && created.body.materials.scenarios.length === 4 && !('condition' in (created.body || {})));
+    if (sid) {
+      const w = await call({ action: 'withdraw', sessionId: sid });
+      check('withdraw recorded (no responses stored)', w.body?.status === 'withdrawn', w.body?.error || '');
+      const again = await call({ action: 'submit', sessionId: sid });
+      check('ended session refuses a submission', again.body?.status === 409 || again.body?.status === 400, `status ${again.body?.status}`);
+    }
+    if (token && before && !before.error) {
+      const s = await call({ action: 'summary', token });
+      const grew = (s.body?.totals?.withdrawn ?? 0) === (before.totals?.withdrawn ?? 0) + 1 && (s.body?.consentCount ?? 0) === (before.consentCount ?? 0) + 1;
+      check('sheet persisted the session and the consent record', grew, `withdrawn ${before.totals?.withdrawn} → ${s.body?.totals?.withdrawn}, consent ${before.consentCount} → ${s.body?.consentCount}`);
+    } else if (!token) {
+      console.log('note: pass the ADMIN_TOKEN script property as the second argument to also verify persistence');
+    }
+  } catch (e) {
+    check('request failed', false, e.message);
+  }
+  const failedGas = results.filter((r) => !r.ok);
+  console.log(`\n${results.length - failedGas.length}/${results.length} checks passed`);
+  process.exit(failedGas.length ? 1 : 0);
+}
 
 try {
   const h = await getJson('/healthz');

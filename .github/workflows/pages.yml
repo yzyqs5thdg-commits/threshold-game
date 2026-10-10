@@ -1,12 +1,18 @@
-# Rebuilds the no-server preview (dist/index.html) and publishes it to the gh-pages branch,
-# which GitHub Pages serves at https://yzyqs5thdg-commits.github.io/threshold-game/
-# The preview records nothing; it exists so the instrument can be reviewed and played.
-name: Publish preview to GitHub Pages
+# Builds the static site and publishes it to the gh-pages branch, which GitHub Pages serves at
+# https://yzyqs5thdg-commits.github.io/threshold-game/
+#
+# Two modes, chosen by the repository variable THRESHOLD_GAS_ENDPOINT (Settings → Secrets and
+# variables → Actions → Variables):
+#   unset  → the root page is the researcher PREVIEW (records nothing)
+#   set    → the root page is the PARTICIPANT build, which stores responses through the Google Apps
+#            Script web app at that URL (see docs/DEPLOY_SHEETS.md); the preview moves to /preview/
+# Optional variable THRESHOLD_FOLLOWUP_FORM_URL: the Google Form link shown after submission.
+name: Publish site to GitHub Pages
 
 on:
   push:
     branches: [claude/build-threshold-game, master, main]
-    paths: [server/**, public/**, scripts/**, .github/workflows/pages.yml]
+    paths: [server/**, public/**, scripts/**, gas/**, .github/workflows/pages.yml]
   workflow_dispatch:
 
 permissions:
@@ -19,22 +25,37 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      GAS_ENDPOINT: ${{ vars.THRESHOLD_GAS_ENDPOINT }}
+      FOLLOWUP_URL: ${{ vars.THRESHOLD_FOLLOWUP_FORM_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm test
-      - run: node scripts/build-standalone.js
+      - name: Build site
+        run: |
+          mkdir -p site/preview
+          touch site/.nojekyll
+          node scripts/build-standalone.js --mode=preview --out=site/preview/index.html
+          node scripts/build-gas.js
+          if [ -n "$GAS_ENDPOINT" ]; then
+            node scripts/build-standalone.js --mode=participant --endpoint="$GAS_ENDPOINT" --followup="$FOLLOWUP_URL" --out=site/index.html
+            echo "Participant build published at the site root (backend: Google Sheets)."
+          else
+            cp site/preview/index.html site/index.html
+            echo "No THRESHOLD_GAS_ENDPOINT variable: the site root is the preview."
+          fi
+          cp dist/consent.html site/consent.html
       - name: Push to gh-pages
         run: |
-          mkdir -p site && cp dist/index.html site/index.html && touch site/.nojekyll
           cd site
           git init -q -b gh-pages
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -q -m "Publish preview from ${GITHUB_SHA::7}"
+          git commit -q -m "Publish site from ${GITHUB_SHA::7}"
           git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

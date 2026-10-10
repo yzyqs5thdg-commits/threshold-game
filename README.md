@@ -18,7 +18,8 @@ All instrument text comes verbatim from Protocol v1.3, Appendix B and C. Build c
 | `server/validate.js` | Server-side validation of every submitted value. |
 | `server/export.js` | Derived variables and CSV export. |
 | `public/` | The game (plain HTML/CSS/JS, no build step) and the study-team page at `/admin`. |
-| `test/` | Unit and API tests (`npm test`). |
+| `gas/` + `scripts/build-gas.js` | Google Apps Script backend (`npm run build:gas` → `dist/gas/Code.gs`), the no-server alternative to `server/`. |
+| `test/` | Unit, API and Apps Script harness tests (`npm test`). |
 
 ## Running it
 
@@ -55,7 +56,12 @@ Tests: `npm test`. Export from the command line without the server running: `npm
 
 ## Deploying
 
-For Render, see [`docs/DEPLOY_RENDER.md`](docs/DEPLOY_RENDER.md) (one-click Blueprint in `render.yaml`).
+Two supported ways to run the study:
+
+- **Google Sheets backend, no server (recommended for this study)**: the game runs as a static page on GitHub Pages and stores responses in the study's Google Sheet through a Google Apps Script web app. Free, and the data sits directly in the team's Google Drive. See [`docs/DEPLOY_SHEETS.md`](docs/DEPLOY_SHEETS.md).
+- **Node server on Render**: SQLite on a persistent disk with an admin page and CSV exports. See [`docs/DEPLOY_RENDER.md`](docs/DEPLOY_RENDER.md) (one-click Blueprint in `render.yaml`).
+
+Both store exactly the same variables (`docs/DATA_DICTIONARY.md`), keep the consent log separate from responses, write responses only on Submit, and never record IP addresses.
 
 The server needs a persistent disk for `DATA_DIR` and must sit behind HTTPS. Any host that runs a Node process with a volume works (Render, Railway, Fly.io, a Columbia-managed VM, Docker anywhere). Serverless platforms (Vercel, Netlify functions) will not work because they have no persistent local disk.
 

@@ -48,6 +48,9 @@ const STEP_CLOCK = ['07:45', '08:00', '08:20', '08:45', '09:30', '11:00', '12:30
 // Optional hooks used by the standalone (no-server) build: a replacement for the network
 // layer and a callback after each screen renders. Absent in the normal deployment.
 const hooks = window.__THRESHOLD_HOOKS__ || {};
+// Optional alternative backend for the static (GitHub Pages) build: a Google Apps Script web app
+// bound to the study's Google Sheet. Set by scripts/build-standalone.js in participant mode.
+const BACKEND = window.__THRESHOLD_BACKEND__ || null;
 
 let config = null;
 let state = loadState() || freshState();
@@ -118,6 +121,7 @@ const todayIso = () => {
 
 async function api(path, { method = 'GET', body } = {}) {
   if (hooks.api) return hooks.api(path, { method, body });
+  if (BACKEND && BACKEND.type === 'gas') return gasApi(path, method, body);
   const res = await fetch(path, {
     method,
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
@@ -134,6 +138,48 @@ async function api(path, { method = 'GET', body } = {}) {
   if (!res.ok) {
     const err = new Error(data?.error || `Request failed (${res.status})`);
     err.status = res.status;
+    err.details = data?.details;
+    throw err;
+  }
+  return data;
+}
+
+// Google Apps Script transport. The script accepts one JSON document per request; the request
+// is sent as text/plain so the browser makes a "simple" cross-origin request (no preflight, which
+// Apps Script cannot answer). Errors come back inside the JSON with an HTTP-style status.
+async function gasApi(path, method, body) {
+  if (path === '/api/config') return window.__THRESHOLD_CONFIG__;
+  let action;
+  let payload = {};
+  const m = path.match(/^\/api\/sessions\/([^/]+)\/(submit|withdraw)$/);
+  if (path === '/api/sessions' && method === 'POST') {
+    action = 'session';
+    payload = body || {};
+  } else if (m && method === 'POST') {
+    action = m[2];
+    payload = { sessionId: m[1], ...(body || {}) };
+  } else {
+    const err = new Error('Unsupported request');
+    err.status = 404;
+    throw err;
+  }
+  const res = await fetch(BACKEND.url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, ...payload }),
+    credentials: 'omit',
+    cache: 'no-store',
+    redirect: 'follow',
+  });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* non-JSON */
+  }
+  if (!res.ok || !data || data.error) {
+    const err = new Error(data?.error || `Request failed (${res.status})`);
+    err.status = data?.status || res.status || 500;
     err.details = data?.details;
     throw err;
   }
@@ -820,7 +866,7 @@ function bootSplash() {
 (async function boot() {
   mountDesk();
   try {
-    config = await api('/api/config');
+    config = window.__THRESHOLD_CONFIG__ || (await api('/api/config'));
   } catch {
     render(`<div class="panel"><h1>Unable to load</h1><p>The study page could not be loaded. Please refresh or try again later.</p></div>`, { step: 0 });
     return;

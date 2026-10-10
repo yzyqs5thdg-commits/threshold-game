@@ -1,19 +1,34 @@
-// Builds dist/threshold-standalone.html: the whole game in one file with no server.
-// Used for previewing and playing the instrument (e.g. as a hosted artifact). It runs the same
-// client code and the same study text as the real deployment; the network layer is replaced by
-// an in-browser store, a researcher preview bar is added, and the session record is shown at
-// the end. It records nothing anywhere. Not for data collection.
+// Builds the single-file static game. Two modes:
 //
-//   node scripts/build-standalone.js
+//   --mode=preview (default)
+//     dist/index.html + dist/threshold-standalone.html: the whole game with an in-browser store, a
+//     researcher preview bar and a session-record panel. Records nothing. Not for data collection.
+//
+//   --mode=participant --endpoint=<Apps Script /exec URL> [--followup=<Google Form URL>]
+//     dist/index.html: the participant build for static hosting (GitHub Pages). No researcher
+//     controls; responses are stored through the Google Apps Script backend (see docs/DEPLOY_SHEETS.md).
+//
+//   --out=<path> writes the full document somewhere else (used by the Pages workflow).
+// Both modes also write dist/consent.html (the printable consent form).
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { publicMaterials, INSTRUMENT_VERSION, CONSENT_VERSION } from '../server/content.js';
+import { consentPayload, consentPrintHtml } from '../server/consent.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(resolve(root, p), 'utf8');
+
+const args = Object.fromEntries(process.argv.slice(2).map((a) => { const m = a.match(/^--([^=]+)=(.*)$/); return m ? [m[1], m[2]] : [a.replace(/^--/, ''), true]; }));
+const mode = args.mode === 'participant' ? 'participant' : 'preview';
+if (mode === 'participant' && !args['allow-any-endpoint'] && !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(String(args.endpoint || ''))) {
+  process.stderr.write('participant mode needs --endpoint=https://script.google.com/macros/s/<id>/exec\n');
+  process.exit(1);
+}
+const outPath = resolve(root, String(args.out || 'dist/index.html'));
 
 // Turn an ES module source into plain script text sharing one scope.
 const demodule = (src) =>
@@ -165,7 +180,7 @@ document.getElementById('preview-debrief').addEventListener('change', (e) => {
 // Shell markup comes from public/index.html (everything inside <body>, minus the script tag),
 // with the researcher preview bar inserted above the desk.
 const indexHtml = read('public/index.html');
-const bodyInner = indexHtml.slice(indexHtml.indexOf('<body>') + 6, indexHtml.indexOf('</body>')).replace(/<script[^>]*><\/script>/, '').trim();
+const bodyInner = indexHtml.slice(indexHtml.indexOf('<body>') + 6, indexHtml.indexOf('</body>')).replace(/<script[^>]*><\/script>/, '').replace('href="/consent"', 'href="consent.html"').trim();
 const previewBar = `<div class="preview" role="region" aria-label="Researcher preview controls">
   <div class="preview__inner">
     <span><strong>Researcher preview.</strong> Runs entirely in your browser; nothing is recorded or sent.</span>
@@ -182,7 +197,38 @@ const previewBar = `<div class="preview" role="region" aria-label="Researcher pr
   </div>
 </div>`;
 
-const html = `<title>THRESHOLD</title>
+// Participant mode: the study text and the backend address are baked in; the module script carries
+// only the visual layer and the client (materials come from the Apps Script per assigned condition).
+const inlineJson = (v) => JSON.stringify(v).replace(/<\//g, '<\\/');
+const participantConfig = {
+  studyClosed: false,
+  followupFormUrl: String(args.followup || ''),
+  immediateDebrief: false,
+  immediateDebriefText: null,
+  versions: { instrument: INSTRUMENT_VERSION, consent: CONSENT_VERSION },
+  consent: consentPayload(),
+  ...publicMaterials(),
+};
+const participantBoot = `<script>
+window.__THRESHOLD_BACKEND__ = ${inlineJson({ type: 'gas', url: String(args.endpoint || '') })};
+window.__THRESHOLD_CONFIG__ = ${inlineJson(participantConfig)};
+</script>`;
+
+const html = mode === 'participant'
+  ? `<title>THRESHOLD</title>
+<style>
+${css}
+${fxCss}
+</style>
+${bodyInner}
+${participantBoot}
+<script type="module">
+${fxBundle}
+${fxRegistry}
+${appJs}
+</script>
+`
+  : `<title>THRESHOLD</title>
 <style>
 ${css}
 ${fxCss}
@@ -216,9 +262,12 @@ ${appJs}
 }
 
 mkdirSync(resolve(root, 'dist'), { recursive: true });
-// Fragment (no document skeleton) for hosts that wrap the page themselves.
+mkdirSync(dirname(outPath), { recursive: true });
+// Fragment (no document skeleton) for hosts that wrap the page themselves (preview only).
 const out = resolve(root, 'dist/threshold-standalone.html');
-writeFileSync(out, html);
+if (mode === 'preview') writeFileSync(out, html);
+// Printable consent form next to the page.
+writeFileSync(resolve(root, 'dist/consent.html'), consentPrintHtml(CONSENT_VERSION));
 // Complete document for static hosting (GitHub Pages) or opening from disk / an email attachment.
 const favicon = 'data:image/svg+xml,' + encodeURIComponent(read('public/favicon.svg'));
 const full = `<!doctype html>
@@ -233,6 +282,5 @@ ${html}
 </body>
 </html>
 `.replace('<title>THRESHOLD</title>\n<style>', '<title>THRESHOLD — Decision-Making in Organizational Risk Scenarios</title>\n<style>').replace('</style>\n<a class="skip"', '</style>\n</head>\n<body>\n<a class="skip"');
-const outFull = resolve(root, 'dist/index.html');
-writeFileSync(outFull, full);
-process.stdout.write(`${out} (${(Buffer.byteLength(html) / 1024).toFixed(0)} KB)\n${outFull} (${(Buffer.byteLength(full) / 1024).toFixed(0)} KB)\n`);
+writeFileSync(outPath, full);
+process.stdout.write(`[${mode}] ${outPath} (${(Buffer.byteLength(full) / 1024).toFixed(0)} KB)${mode === 'preview' ? `\n[preview] ${out} (${(Buffer.byteLength(html) / 1024).toFixed(0)} KB)` : ''}\n`);
