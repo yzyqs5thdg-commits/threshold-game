@@ -9,6 +9,7 @@ import * as supply from './supply.js';
 import * as audit from './audit.js';
 import * as regulatory from './regulatory.js';
 import * as geo from './geo.js';
+import * as portrait from './portrait.js';
 import { mountAmbient } from './ambient.js';
 import { renderHudExtras, renderIncomingBanner, scanSweep, decodeReveal, badgeActivate, lockIn, stampIn } from './effects.js';
 
@@ -21,4 +22,4 @@ export const VIGNETTES = {
   Geopolitical: geo,
 };
 
-export { mountAmbient, renderHudExtras, renderIncomingBanner, scanSweep, decodeReveal, badgeActivate, lockIn, stampIn };
+export { portrait, mountAmbient, renderHudExtras, renderIncomingBanner, scanSweep, decodeReveal, badgeActivate, lockIn, stampIn };

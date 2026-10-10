@@ -25,10 +25,13 @@ The game layer is deliberately rich (a boot splash, an ambient particle field, H
 
 - **No information.** No scene, icon or animation shows a number, a severity, a trend, a gauge, a traffic-light colour, or anything that could be read as the "right" answer. The palette is amber and blue only. The five incident scenes are themed by domain (network map, route map, ledger, scales and seals, globe) and are the same in every condition because they only know the domain, never the condition or any decision.
 - **No feedback.** The lock-in effect on "Log decision" is identical whichever option was chosen; nothing on screen changes in response to the content of a decision.
-- **Same timing for everyone.** The decode effect on Dr. Vale's briefing finishes at a fixed 900 ms regardless of the text length, so the epistemic and aleatory briefings are revealed identically. The incident's situation report is readable from first paint; the scene above it is decorative and the latency clock still starts at render.
+- **Same timing for everyone.** The decode effect on Dr. Vale's briefing finishes at a fixed 900 ms regardless of the text length, so the epistemic and aleatory briefings are revealed identically.
+- **Timed screens are not animated in.** The incident card has no entrance fade and no scan sweep: the situation report is fully legible at first paint. The animated scene sits behind the card's header as a backdrop band rather than as a block above the text, and on cards at least 640 px wide the three options sit in one row, so at 1280×720 and 1366×768 the whole situation report and all three options are on screen at render without scrolling (measured in all four conditions, see the review notes in `docs/REVIEW_NOTES.md`).
+- **Latency clock.** `lat_n` starts at the first frame painted after the incident renders (double `requestAnimationFrame`), and the click times come from the input event's own timestamp (`event.timeStamp`), so a busy main thread cannot delay either end of the measurement.
 - **Reduced motion.** Under `prefers-reduced-motion` the splash is skipped, the ambient canvas draws one static frame, and every effect sets its final state immediately.
 - **No third-party resources.** All art is inline SVG, CSS and Canvas in `public/fx/`; the page still makes no external request.
-- **Failure-safe.** Every effect is wrapped so that if it throws, the study flow continues unchanged.
+- **Failure-safe.** Every effect is wrapped so that if it throws, the study flow continues unchanged. While a lock-in or badge effect plays, the inputs it has already captured are disabled and the handler is one-shot, so a second click cannot log a second decision or skip an item.
+- **Internal Review scene.** The audit scene shows abstract ledger rows, a dial and a document with a seal and small check marks settling into place. These are thematic dressing for an item that itself states "No material findings were identified"; the item's response is a pre-registered attention check, not a scored decision, so the scene carries no information about the correct response beyond the item's own instruction.
 
 ## Other choices worth knowing
 

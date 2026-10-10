@@ -7,6 +7,8 @@
 //   node scripts/build-standalone.js
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -29,7 +31,7 @@ const css = read('public/styles.css');
 
 // Visual-effects modules: each becomes a namespaced object so their identical export names
 // (every vignette exports render()) cannot collide inside the single bundle scope.
-const FX_MODULES = ['cyber', 'supply', 'audit', 'regulatory', 'geo', 'ambient', 'effects'];
+const FX_MODULES = ['cyber', 'supply', 'audit', 'regulatory', 'geo', 'portrait', 'ambient', 'effects'];
 function wrapFx(name) {
   let src = read(`public/fx/${name}.js`).replace(/^import .*?;$/gm, '');
   const names = new Set();
@@ -41,6 +43,7 @@ function wrapFx(name) {
 const fxBundle = FX_MODULES.map(wrapFx).join('\n');
 const fxRegistry = `
 const VIGNETTES = { Cybersecurity: fx_cyber, 'Supply chain': fx_supply, 'Internal audit': fx_audit, Regulatory: fx_regulatory, Geopolitical: fx_geo };
+const portrait = fx_portrait;
 const { mountAmbient } = fx_ambient;
 const { renderHudExtras, renderIncomingBanner, scanSweep, decodeReveal, badgeActivate, lockIn, stampIn } = fx_effects;
 `;
@@ -198,6 +201,19 @@ ${glue}
 ${appJs}
 </script>
 `;
+
+// Build-time check: the concatenated script must parse as a module, otherwise the whole page is blank.
+{
+  const script = html.slice(html.indexOf('<script type="module">') + '<script type="module">'.length, html.lastIndexOf('</script>'));
+  const tmp = resolve(tmpdir(), `threshold-standalone-check-${process.pid}.mjs`);
+  writeFileSync(tmp, script);
+  try {
+    execFileSync(process.execPath, ['--check', tmp], { stdio: 'pipe' });
+  } catch (e) {
+    process.stderr.write(`Standalone bundle does not parse:\n${e.stderr}\n`);
+    process.exit(1);
+  }
+}
 
 mkdirSync(resolve(root, 'dist'), { recursive: true });
 // Fragment (no document skeleton) for hosts that wrap the page themselves.

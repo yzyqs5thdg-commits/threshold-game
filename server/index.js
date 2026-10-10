@@ -12,6 +12,7 @@ import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, extname, normalize, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID, createHash, timingSafeEqual } from 'node:crypto';
+import { gzipSync } from 'node:zlib';
 
 import { openDatabases, openInMemory, recordConsent, createSession, getSession, submitSession, withdrawSession, allSessions, allConsentRecords, summary } from './db.js';
 import { assignCondition } from './randomise.js';
@@ -202,14 +203,35 @@ export function createApp(config, dbs) {
   }
 
   // --- static files --------------------------------------------------------
-  function serveStatic(res, relPath) {
+  // Text assets are served gzip-compressed (cached per file mtime) so the game loads quickly on slow links.
+  const gzipCache = new Map();
+  const COMPRESSIBLE = new Set(['.html', '.js', '.css', '.svg', '.json', '.txt', '.webmanifest']);
+  function serveStatic(req, res, relPath) {
     const safe = normalize('/' + relPath).replace(/^(\.\.[/\\])+/, '');
     const file = join(PUBLIC_DIR, safe);
-    if (!file.startsWith(PUBLIC_DIR) || !existsSync(file) || !statSync(file).isFile()) return false;
+    if (!file.startsWith(PUBLIC_DIR) || !existsSync(file)) return false;
+    const stat = statSync(file);
+    if (!stat.isFile()) return false;
     const ext = extname(file).toLowerCase();
-    const body = readFileSync(file);
+    let body = readFileSync(file);
+    const encodingHeaders = {};
+    const acceptsGzip = /\bgzip\b/.test(req.headers['accept-encoding'] || '');
+    if (acceptsGzip && COMPRESSIBLE.has(ext)) {
+      const key = `${file}:${stat.mtimeMs}:${stat.size}`;
+      let gz = gzipCache.get(key);
+      if (!gz) {
+        gz = gzipSync(body, { level: 6 });
+        if (gzipCache.size > 200) gzipCache.clear();
+        gzipCache.set(key, gz);
+      }
+      body = gz;
+      encodingHeaders['Content-Encoding'] = 'gzip';
+    }
     send(res, 200, body, {
       'Content-Type': MIME[ext] || 'application/octet-stream',
+      'Content-Length': body.length,
+      Vary: 'Accept-Encoding',
+      ...encodingHeaders,
       'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=3600',
       ...(ext === '.html'
         ? {
@@ -231,11 +253,11 @@ export function createApp(config, dbs) {
     try {
       if (url.pathname.startsWith('/api/')) return await handleApi(req, res, url);
       if (req.method !== 'GET' && req.method !== 'HEAD') return error(res, 405, 'Method not allowed');
-      if (url.pathname === '/') return serveStatic(res, 'index.html');
-      if (url.pathname === '/admin') return serveStatic(res, 'admin.html');
+      if (url.pathname === '/') return serveStatic(req, res, 'index.html');
+      if (url.pathname === '/admin') return serveStatic(req, res, 'admin.html');
       if (url.pathname === '/consent') return send(res, 200, consentPrintHtml(CONSENT_VERSION), { 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': "default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'" });
       if (url.pathname === '/healthz') return json(res, 200, { ok: true });
-      if (serveStatic(res, url.pathname)) return;
+      if (serveStatic(req, res, url.pathname)) return;
       return error(res, 404, 'Not found');
     } catch (e) {
       const status = e.status || 500;

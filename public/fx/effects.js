@@ -4,7 +4,8 @@
 // any decision; every function renders or plays identically on every call. Nothing drawn carries
 // meaning: breathing status dots, a looping abstract waveform with no axis, chevrons, light sweeps,
 // rings. Ids are prefixed "fxeffects-", classes "fx-effects-", keyframes "fxeffects-". Styles live in
-// /fx/effects.css (no inline style attributes in markup; JS may set element.style).
+// /fx/effects.css (no inline style attributes in markup; JS may set element.style and always
+// restores what it set, leaving no style attribute behind).
 //
 // Every exported function is safe to call repeatedly, tolerates missing elements, never throws,
 // and under prefers-reduced-motion simply sets the final state immediately.
@@ -67,8 +68,12 @@ function mountOverlay(el, cls, html, ms) {
   }
 }
 
-/** Add a class for `ms` milliseconds, then remove it (used for CSS-driven flashes on the target itself). */
-function pulseClass(el, cls, ms) {
+/**
+ * Add a class for `ms` milliseconds, then remove it (used for CSS-driven flashes on the target
+ * itself). `onEnd`, if given, runs in the same timer callback as the class removal, so any
+ * supporting inline state goes away in the same frame as the animation — never a frame earlier.
+ */
+function pulseClass(el, cls, ms, onEnd) {
   try {
     el.classList.remove(PREFIX + cls);
     // Force a restart if the class is re-applied while the previous animation is still running.
@@ -76,6 +81,9 @@ function pulseClass(el, cls, ms) {
     el.classList.add(PREFIX + cls);
     setTimeout(() => {
       try { el.classList.remove(PREFIX + cls); } catch { /* ignore */ }
+      if (typeof onEnd === 'function') {
+        try { onEnd(); } catch { /* ignore */ }
+      }
     }, ms + TIMER_SLACK);
   } catch {
     /* ignore */
@@ -103,6 +111,8 @@ function wavePath(w, h, parts, phase) {
   return `M${pts.join(' L')}`;
 }
 
+// The amber trace is drawn twice: a wide, faint copy underneath gives the halo that a blur filter
+// used to, without re-filtering a transform-animated group every frame.
 const WAVE_W = 216;
 const WAVE_H = 46;
 const WAVE_A = wavePath(WAVE_W, WAVE_H, [[2, 7], [5, 4.5], [9, 2.2]], 0.6);
@@ -138,10 +148,6 @@ function hudWaveSvg() {
       <stop offset="0.5" stop-color="#f3cf7a" stop-opacity="0.9"/>
       <stop offset="1" stop-color="#f3cf7a" stop-opacity="0"/>
     </linearGradient>
-    <filter id="fxeffects-wave-glow" x="-10%" y="-40%" width="120%" height="180%">
-      <feGaussianBlur stdDeviation="1.6" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
   <rect x="0" y="0" width="${w}" height="${h}" fill="url(#fxeffects-wave-dots)"/>
   <line x1="0" y1="${h / 2}" x2="${w}" y2="${h / 2}" stroke="#ffffff" stroke-opacity="0.06" stroke-width="1" stroke-dasharray="2 4"/>
@@ -149,7 +155,8 @@ function hudWaveSvg() {
     <g class="${PREFIX}wave-b">
       <path d="${WAVE_B}" fill="none" stroke="#7fb3ff" stroke-width="1" stroke-opacity="0.42" stroke-linejoin="round"/>
     </g>
-    <g class="${PREFIX}wave-a" filter="url(#fxeffects-wave-glow)">
+    <g class="${PREFIX}wave-a">
+      <path d="${WAVE_A}" fill="none" stroke="#e9b94c" stroke-width="3.5" stroke-opacity="0.25" stroke-linejoin="round" stroke-linecap="round"/>
       <path d="${WAVE_A}" fill="none" stroke="#e9b94c" stroke-width="1.4" stroke-opacity="0.9" stroke-linejoin="round"/>
     </g>
     <g class="${PREFIX}wave-cursor">
@@ -216,8 +223,9 @@ function chevronSvg() {
 export function renderIncomingBanner({ code, domain } = {}) {
   try {
     const parts = ['INCOMING', code, domain].filter((p) => p != null && String(p).trim() !== '');
-    const text = parts.map((p, i) => `<span class="${PREFIX}incoming-part ${PREFIX}incoming-part-${i + 1}">${escapeHtml(p)}</span>`)
-      .join(`<span class="${PREFIX}incoming-sep">·</span>`);
+    // Separators are numbered too so the one before a dropped segment can be hidden with it.
+    const text = parts.map((p, i) => (i ? `<span class="${PREFIX}incoming-sep ${PREFIX}incoming-sep-${i}">·</span>` : '')
+      + `<span class="${PREFIX}incoming-part ${PREFIX}incoming-part-${i + 1}">${escapeHtml(p)}</span>`).join('');
     return `
 <div class="${PREFIX}incoming" aria-hidden="true">
   <span class="${PREFIX}incoming-corner ${PREFIX}incoming-corner-l"></span>
@@ -250,10 +258,13 @@ export function scanSweep(el) {
   return o ? wait(ms) : Promise.resolve();
 }
 
-// decodeReveal state: element -> { original, token }. Keeping the original text here means a second
-// call during a running decode still knows the true text instead of a half-scrambled snapshot.
+// decodeReveal state: element -> { original, saved, lockHeight, token }. Keeping the original text
+// and the saved inline height values here means a second call during a running decode still knows
+// the true text and the true pre-decode styles instead of a half-scrambled snapshot.
 const DECODING = new WeakMap();
-const GLYPHS = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghkmnopqrstuvwxyz0123456789#%&<>/|=+*';
+// No wide glyphs (W, M, m, w, %, &, #) so the scrambled line is seldom longer than the real one.
+const GLYPHS = 'ABCDEFGHJKLNPRSTUVXYZabcdefghkinopqrstuvxyz0123456789<>/|=+*';
+const LOCK_PROPS = ['min-height', 'max-height'];
 
 /** Small deterministic hash → [0,1), used for per-character resolve jitter. */
 function unitHash(i) {
@@ -275,15 +286,27 @@ function unitHash(i) {
 export function decodeReveal(el, { duration = 900 } = {}) {
   if (!isElement(el)) return Promise.resolve();
   let original;
+  let saved;
+  let lockHeight;
   try {
     const prev = DECODING.get(el);
-    original = prev ? prev.original : el.textContent;
+    if (prev) {
+      // A decode already owns this element: its inline styles are ours, so carry the values it
+      // saved forward rather than re-reading our own lock as if it were the caller's.
+      original = prev.original;
+      saved = prev.saved;
+      lockHeight = prev.lockHeight;
+    } else {
+      original = el.textContent;
+      saved = LOCK_PROPS.map((prop) => [prop, el.style.getPropertyValue(prop), el.style.getPropertyPriority(prop)]);
+      lockHeight = undefined;
+    }
   } catch {
     return Promise.resolve();
   }
   if (typeof original !== 'string') return Promise.resolve();
 
-  const state = { original, token: Symbol('decode') };
+  const state = { original, saved, lockHeight, token: Symbol('decode') };
   DECODING.set(el, state);
   const owns = () => DECODING.get(el) === state;
 
@@ -292,7 +315,12 @@ export function decodeReveal(el, { duration = 900 } = {}) {
     try {
       el.textContent = original;
       el.classList.remove(PREFIX + 'decoding');
-      if (state.minHeight !== undefined) el.style.minHeight = state.minHeight;
+      for (const [prop, value, priority] of state.saved) {
+        if (value) el.style.setProperty(prop, value, priority);
+        else el.style.removeProperty(prop);
+      }
+      // Leave no residue: an emptied style attribute is dropped entirely.
+      if (el.style.length === 0 && el.getAttribute('style') !== null) el.removeAttribute('style');
     } catch { /* ignore */ }
     DECODING.delete(el);
   };
@@ -312,10 +340,24 @@ export function decodeReveal(el, { duration = 900 } = {}) {
     thresholds[i] = Math.min(0.97, 0.05 + base * 0.78 + unitHash(i) * 0.14);
   }
 
+  // Pin the element to its final height for the duration (min- and max-height; the decoding class
+  // adds overflow: hidden) so the wider scrambled glyphs never reflow what sits below it.
   try {
-    state.minHeight = el.style.minHeight;
-    const h = el.getBoundingClientRect().height;
-    if (h > 0) el.style.minHeight = `${Math.ceil(h)}px`;
+    if (state.lockHeight === undefined) {
+      const rect = el.getBoundingClientRect();
+      let h = rect.height;
+      const cs = getComputedStyle(el);
+      if (cs.boxSizing !== 'border-box') {
+        for (const side of ['Top', 'Bottom']) {
+          h -= parseFloat(cs[`padding${side}`]) || 0;
+          h -= parseFloat(cs[`border${side}Width`]) || 0;
+        }
+      }
+      state.lockHeight = h > 0 ? h : null;
+    }
+    if (state.lockHeight) {
+      for (const prop of LOCK_PROPS) el.style.setProperty(prop, `${state.lockHeight}px`);
+    }
     el.classList.add(PREFIX + 'decoding');
   } catch { /* ignore */ }
 
@@ -422,8 +464,13 @@ export function stampIn(el) {
   try { el.style.setProperty('--fxeffects-rest', rest === 'none' ? 'rotate(0deg)' : rest); } catch { /* ignore */ }
   const o = mountOverlay(el, 'stamp-wave', `<i class="${PREFIX}stamp-ring"></i><i class="${PREFIX}stamp-ring ${PREFIX}stamp-ring-2"></i>`, ms);
   if (!o) return Promise.resolve();
-  pulseClass(el, 'stamp-in', ms);
-  return wait(ms).then(() => {
-    try { el.style.removeProperty('--fxeffects-rest'); } catch { /* ignore */ }
+  // The resting transform is removed in the same callback that removes the class: while the class
+  // is on, the keyframes read --fxeffects-rest, so dropping it earlier would snap the stamp upright.
+  pulseClass(el, 'stamp-in', ms, () => {
+    try {
+      el.style.removeProperty('--fxeffects-rest');
+      if (el.style.length === 0 && el.getAttribute('style') !== null) el.removeAttribute('style');
+    } catch { /* ignore */ }
   });
+  return wait(ms);
 }

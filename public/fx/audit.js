@@ -238,7 +238,7 @@ function dial() {
   </g>`;
 }
 
-function document() {
+function documentSheet() {
   // Document lines: short dashes of non-monotonic length, no digits.
   const LINES = [[10, 48], [10, 34], [10, 56], [10, 40], [10, 52], [10, 28], [10, 46]];
   const lines = LINES.map(([x, w], i) => {
@@ -329,7 +329,7 @@ export function render() {
     ${ghostColumn(656, 52, [44, 60, 36, 56, 42, 64, 34, 52], '#e9b94c')}
     ${ledger()}
     ${dial()}
-    ${document()}
+    ${documentSheet()}
     ${hud()}
   </svg>`;
 }

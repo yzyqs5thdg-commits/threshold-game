@@ -1,8 +1,11 @@
 /* THRESHOLD fx: "effects" — HUD extras and screen-transition effects.
    Class prefix fx-effects-, keyframe prefix fxeffects-. Palette: ground/panel/amber/signal tokens
    plus transparent whites only. No inline style attributes anywhere; JS sets element.style for
-   positioning contexts and the stamp's resting transform. Under prefers-reduced-motion every
-   animation is removed and the artwork rests in its final state. */
+   positioning contexts, the stamp's resting transform and the decode height lock. Under
+   prefers-reduced-motion every animation is removed and the artwork rests in its final state.
+   Performance: nothing that moves carries a filter, and the looping HUD animates opacity and
+   transform only (glows are static box-shadows); the glyph row and each tick group are lit by one
+   moving highlight behind a block-shaped mask instead of one animator per block. */
 
 /* =========================================================================================
    HUD extras (216px rail column)
@@ -33,25 +36,38 @@
 }
 .fx-effects-hud-foot { justify-content: space-between; }
 
-/* six tiny glyph blocks that light in a slow travelling wave */
-.fx-effects-hud-glyphs { display: inline-flex; gap: 3px; }
+/* six tiny glyph blocks that light in a slow travelling wave: the blocks are static, and one soft
+   highlight slides along behind a mask shaped like the blocks (a single animator, transform only) */
+.fx-effects-hud-glyphs {
+  position: relative;
+  display: inline-flex;
+  gap: 3px;
+  overflow: hidden;
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 8px);
+  mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 8px);
+}
 .fx-effects-hud-glyphs i {
   width: 5px;
   height: 7px;
   border-radius: 1px;
   background: #7fb3ff;
   opacity: 0.18;
+}
+.fx-effects-hud-glyphs::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 24px;
+  background: linear-gradient(90deg, rgba(127, 179, 255, 0) 0%, rgba(127, 179, 255, 0.55) 35%, rgba(170, 205, 255, 0.85) 50%, rgba(127, 179, 255, 0.55) 65%, rgba(127, 179, 255, 0) 100%);
+  transform: translateX(10px);
   animation: fxeffects-glyph 4.8s ease-in-out infinite;
 }
-.fx-effects-hud-glyphs i:nth-child(2) { animation-delay: 0.4s; }
-.fx-effects-hud-glyphs i:nth-child(3) { animation-delay: 0.8s; }
-.fx-effects-hud-glyphs i:nth-child(4) { animation-delay: 1.2s; }
-.fx-effects-hud-glyphs i:nth-child(5) { animation-delay: 1.6s; }
-.fx-effects-hud-glyphs i:nth-child(6) { animation-delay: 2.0s; }
 @keyframes fxeffects-glyph {
-  0%, 100% { opacity: 0.18; }
-  18% { opacity: 0.85; box-shadow: 0 0 6px rgba(127, 179, 255, 0.6); }
-  40% { opacity: 0.18; }
+  0% { transform: translateX(-24px); }
+  55% { transform: translateX(45px); }
+  100% { transform: translateX(45px); }
 }
 
 /* status chips */
@@ -101,32 +117,46 @@
 .fx-effects-chip-2 .fx-effects-dot { animation-delay: -1.4s; }
 .fx-effects-chip-3 .fx-effects-dot { animation-delay: -2.8s; }
 @keyframes fxeffects-breathe {
-  0%, 100% { opacity: 0.55; box-shadow: 0 0 0 2px rgba(233, 185, 76, 0.08), 0 0 4px rgba(233, 185, 76, 0.25); }
-  50% { opacity: 1; box-shadow: 0 0 0 3px rgba(233, 185, 76, 0.18), 0 0 12px rgba(233, 185, 76, 0.7); }
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
-/* three equal activity squares that light in sequence — equal size so nothing reads as a level */
-.fx-effects-ticks { display: inline-flex; gap: 3px; flex: none; }
+/* three equal activity squares that light in sequence — equal size so nothing reads as a level.
+   The squares are static; one highlight slides across behind a square-shaped mask (one animator per
+   chip instead of three), the chips offset from each other so the lights run around the rail. */
+.fx-effects-ticks {
+  position: relative;
+  display: inline-flex;
+  gap: 3px;
+  flex: none;
+  overflow: hidden;
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 4px, transparent 4px 7px);
+  mask-image: repeating-linear-gradient(90deg, #000 0 4px, transparent 4px 7px);
+}
 .fx-effects-ticks i {
   width: 4px;
   height: 4px;
   border-radius: 1px;
   background: #7fb3ff;
   opacity: 0.22;
+}
+.fx-effects-ticks::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 12px;
+  background: linear-gradient(90deg, rgba(127, 179, 255, 0) 0%, rgba(127, 179, 255, 0.9) 50%, rgba(127, 179, 255, 0) 100%);
+  transform: translateX(3px);
   animation: fxeffects-tick 2.6s ease-in-out infinite;
 }
-.fx-effects-ticks i:nth-child(2) { animation-delay: 0.3s; }
-.fx-effects-ticks i:nth-child(3) { animation-delay: 0.6s; }
-.fx-effects-chip-2 .fx-effects-ticks i { animation-delay: 0.9s; }
-.fx-effects-chip-2 .fx-effects-ticks i:nth-child(2) { animation-delay: 1.2s; }
-.fx-effects-chip-2 .fx-effects-ticks i:nth-child(3) { animation-delay: 1.5s; }
-.fx-effects-chip-3 .fx-effects-ticks i { animation-delay: 1.8s; }
-.fx-effects-chip-3 .fx-effects-ticks i:nth-child(2) { animation-delay: 2.1s; }
-.fx-effects-chip-3 .fx-effects-ticks i:nth-child(3) { animation-delay: 2.4s; }
+.fx-effects-chip-2 .fx-effects-ticks::after { animation-delay: 0.9s; }
+.fx-effects-chip-3 .fx-effects-ticks::after { animation-delay: 1.8s; }
 @keyframes fxeffects-tick {
-  0%, 100% { opacity: 0.22; }
-  20% { opacity: 0.9; }
-  45% { opacity: 0.22; }
+  0% { transform: translateX(-12px); }
+  45% { transform: translateX(18px); }
+  100% { transform: translateX(18px); }
 }
 
 /* waveform box */
@@ -175,6 +205,9 @@
   align-items: center;
   gap: 12px;
   min-height: 36px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   margin: 0 0 12px;
   padding: 7px 16px 7px 14px;
   border: 1px solid #2f4169;
@@ -234,7 +267,7 @@
   30% { opacity: 1; }
 }
 
-.fx-effects-incoming-text { flex: none; display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.fx-effects-incoming-text { flex: 0 1 auto; min-width: 0; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; white-space: nowrap; }
 .fx-effects-incoming-part {
   animation: fxeffects-part-in 500ms ease-out both;
 }
@@ -243,8 +276,8 @@
 .fx-effects-incoming-part-3 { color: #aab6d0; animation-delay: 440ms; }
 .fx-effects-incoming-sep { color: #7b89a8; opacity: 0.8; animation: fxeffects-part-in 500ms ease-out 240ms both; }
 @keyframes fxeffects-part-in {
-  from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
-  to { opacity: 1; transform: none; filter: none; }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
 }
 
 .fx-effects-incoming-rule {
@@ -286,9 +319,40 @@
 
 @media (max-width: 560px) {
   .fx-effects-incoming { gap: 8px; padding: 6px 10px 6px 8px; font-size: 0.6rem; letter-spacing: 0.12em; }
-  .fx-effects-incoming-text { gap: 7px; }
+  /* the text may wrap between its parts; the strip never grows wider than its container */
+  .fx-effects-incoming-text { gap: 2px 7px; white-space: normal; }
+  .fx-effects-incoming-part, .fx-effects-incoming-sep { white-space: nowrap; }
   .fx-effects-incoming-tail { display: none; }
   .fx-effects-incoming-chevrons { margin-left: 4px; }
+}
+
+/* Inline variant: a compact chip (about 28px tall) that sits in a flex row next to other chips,
+   e.g. inside the incident card's header band. No margins, no stretching dashed tail; keeps the
+   chevron slide-in, the part fade-in, the settle glow and the single light sweep. */
+.fx-effects-incoming--inline {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-self: center;
+  gap: 8px;
+  min-height: 0;
+  height: 28px;
+  margin: 0;
+  padding: 0 12px 0 8px;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  vertical-align: middle;
+}
+.fx-effects-incoming--inline .fx-effects-incoming-corner { top: 2px; bottom: 2px; width: 5px; }
+.fx-effects-incoming--inline .fx-effects-incoming-chevrons { margin-left: 3px; width: 18px; height: 12px; }
+.fx-effects-incoming--inline .fx-effects-incoming-text { gap: 0 7px; white-space: nowrap; flex-wrap: nowrap; }
+.fx-effects-incoming--inline .fx-effects-incoming-rule,
+.fx-effects-incoming--inline .fx-effects-incoming-tail { display: none; }
+.fx-effects-incoming--inline .fx-effects-incoming-sweep { width: 45%; }
+@media (max-width: 560px) {
+  .fx-effects-incoming--inline { font-size: 0.56rem; letter-spacing: 0.1em; padding: 0 9px 0 6px; gap: 6px; }
+  .fx-effects-incoming--inline .fx-effects-incoming-part-3,
+  .fx-effects-incoming--inline .fx-effects-incoming-sep-2 { display: none; }
 }
 
 /* =========================================================================================
@@ -342,6 +406,9 @@
 .fx-effects-decoding {
   text-shadow: 0 0 10px rgba(127, 179, 255, 0.35);
   transition: text-shadow 400ms ease;
+  /* JS pins min/max-height to the final height for the duration; the wider scrambled glyphs may
+     need one more line than the real text, and that line is clipped rather than pushing the layout */
+  overflow: hidden;
 }
 
 /* =========================================================================================
@@ -504,6 +571,8 @@
    ========================================================================================= */
 @media (prefers-reduced-motion: reduce) {
   .fx-effects-hud *,
+  .fx-effects-hud *::before,
+  .fx-effects-hud *::after,
   .fx-effects-incoming,
   .fx-effects-incoming *,
   .fx-effects-scan,

@@ -9,7 +9,7 @@
 // "Submit my responses" on the closing screen. Only then is anything beyond the session's
 // existence sent to the server. Choosing "Withdraw" discards everything.
 
-import { VIGNETTES, mountAmbient, renderHudExtras, renderIncomingBanner, scanSweep, decodeReveal, badgeActivate, lockIn, stampIn } from './fx/index.js';
+import { VIGNETTES, portrait, mountAmbient, renderHudExtras, renderIncomingBanner, scanSweep, decodeReveal, badgeActivate, lockIn, stampIn } from './fx/index.js';
 
 const STORAGE_KEY = 'threshold.session.v1';
 const BOOT_KEY = 'threshold.booted.v1';
@@ -54,6 +54,7 @@ let state = loadState() || freshState();
 
 // Per-screen volatile timing (never persisted; reset whenever an item is (re)rendered).
 let itemShownAt = null;
+let itemShownToken = null;
 let itemHidden = false;
 let firstChoiceAt = null;
 let lastChoiceAt = null;
@@ -98,6 +99,7 @@ function saveState() {
 function clearState() {
   try {
     sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(BOOT_KEY);
   } catch {
     /* ignore */
   }
@@ -186,8 +188,11 @@ const PORTRAIT = `<svg viewBox="0 0 150 200" aria-hidden="true">
   <path d="M58 118h-6v-12M98 118h6v-12" stroke="#7c8db0" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 const iconFor = (domain) => ICONS[domain] || ICONS.default;
+function portraitHtml() {
+  try { return portrait?.render?.() || PORTRAIT; } catch { return PORTRAIT; }
+}
 
-function render(html, { step, focus = true } = {}) {
+function render(html, { step, focus = true, sweep = true } = {}) {
   if (vignetteCleanup) {
     try { vignetteCleanup(); } catch { /* ignore */ }
     vignetteCleanup = null;
@@ -195,7 +200,7 @@ function render(html, { step, focus = true } = {}) {
   app.innerHTML = html;
   if (typeof step === 'number') setProgress(step);
   const panel = app.querySelector('.panel');
-  if (panel) fx(scanSweep, panel);
+  if (panel && sweep) fx(scanSweep, panel);
   window.scrollTo(0, 0);
   if (focus) {
     const h = app.querySelector('h1, h2');
@@ -397,8 +402,9 @@ function renderProfile() {
       else profile[it.id] = v;
     }
     if (bad) return showError(form, 'Please answer every question to continue.');
-    const btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true;
+    if (form.dataset.submitted) return;
+    form.dataset.submitted = '1';
+    for (const el of form.querySelectorAll('select, button')) el.disabled = true;
     fx(badgeActivate, document.querySelector('.badge')).then(() => go('style', { profile }));
   });
 }
@@ -452,7 +458,7 @@ function renderBriefing() {
       <p class="kicker">Day 1 · 08:45 · Secure line</p>
       <h1>Briefing from the strategy desk</h1>
       <div class="comms">
-        <div class="portrait"><span class="portrait__live">Live</span>${PORTRAIT}</div>
+        <div class="portrait"><span class="portrait__live">Live</span>${portraitHtml()}</div>
         <div>
           <div class="comms__meta"><span class="comms__name">${esc(m.organisation.analyst)}</span> · ${esc(m.organisation.analystTitle)}</div>
           <div class="speech"><p>${esc(m.briefing)}</p></div>
@@ -483,18 +489,25 @@ function renderItem() {
   let banner = '';
   try { banner = vignette?.render?.() || ''; } catch { banner = ''; }
   let incoming = '';
-  try { incoming = renderIncomingBanner({ code, domain: data.domain }) || ''; } catch { incoming = ''; }
+  try {
+    incoming = (renderIncomingBanner({ code, domain: data.domain }) || '').replace(/class="fx-effects-incoming(["\s])/, 'class="fx-effects-incoming fx-effects-incoming--inline$1');
+  } catch { incoming = ''; }
+  // Timed screen: no entrance fade and no scan sweep, so the situation report is fully readable at first paint.
   render(`
-    ${incoming}
-    <div class="panel incident">
-      <div class="incident__vignette" aria-hidden="true">${banner}</div>
-      <div class="eyebrow">
-        <span class="tag">${iconFor(data.domain)}${esc(data.domain)}</span>
-        <span class="counter">${esc(code)} · ${idx + 1} of ${seq.length}</span>
-      </div>
-      <div class="incident__head">
-        <div class="incident__icon">${iconFor(data.domain)}</div>
-        <h1>${esc(data.title)}</h1>
+    <div class="panel incident" data-item="${idx + 1}">
+      <div class="incident__band" aria-hidden="true">${banner}</div>
+      <div class="incident__top">
+        <div class="eyebrow">
+          <div class="eyebrow__left">${incoming}</div>
+          <span class="counter">${idx + 1} of ${seq.length}</span>
+        </div>
+        <div class="incident__head">
+          <div class="incident__icon" aria-hidden="true">${iconFor(data.domain)}</div>
+          <div class="incident__title">
+            <span class="incident__domain">${esc(data.domain)}</span>
+            <h1>${esc(data.title)}</h1>
+          </div>
+        </div>
       </div>
       <div class="sitrep">
         <div class="sitrep__label">Situation report</div>
@@ -504,7 +517,7 @@ function renderItem() {
       <div class="decision">
         <div class="decision__label"><h2 id="decision-label">Your call</h2><span class="counter">Risk exposure</span></div>
         <div class="options" role="group" aria-labelledby="decision-label">
-          ${m.decisionOptions.map((o) => `<button type="button" class="option" data-value="${esc(o.value)}" aria-pressed="false"><span class="option__glyph">${OPTION_GLYPHS[o.value] || ''}</span><span>${esc(o.label)}</span></button>`).join('')}
+          ${m.decisionOptions.map((o) => `<button type="button" class="option" data-value="${esc(o.value)}" aria-pressed="false"><span class="option__glyph">${OPTION_GLYPHS[o.value] || ''}</span><span class="option__label">${esc(o.label)}</span></button>`).join('')}
         </div>
       </div>
       <form id="confidence" class="confidence" hidden novalidate>
@@ -517,7 +530,7 @@ function renderItem() {
           <button type="submit" class="btn">Log decision</button>
         </div>
       </form>
-    </div>`, { step: 4 + idx });
+    </div>`, { step: 4 + idx, sweep: false });
 
   // Optional JS-driven animation inside the vignette (cleaned up on the next render).
   const svg = app.querySelector('.incident__vignette svg');
@@ -525,8 +538,14 @@ function renderItem() {
     try { vignetteCleanup = vignette.mount(svg) || null; } catch { vignetteCleanup = null; }
   }
 
-  // Latency clock starts when the scenario is painted.
+  // Latency clock starts when the scenario is painted: provisional value now, replaced by the
+  // timestamp of the first frame after this render (double requestAnimationFrame).
   itemShownAt = performance.now();
+  const shownToken = Symbol('shown');
+  itemShownToken = shownToken;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (itemShownToken === shownToken) itemShownAt = performance.now();
+  }));
   itemHidden = document.visibilityState === 'hidden';
   firstChoiceAt = null;
   lastChoiceAt = null;
@@ -537,9 +556,12 @@ function renderItem() {
   const options = [...app.querySelectorAll('.option')];
   const confidenceForm = document.getElementById('confidence');
 
+  const eventTime = (e) => (e && typeof e.timeStamp === 'number' && e.timeStamp > 0 && e.timeStamp < 1e12 ? e.timeStamp : performance.now());
+  let logged = false;
   for (const btn of options) {
-    btn.addEventListener('click', () => {
-      const t = performance.now();
+    btn.addEventListener('click', (e) => {
+      if (logged) return;
+      const t = eventTime(e);
       if (firstChoiceAt === null) firstChoiceAt = t;
       lastChoiceAt = t;
       choice = btn.dataset.value;
@@ -562,9 +584,12 @@ function renderItem() {
     const latencyFirst = (firstChoiceAt - itemShownAt) / 1000;
     document.removeEventListener('visibilitychange', onVisibility);
 
+    if (logged) return;
+    logged = true;
     const logBtn = confidenceForm.querySelector('button[type="submit"]');
     logBtn.disabled = true;
     for (const b of options) b.disabled = true;
+    for (const r of confidenceForm.querySelectorAll('input')) r.disabled = true;
     const advance = () => {
       if (kind === 'scenario') {
         const decisions = state.decisions.filter((d) => d.scenarioId !== data.id);
@@ -587,7 +612,7 @@ function renderManipulation() {
       <p class="kicker">Day 1 · 17:00 · Secure line</p>
       <h1>${esc(mc.heading)}</h1>
       <div class="comms">
-        <div class="portrait"><span class="portrait__live">Live</span>${PORTRAIT}</div>
+        <div class="portrait"><span class="portrait__live">Live</span>${portraitHtml()}</div>
         <div>
           <div class="comms__meta"><span class="comms__name">${esc(m.organisation.analyst)}</span> · ${esc(m.organisation.analystTitle)}</div>
           <div class="speech"><p>${esc(mc.intro)}</p></div>
@@ -786,6 +811,8 @@ function bootSplash() {
       setTimeout(() => { el.remove(); resolve(); }, 420);
     };
     el.addEventListener('click', finish);
+    const onKey = () => { document.removeEventListener('keydown', onKey); finish(); };
+    document.addEventListener('keydown', onKey);
     setTimeout(finish, 1700);
   });
 }
