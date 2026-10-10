@@ -1,0 +1,239 @@
+/* THRESHOLD fx: "audit" vignette — styles and motion.
+   Class prefix fx-audit-, keyframe prefix fxaudit-. Palette: ground/panel/amber/signal tokens only.
+   The container decides the size; the SVG fills it (viewBox 760x200, slice).
+
+   Timing: one 14s "audit pass". The row highlight walks down the eight ledger rows between 8% and 57%
+   of the cycle; each check glyph draws itself as the highlight reaches its row (7% apart), every check
+   holds, then all of them fade together at 86-93% and the pass starts again. The seal and dial run on
+   their own slow, continuous loops so the scene never sits still. */
+
+.fx-audit {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.fx-audit-glyphs text {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight: 500;
+}
+
+/* ---- background: ruled paper drifts very slowly ---- */
+.fx-audit-paper {
+  animation: fxaudit-drift 16s ease-in-out infinite alternate;
+}
+
+/* ---- motes: specks rise slowly and fade, staggered ---- */
+.fx-audit-mote {
+  animation: fxaudit-mote 12s ease-in-out infinite;
+}
+.fx-audit-mote--v1 { animation-delay: 0s; }
+.fx-audit-mote--v2 { animation-delay: -1.7s; animation-duration: 14s; }
+.fx-audit-mote--v3 { animation-delay: -3.1s; }
+.fx-audit-mote--v4 { animation-delay: -4.9s; animation-duration: 13s; }
+.fx-audit-mote--v5 { animation-delay: -6.2s; }
+.fx-audit-mote--v6 { animation-delay: -7.8s; animation-duration: 11s; }
+.fx-audit-mote--v7 { animation-delay: -9.3s; }
+.fx-audit-mote--v8 { animation-delay: -10.6s; animation-duration: 13s; }
+
+/* ---- ledger: row highlight walks the rows, checks land one by one ---- */
+.fx-audit-rowscan {
+  animation: fxaudit-rowscan 14s linear infinite;
+}
+.fx-audit-check {
+  animation: fxaudit-check-1 14s linear infinite;
+}
+.fx-audit-check--1 { animation-name: fxaudit-check-1; }
+.fx-audit-check--2 { animation-name: fxaudit-check-2; }
+.fx-audit-check--3 { animation-name: fxaudit-check-3; }
+.fx-audit-check--4 { animation-name: fxaudit-check-4; }
+.fx-audit-check--5 { animation-name: fxaudit-check-5; }
+.fx-audit-check--6 { animation-name: fxaudit-check-6; }
+.fx-audit-check--7 { animation-name: fxaudit-check-7; }
+.fx-audit-check--8 { animation-name: fxaudit-check-8; }
+
+.fx-audit-check-halo {
+  transform-origin: 13.5px 0;
+  animation: fxaudit-halo 14s ease-out infinite;
+}
+.fx-audit-check-halo--1 { animation-delay: 1.12s; }
+.fx-audit-check-halo--2 { animation-delay: 2.10s; }
+.fx-audit-check-halo--3 { animation-delay: 3.08s; }
+.fx-audit-check-halo--4 { animation-delay: 4.06s; }
+.fx-audit-check-halo--5 { animation-delay: 5.04s; }
+.fx-audit-check-halo--6 { animation-delay: 6.02s; }
+.fx-audit-check-halo--7 { animation-delay: 7.00s; }
+.fx-audit-check-halo--8 { animation-delay: 7.98s; }
+
+.fx-audit-row { animation: fxaudit-breathe 9s ease-in-out infinite; }
+.fx-audit-row--2, .fx-audit-row--6 { animation-delay: -2s; }
+.fx-audit-row--3, .fx-audit-row--7 { animation-delay: -4s; }
+.fx-audit-row--4, .fx-audit-row--8 { animation-delay: -6s; }
+
+.fx-audit-ledger-bracket { animation: fxaudit-breathe-soft 7s ease-in-out infinite; }
+
+/* ---- controls dial: tick ring crawls, dashed ring counter-rotates, arcs orbit, heart breathes ---- */
+.fx-audit-dial-ticks {
+  transform-origin: 0 0;
+  animation: fxaudit-spin 48s linear infinite;
+}
+.fx-audit-dial-dash {
+  transform-origin: 0 0;
+  animation: fxaudit-spin-rev 30s linear infinite;
+}
+.fx-audit-dial-arcs {
+  transform-origin: 0 0;
+  animation: fxaudit-spin 20s linear infinite;
+}
+.fx-audit-dial-arcs-b {
+  transform-origin: 0 0;
+  animation: fxaudit-spin-rev 36s linear infinite;
+}
+.fx-audit-dial-inner {
+  transform-origin: 0 0;
+  animation: fxaudit-spin-rev 14s linear infinite;
+}
+.fx-audit-dial-orbit {
+  transform-origin: 0 0;
+  animation: fxaudit-spin 26s linear infinite;
+}
+.fx-audit-signature { animation: fxaudit-breathe-soft 10s ease-in-out infinite; }
+.fx-audit-dial-heart {
+  transform-origin: 0 0;
+  animation: fxaudit-heart 5s ease-in-out infinite;
+}
+.fx-audit-dial-reticle { animation: fxaudit-breathe-soft 8s ease-in-out infinite; }
+
+/* ---- document: a reading line passes down the sheet; the seal turns and glows ---- */
+.fx-audit-docscan {
+  animation: fxaudit-docscan 11s ease-in-out infinite;
+}
+.fx-audit-seal-ring {
+  transform-origin: 0 0;
+  animation: fxaudit-spin 40s linear infinite;
+}
+.fx-audit-seal-inner {
+  transform-origin: 0 0;
+  animation: fxaudit-spin-rev 22s linear infinite;
+}
+.fx-audit-seal-glow {
+  transform-origin: 0 0;
+  animation: fxaudit-sealglow 6s ease-in-out infinite;
+}
+.fx-audit-seal-ribbon { animation: fxaudit-breathe-soft 6s ease-in-out infinite; }
+
+/* ---- HUD: slow full-width sweep, glyphs blink gently ---- */
+.fx-audit-bar {
+  animation: fxaudit-bar 17s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.fx-audit-blink { animation: fxaudit-blink 5s ease-in-out infinite; }
+.fx-audit-blink--b { animation-delay: 2.4s; animation-duration: 7s; }
+
+/* ---- keyframes ---- */
+@keyframes fxaudit-spin      { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes fxaudit-spin-rev  { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+@keyframes fxaudit-drift     { from { transform: translate(0, 0); } to { transform: translate(-12px, -7px); } }
+@keyframes fxaudit-breathe      { 0%, 100% { opacity: 0.78; } 50% { opacity: 1; } }
+@keyframes fxaudit-breathe-soft { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.9; } }
+@keyframes fxaudit-blink        { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes fxaudit-heart {
+  0%, 100% { transform: scale(1);    opacity: 0.92; }
+  50%      { transform: scale(1.35); opacity: 1; }
+}
+@keyframes fxaudit-sealglow {
+  0%, 100% { transform: scale(0.92); opacity: 0.7; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+@keyframes fxaudit-mote {
+  0%   { transform: translate(0, 0);       opacity: 0; }
+  15%  { opacity: 0.75; }
+  85%  { opacity: 0.55; }
+  100% { transform: translate(6px, -34px); opacity: 0; }
+}
+@keyframes fxaudit-bar {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(830px); }
+}
+
+/* Row highlight: rows sit 13 viewBox units apart, so row 8 is 91 units below row 1. */
+@keyframes fxaudit-rowscan {
+  0%   { transform: translateY(0);    opacity: 0; }
+  8%   { transform: translateY(0);    opacity: 1; }
+  57%  { transform: translateY(91px); opacity: 1; }
+  86%  { transform: translateY(91px); opacity: 1; }
+  92%  { transform: translateY(91px); opacity: 0; }
+  93%  { transform: translateY(0);    opacity: 0; }
+  100% { transform: translateY(0);    opacity: 0; }
+}
+
+/* Document reading line: sheet is 112 units tall. */
+@keyframes fxaudit-docscan {
+  0%   { transform: translateY(6px);   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(106px); opacity: 0; }
+}
+
+/* Landing halo: a soft ring blooms when a check settles. */
+@keyframes fxaudit-halo {
+  0%    { transform: scale(0.4); opacity: 0; }
+  1%    { opacity: 0.38; }
+  6%    { transform: scale(1.6); opacity: 0; }
+  100%  { transform: scale(1.6); opacity: 0; }
+}
+
+/* Check glyphs: each draws in over 3% of the cycle as the highlight reaches its row; all fade at 86-93%. */
+@keyframes fxaudit-check-1 {
+  0%, 8%     { stroke-dashoffset: 11; opacity: 0; }
+  11%, 86%   { stroke-dashoffset: 0;  opacity: 0.95; }
+  93%, 100%  { stroke-dashoffset: 0;  opacity: 0; }
+}
+@keyframes fxaudit-check-2 {
+  0%, 15%    { stroke-dashoffset: 11; opacity: 0; }
+  18%, 86%   { stroke-dashoffset: 0;  opacity: 0.95; }
+  93%, 100%  { stroke-dashoffset: 0;  opacity: 0; }
+}
+@keyframes fxaudit-check-3 {
+  0%, 22%    { stroke-dashoffset: 11; opacity: 0; }
+  25%, 86%   { stroke-dashoffset: 0;  opacity: 0.95; }
+  93%, 100%  { stroke-dashoffset: 0;  opacity: 0; }
+}
+@keyframes fxaudit-check-4 {
+  0%, 29%    { stroke-dashoffset: 11; opacity: 0; }
+  32%, 86%   { stroke-dashoffset: 0;  opacity: 0.95; }
+  93%, 100%  { stroke-dashoffset: 0;  opacity: 0; }
+}
+@keyframes fxaudit-check-5 {
+  0%, 36%    { stroke-dashoffset: 11; opacity: 0; }
+  39%, 86%   { stroke-dashoffset: 0;  opacity: 0.95; }
+  93%, 100%  { stroke-dashoffset: 0;  opacity: 0; }
+}
+@keyframes fxaudit-check-6 {
+  0%, 43%    { stroke-dashoffset: 11; opacity: 0; }
+  46%, 86%   { stroke-dashoffset: 0;  opacity: 0.95; }
+  93%, 100%  { stroke-dashoffset: 0;  opacity: 0; }
+}
+@keyframes fxaudit-check-7 {
+  0%, 50%    { stroke-dashoffset: 11; opacity: 0; }
+  53%, 86%   { stroke-dashoffset: 0;  opacity: 0.95; }
+  93%, 100%  { stroke-dashoffset: 0;  opacity: 0; }
+}
+@keyframes fxaudit-check-8 {
+  0%, 57%    { stroke-dashoffset: 11; opacity: 0; }
+  60%, 86%   { stroke-dashoffset: 0;  opacity: 0.95; }
+  93%, 100%  { stroke-dashoffset: 0;  opacity: 0; }
+}
+
+/* ---- reduced motion: a complete static frame (all checks settled, highlight parked, sweeps hidden) ---- */
+@media (prefers-reduced-motion: reduce) {
+  .fx-audit *, .fx-audit { animation: none !important; }
+  .fx-audit-bar { display: none; }
+  .fx-audit-docscan { display: none; }
+  .fx-audit-check-halo { display: none; }
+  .fx-audit-mote { opacity: 0.5; }
+  .fx-audit-check { stroke-dashoffset: 0; opacity: 0.95; }
+  .fx-audit-rowscan { transform: translateY(91px); opacity: 0.8; }
+  .fx-audit-seal-glow { opacity: 0.85; }
+}

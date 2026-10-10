@@ -297,3 +297,38 @@ legend { font-weight: 600; padding: 0; margin-bottom: 8px; }
 .admin thead th { color: var(--ink-3); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
 .admin tfoot td { font-weight: 700; }
 .admin code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 6px; font-size: 0.9em; }
+
+/* ---------- visual effects integration ---------- */
+.fx-ambient-canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.desk { z-index: 1; }
+.panel { position: relative; overflow: hidden; }
+.hud__extras:empty { display: none; }
+@media (max-width: 860px) { .hud__extras { display: none; } }
+
+/* incident vignette banner (animated scene above the incident title) */
+.incident__vignette { position: relative; margin: -30px -32px 18px; height: 200px; overflow: hidden; background: #0b1324; border-bottom: 1px solid var(--line); }
+.incident__vignette::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(19,29,51,0) 60%, rgba(19,29,51,0.85) 100%); }
+.incident__vignette svg { width: 100%; height: 100%; display: block; }
+@media (max-width: 560px) { .incident__vignette { margin: -22px -18px 16px; height: 150px; } }
+
+/* one-time boot splash over the sign-in screen */
+.boot { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: radial-gradient(900px 500px at 50% 40%, #142040, var(--ground) 70%); animation: bootIn 300ms ease; }
+.boot::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.35;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 4px); }
+.boot--out { animation: bootOut 420ms ease forwards; }
+.boot__inner { position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 24px; }
+.mark--lg { width: 56px; height: 56px; border-radius: 14px; margin-bottom: 8px; animation: markPulse 1.6s ease-in-out infinite; }
+.boot__title { font-family: var(--mono); font-size: 1.6rem; letter-spacing: 0.42em; color: var(--amber); margin-left: 0.42em; }
+.boot__sub { font-size: 0.9rem; color: var(--ink-2); letter-spacing: 0.08em; text-transform: uppercase; }
+.boot__line { width: min(360px, 70vw); height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px; overflow: hidden; margin-top: 14px; }
+.boot__line i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--amber), var(--amber-2)); box-shadow: 0 0 12px var(--amber); animation: bootLine 1.3s cubic-bezier(.2,.6,.2,1) forwards; }
+.boot__log { position: relative; height: 1.4em; width: min(360px, 70vw); font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; }
+.boot__log span { position: absolute; inset: 0; opacity: 0; animation: bootLog 1.5s linear forwards; }
+.boot__log span:nth-child(2) { animation-delay: 0.45s; }
+.boot__log span:nth-child(3) { animation-delay: 0.9s; }
+@keyframes bootIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bootOut { to { opacity: 0; transform: scale(1.02); } }
+@keyframes bootLine { to { width: 100%; } }
+@keyframes bootLog { 0% { opacity: 0; } 10% { opacity: 1; } 30% { opacity: 1; } 40% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes markPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(233,185,76,0.4), 0 6px 18px rgba(233,185,76,0.25); } 50% { box-shadow: 0 0 0 14px rgba(233,185,76,0), 0 6px 24px rgba(233,185,76,0.45); } }
+@media (prefers-reduced-motion: reduce) { .boot, .boot * { animation: none !important; } }

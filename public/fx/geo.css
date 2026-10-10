@@ -1,0 +1,169 @@
+/* THRESHOLD fx: "geo" vignette — styles and motion.
+   Class prefix fx-geo-, keyframe prefix fxgeo-. Palette: ground/panel/amber/signal tokens only.
+   The container decides the size; the SVG fills it (viewBox 760x200, slice).
+   The globe spin and satellite are SMIL (see geo.js); everything here is CSS. */
+
+.fx-geo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.fx-geo-glyphs text {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight: 500;
+}
+
+/* ---- background: grid drifts, star field twinkles, concentric rings crawl ---- */
+.fx-geo-grid {
+  animation: fxgeo-drift 16s ease-in-out infinite alternate;
+}
+.fx-geo-star {
+  opacity: 0.5;
+  animation: fxgeo-twinkle 5s ease-in-out infinite;
+}
+.fx-geo-star--v1 { animation-duration: 4.2s; animation-delay: -0.6s; }
+.fx-geo-star--v2 { animation-duration: 6.1s; animation-delay: -2.4s; }
+.fx-geo-star--v3 { animation-duration: 5.3s; animation-delay: -1.1s; }
+.fx-geo-star--v4 { animation-duration: 7.4s; animation-delay: -3.9s; }
+.fx-geo-star--v5 { animation-duration: 4.8s; animation-delay: -2.9s; }
+
+.fx-geo-bgring { transform-origin: 380px 100px; }
+.fx-geo-bgring--1 { animation: fxgeo-spin 60s linear infinite; }
+.fx-geo-bgring--2 { animation: fxgeo-spin-rev 84s linear infinite; }
+.fx-geo-bgring--3 { animation: fxgeo-spin 110s linear infinite; }
+
+/* ---- globe: a soft scan line descends through the disc ---- */
+.fx-geo-scanline {
+  animation: fxgeo-scanline 7s cubic-bezier(.45,.05,.55,.95) infinite;
+}
+
+/* ---- markers: three expanding rings per marker, identical, staggered only by phase ---- */
+.fx-geo-ring {
+  transform-origin: 0 0;
+  opacity: 0;
+  animation: fxgeo-ring 4.2s cubic-bezier(.2,.6,.3,1) infinite;
+}
+.fx-geo-ring--b { animation-delay: -1.4s; }
+.fx-geo-ring--c { animation-delay: -2.8s; }
+.fx-geo-marker--v2 .fx-geo-ring { animation-delay: -0.9s; }
+.fx-geo-marker--v2 .fx-geo-ring--b { animation-delay: -2.3s; }
+.fx-geo-marker--v2 .fx-geo-ring--c { animation-delay: -3.7s; }
+.fx-geo-marker--v3 .fx-geo-ring { animation-delay: -2.1s; }
+.fx-geo-marker--v3 .fx-geo-ring--b { animation-delay: -3.5s; }
+.fx-geo-marker--v3 .fx-geo-ring--c { animation-delay: -0.7s; }
+
+.fx-geo-lock {
+  transform-origin: 0 0;
+  animation: fxgeo-lock 6s ease-in-out infinite;
+}
+.fx-geo-marker--v2 .fx-geo-lock { animation-delay: -2s; }
+.fx-geo-marker--v3 .fx-geo-lock { animation-delay: -4s; }
+
+/* ---- arcs: a comet of light travels each arc (dash offset over pathLength=100) ---- */
+.fx-geo-light--tail { animation: fxgeo-travel-tail 6.5s linear infinite; }
+.fx-geo-light--head { animation: fxgeo-travel-head 6.5s linear infinite; }
+.fx-geo-light--v2 { animation-delay: -2.2s; }
+.fx-geo-light--v3 { animation-delay: -4.3s; }
+
+/* ---- a slow amber ping expands from the globe ---- */
+.fx-geo-ping {
+  transform-origin: 0 0;
+  opacity: 0;
+  animation: fxgeo-ping 9s cubic-bezier(.2,.6,.3,1) infinite;
+}
+
+/* ---- HUD reticle rings around the globe ---- */
+.fx-geo-orbitring {
+  transform-origin: 0 0;
+  animation: fxgeo-spin 48s linear infinite;
+}
+.fx-geo-orbitring-b {
+  transform-origin: 0 0;
+  animation: fxgeo-spin-rev 26s linear infinite;
+}
+
+/* ---- wings ---- */
+.fx-geo-radar {
+  transform-origin: 0 0;
+  animation: fxgeo-spin 5.5s linear infinite;
+}
+.fx-geo-track { transform-origin: 0 0; }
+.fx-geo-track--1 { animation: fxgeo-spin 14s linear infinite; }
+.fx-geo-track--2 { animation: fxgeo-spin-60 19s linear infinite; }
+.fx-geo-track--3 { animation: fxgeo-spin-m60 23s linear infinite; }
+
+/* ---- HUD: slow horizontal scan bar, two glyphs blink gently ---- */
+.fx-geo-bar {
+  animation: fxgeo-bar 13s ease-in-out infinite;
+}
+.fx-geo-blink { animation: fxgeo-blink 5s ease-in-out infinite; }
+.fx-geo-blink--b { animation-delay: -2.6s; animation-duration: 6.4s; }
+
+/* ---- keyframes ---- */
+@keyframes fxgeo-drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(14px, 9px); }
+}
+@keyframes fxgeo-twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.85; }
+}
+@keyframes fxgeo-spin { to { transform: rotate(360deg); } }
+@keyframes fxgeo-spin-rev { to { transform: rotate(-360deg); } }
+@keyframes fxgeo-spin-60 { from { transform: rotate(60deg); } to { transform: rotate(420deg); } }
+@keyframes fxgeo-spin-m60 { from { transform: rotate(-60deg); } to { transform: rotate(-420deg); } }
+@keyframes fxgeo-scanline {
+  0% { transform: translateY(-86px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(86px); opacity: 0; }
+}
+@keyframes fxgeo-ring {
+  0% { transform: scale(0.35); opacity: 0.85; }
+  70% { opacity: 0.18; }
+  100% { transform: scale(2.3); opacity: 0; }
+}
+@keyframes fxgeo-ping {
+  0% { transform: scale(1); opacity: 0; }
+  8% { opacity: 0.34; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes fxgeo-lock {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.18); opacity: 0.45; }
+}
+@keyframes fxgeo-travel-tail {
+  from { stroke-dashoffset: 118; }
+  to { stroke-dashoffset: 18; }
+}
+@keyframes fxgeo-travel-head {
+  from { stroke-dashoffset: 104; }
+  to { stroke-dashoffset: 4; }
+}
+@keyframes fxgeo-bar {
+  0% { transform: translateX(120px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateX(640px); opacity: 0; }
+}
+@keyframes fxgeo-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ---- reduced motion: a complete static frame. SMIL is paused by mount() in geo.js. ---- */
+@media (prefers-reduced-motion: reduce) {
+  .fx-geo *, .fx-geo { animation: none !important; }
+  .fx-geo-light { display: none; }
+  .fx-geo-bar { display: none; }
+  .fx-geo-scanline { display: none; }
+  .fx-geo-star { opacity: 0.55; }
+  .fx-geo-ring { opacity: 0.3; transform: scale(1.4); }
+  .fx-geo-ring--b { opacity: 0.15; transform: scale(2); }
+  .fx-geo-ring--c { display: none; }
+  .fx-geo-ping { display: none; }
+  .fx-geo-radar { transform: rotate(40deg); }
+}

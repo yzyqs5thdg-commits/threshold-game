@@ -9,9 +9,17 @@
   <title>THRESHOLD — Decision-Making in Organizational Risk Scenarios</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/fx/ambient.css">
+  <link rel="stylesheet" href="/fx/effects.css">
+  <link rel="stylesheet" href="/fx/cyber.css">
+  <link rel="stylesheet" href="/fx/supply.css">
+  <link rel="stylesheet" href="/fx/audit.css">
+  <link rel="stylesheet" href="/fx/regulatory.css">
+  <link rel="stylesheet" href="/fx/geo.css">
 </head>
 <body>
   <a class="skip" href="#app">Skip to content</a>
+  <canvas id="ambient" class="fx-ambient-canvas" aria-hidden="true"></canvas>
   <div class="desk">
     <aside class="hud" aria-label="Session status">
       <div class="hud__brand">
@@ -25,6 +33,7 @@
         <span class="hud__label">CRO desk · Day 1</span>
         <span class="hud__time" id="hud-time">07:45</span>
       </div>
+      <div id="hud-extras" class="hud__extras" aria-hidden="true"></div>
       <ol class="timeline" id="timeline" aria-label="Day timeline"></ol>
       <div class="hud__foot">Columbia University IRB-ACYY3579<br><a href="/consent" target="_blank" rel="noopener">Consent form</a> · <span class="hud__mail">CU_ERM_Research@columbia.edu</span></div>
     </aside>

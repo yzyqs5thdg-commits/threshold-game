@@ -24,8 +24,27 @@ const content = demodule(read('server/content.js'));
 const consent = demodule(read('server/consent.js')).replace(/\besc\b/g, 'escConsent'); // avoid clashing with the client's esc()
 const validate = demodule(read('server/validate.js'));
 const exporter = demodule(read('server/export.js'));
-const appJs = read('public/app.js');
+const appJs = demodule(read('public/app.js')); // drops its import of ./fx/index.js; the registry below provides those names
 const css = read('public/styles.css');
+
+// Visual-effects modules: each becomes a namespaced object so their identical export names
+// (every vignette exports render()) cannot collide inside the single bundle scope.
+const FX_MODULES = ['cyber', 'supply', 'audit', 'regulatory', 'geo', 'ambient', 'effects'];
+function wrapFx(name) {
+  let src = read(`public/fx/${name}.js`).replace(/^import .*?;$/gm, '');
+  const names = new Set();
+  src = src.replace(/^export (const|let|function|async function) ([A-Za-z_$][\w$]*)/gm, (m, kind, id) => { names.add(id); return `${kind} ${id}`; });
+  src = src.replace(/^export \{([^}]*)\};?$/gm, (m, list) => { list.split(',').map((x) => x.trim().split(/\s+as\s+/).pop()).filter(Boolean).forEach((n) => names.add(n)); return ''; });
+  const exportsList = [...names].join(', ');
+  return `const fx_${name} = (() => {\n${src}\nreturn { ${exportsList} };\n})();`;
+}
+const fxBundle = FX_MODULES.map(wrapFx).join('\n');
+const fxRegistry = `
+const VIGNETTES = { Cybersecurity: fx_cyber, 'Supply chain': fx_supply, 'Internal audit': fx_audit, Regulatory: fx_regulatory, Geopolitical: fx_geo };
+const { mountAmbient } = fx_ambient;
+const { renderHudExtras, renderIncomingBanner, scanSweep, decodeReveal, badgeActivate, lockIn, stampIn } = fx_effects;
+`;
+const fxCss = FX_MODULES.map((n) => read(`public/fx/${n}.css`)).join('\n');
 
 const extraCss = `
 /* standalone preview additions */
@@ -163,6 +182,7 @@ const previewBar = `<div class="preview" role="region" aria-label="Researcher pr
 const html = `<title>THRESHOLD</title>
 <style>
 ${css}
+${fxCss}
 ${extraCss}
 </style>
 ${previewBar}
@@ -172,6 +192,8 @@ ${content}
 ${consent}
 ${validate}
 ${exporter}
+${fxBundle}
+${fxRegistry}
 ${glue}
 ${appJs}
 </script>

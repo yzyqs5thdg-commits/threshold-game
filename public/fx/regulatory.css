@@ -1,0 +1,141 @@
+/* THRESHOLD fx: "regulatory" vignette — styles and motion.
+   Class prefix fx-regulatory-, keyframe prefix fxregulatory-. Palette: ground/panel/amber/signal tokens only.
+   The container decides the size; the SVG fills it (viewBox 760x200, slice).
+   Every animated group sits inside a translate() parent, so transform-origin 0 0 is the right pivot. */
+
+.fx-regulatory {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.fx-regulatory-glyphs text,
+.fx-regulatory-motes text {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight: 500;
+}
+
+/* ---- background ---- */
+.fx-regulatory-grid { animation: fxregulatory-drift 16s ease-in-out infinite alternate; }
+.fx-regulatory-sealhalo { animation: fxregulatory-breathe-halo 9s ease-in-out infinite; }
+.fx-regulatory-facade { animation: fxregulatory-breathe-soft 12s ease-in-out infinite; }
+
+/* floor rails: dashes crawl outward from the centre (both sides mirror each other) */
+.fx-regulatory-rail { animation: fxregulatory-crawl 6s linear infinite; }
+
+/* section glyph motes bob gently in place */
+.fx-regulatory-mote { opacity: 0.22; animation: fxregulatory-bob 9s ease-in-out infinite; }
+.fx-regulatory-mote--2 { animation-delay: -2s;  animation-duration: 11s; }
+.fx-regulatory-mote--3 { animation-delay: -4s;  animation-duration: 8s; }
+.fx-regulatory-mote--4 { animation-delay: -6s;  animation-duration: 12s; }
+.fx-regulatory-mote--5 { animation-delay: -1s;  animation-duration: 10s; }
+.fx-regulatory-mote--6 { animation-delay: -7s;  animation-duration: 9.5s; }
+
+/* ---- documents: scan line travels down the front sheet, stack breathes ---- */
+.fx-regulatory-docscan { animation: fxregulatory-docscan 5.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.fx-regulatory-sheet--2 { animation: fxregulatory-breathe-soft 7s ease-in-out infinite; }
+.fx-regulatory-sheet--3 { animation: fxregulatory-breathe-soft 7s ease-in-out -3.5s infinite; }
+.fx-regulatory-tag { animation: fxregulatory-blink 6s ease-in-out infinite; }
+
+/* ---- scales: the beam sways; each pan counter-rotates by the same angle so it hangs level.
+   Both use the same duration and easing, so the pair is perfectly symmetric and never settles. ---- */
+.fx-regulatory-beam {
+  transform-origin: 0 0;
+  animation: fxregulatory-sway 10s ease-in-out infinite;
+}
+.fx-regulatory-pan {
+  transform-origin: 0 0;
+  animation: fxregulatory-sway-rev 10s ease-in-out infinite;
+}
+.fx-regulatory-orbit   { transform-origin: 0 0; animation: fxregulatory-spin 14s linear infinite; }
+.fx-regulatory-bigorbit   { transform-origin: 0 0; animation: fxregulatory-spin 48s linear infinite; }
+.fx-regulatory-bigorbit-b { transform-origin: 0 0; animation: fxregulatory-spin-rev 36s linear infinite; }
+.fx-regulatory-orbit-b { transform-origin: 0 0; animation: fxregulatory-spin-rev 26s linear infinite; }
+.fx-regulatory-hub     { transform-origin: 0 0; animation: fxregulatory-heart 4s ease-in-out infinite; }
+.fx-regulatory-panring { animation: fxregulatory-breathe-soft 5s ease-in-out infinite; }
+
+.fx-regulatory-pulse {
+  transform-origin: 0 0;
+  opacity: 0;
+  animation: fxregulatory-pulse 8s ease-out infinite;
+}
+.fx-regulatory-pulse--2 { animation-delay: 4s; }
+
+/* ---- seal: tick ring turns, dashed ring counter-turns, stars breathe ---- */
+.fx-regulatory-seal-ticks  { transform-origin: 0 0; animation: fxregulatory-spin 40s linear infinite; }
+.fx-regulatory-seal-dash   { transform-origin: 0 0; animation: fxregulatory-spin-rev 24s linear infinite; }
+.fx-regulatory-seal-laurel { transform-origin: 0 0; animation: fxregulatory-breathe 8s ease-in-out infinite; }
+.fx-regulatory-seal-star   { transform-origin: 0 0; animation: fxregulatory-spin 60s linear infinite; }
+.fx-regulatory-seal-star-b { transform-origin: 0 0; animation: fxregulatory-spin-rev 30s linear infinite; }
+.fx-regulatory-seal-core   { transform-origin: 0 0; animation: fxregulatory-heart 6s ease-in-out -2s infinite; }
+
+/* ---- HUD: slow horizontal scan bar, two glyphs blink gently ---- */
+.fx-regulatory-bar { animation: fxregulatory-bar 15s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+.fx-regulatory-blink { animation: fxregulatory-blink 5s ease-in-out infinite; }
+.fx-regulatory-blink--b { animation-delay: 2.4s; animation-duration: 7s; }
+.fx-regulatory-reticle { animation: fxregulatory-breathe-soft 10s ease-in-out infinite; }
+.fx-regulatory-led { opacity: 0.18; animation: fxregulatory-led 6s ease-in-out infinite; }
+.fx-regulatory-led--2 { animation-delay: 0.5s; }
+.fx-regulatory-led--3 { animation-delay: 1s; }
+.fx-regulatory-led--4 { animation-delay: 1.5s; }
+.fx-regulatory-led--5 { animation-delay: 2s; }
+.fx-regulatory-led--6 { animation-delay: 2.5s; }
+
+/* ---- keyframes ---- */
+@keyframes fxregulatory-spin     { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes fxregulatory-spin-rev { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+@keyframes fxregulatory-drift    { from { transform: translate(0, 0); } to { transform: translate(-14px, -8px); } }
+
+/* four segments so the ease-in-out between keyframes approximates a sine: equal time near level and at the turns */
+@keyframes fxregulatory-sway {
+  0%, 100% { transform: rotate(-1.8deg); }
+  25%      { transform: rotate(0deg); }
+  50%      { transform: rotate(1.8deg); }
+  75%      { transform: rotate(0deg); }
+}
+@keyframes fxregulatory-sway-rev {
+  0%, 100% { transform: rotate(1.8deg); }
+  25%      { transform: rotate(0deg); }
+  50%      { transform: rotate(-1.8deg); }
+  75%      { transform: rotate(0deg); }
+}
+@keyframes fxregulatory-heart {
+  0%, 100% { transform: scale(1);    opacity: 0.95; }
+  50%      { transform: scale(1.35); opacity: 1; }
+}
+@keyframes fxregulatory-pulse {
+  0%   { transform: scale(0.6); opacity: 0; }
+  8%   { opacity: 0.6; }
+  45%  { transform: scale(3.4); opacity: 0; }
+  100% { transform: scale(3.4); opacity: 0; }
+}
+@keyframes fxregulatory-docscan {
+  0%   { transform: translateY(0px); opacity: 0; }
+  8%   { opacity: 1; }
+  82%  { opacity: 1; }
+  92%, 100% { transform: translateY(92px); opacity: 0; }
+}
+@keyframes fxregulatory-crawl { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -56; } }
+@keyframes fxregulatory-bob {
+  0%, 100% { transform: translateY(0px);  opacity: 0.14; }
+  50%      { transform: translateY(-6px); opacity: 0.3; }
+}
+@keyframes fxregulatory-breathe      { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.9; } }
+@keyframes fxregulatory-breathe-soft { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.6; } }
+@keyframes fxregulatory-breathe-halo { 0%, 100% { opacity: 0.6; }  50% { opacity: 1; } }
+@keyframes fxregulatory-bar { 0% { transform: translateX(0); } 100% { transform: translateX(830px); } }
+@keyframes fxregulatory-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes fxregulatory-led { 0%, 100% { opacity: 0.18; } 20% { opacity: 0.85; } 45% { opacity: 0.18; } }
+
+/* ---- reduced motion: a complete static frame ---- */
+@media (prefers-reduced-motion: reduce) {
+  .fx-regulatory *, .fx-regulatory { animation: none !important; }
+  .fx-regulatory-bar { display: none; }
+  .fx-regulatory-pulse { opacity: 0.3; transform: scale(2); }
+  .fx-regulatory-docscan { transform: translateY(38px); opacity: 1; }
+  .fx-regulatory-mote { opacity: 0.2; }
+  .fx-regulatory-led { opacity: 0.4; }
+  .fx-regulatory-sheet--2, .fx-regulatory-sheet--3, .fx-regulatory-facade, .fx-regulatory-reticle, .fx-regulatory-panring { opacity: 0.5; }
+}

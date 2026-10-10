@@ -1,0 +1,113 @@
+/* THRESHOLD fx: "cyber" vignette — styles and motion.
+   Class prefix fx-cyber-, keyframe prefix fxcyber-. Palette: ground/panel/amber/signal tokens only.
+   The container decides the size; the SVG fills it (viewBox 760x200, slice). */
+
+.fx-cyber {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.fx-cyber-glyphs text {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight: 500;
+}
+
+/* ---- background drift ---- */
+.fx-cyber-hexgrid {
+  animation: fxcyber-drift 14s ease-in-out infinite alternate;
+}
+
+/* ---- core: shield rotates, inner hex counter-rotates, outer ring crawls, sweep turns ---- */
+.fx-cyber-shield {
+  transform-origin: 0 0;
+  animation: fxcyber-spin 28s linear infinite;
+}
+.fx-cyber-shield-inner {
+  transform-origin: 0 0;
+  animation: fxcyber-spin-rev 18s linear infinite;
+}
+.fx-cyber-ring-outer {
+  transform-origin: 0 0;
+  animation: fxcyber-spin-rev 40s linear infinite;
+}
+.fx-cyber-sweep {
+  transform-origin: 0 0;
+  animation: fxcyber-spin 6s linear infinite;
+}
+.fx-cyber-heart {
+  transform-origin: 0 0;
+  animation: fxcyber-heart 4s ease-in-out infinite;
+}
+.fx-cyber-arcs {
+  transform-origin: 0 0;
+  animation: fxcyber-spin-rev 22s linear infinite;
+}
+.fx-cyber-arcs-b {
+  transform-origin: 0 0;
+  animation: fxcyber-spin 34s linear infinite;
+}
+.fx-cyber-node-orbit {
+  transform-origin: 0 0;
+  animation: fxcyber-spin 12s linear infinite;
+}
+
+/* ---- node pulses: ring grows and fades, staggered ---- */
+.fx-cyber-pulse {
+  transform-origin: 0 0;
+  opacity: 0;
+  animation: fxcyber-pulse 7s ease-out infinite;
+}
+.fx-cyber-pulse--v1 { animation-delay: 0s; }
+.fx-cyber-pulse--v2 { animation-delay: 1.3s; }
+.fx-cyber-pulse--v3 { animation-delay: 2.5s; }
+.fx-cyber-pulse--v4 { animation-delay: 3.6s; }
+.fx-cyber-pulse--v5 { animation-delay: 4.8s; }
+.fx-cyber-pulse--v6 { animation-delay: 5.9s; }
+
+/* ---- edges breathe very slowly (amber core links a touch brighter) ---- */
+.fx-cyber-edge--a { animation: fxcyber-breathe 9s ease-in-out infinite; }
+.fx-cyber-edge--s { animation: fxcyber-breathe-soft 11s ease-in-out infinite; }
+
+/* ---- HUD: slow horizontal scan bar, two glyphs blink gently ---- */
+.fx-cyber-bar {
+  animation: fxcyber-bar 13s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.fx-cyber-blink { animation: fxcyber-blink 5s ease-in-out infinite; }
+.fx-cyber-blink--b { animation-delay: 2.4s; animation-duration: 7s; }
+
+/* ---- keyframes ---- */
+@keyframes fxcyber-spin      { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
+@keyframes fxcyber-spin-rev  { from { transform: rotate(0deg); }   to { transform: rotate(-360deg); } }
+@keyframes fxcyber-drift     { from { transform: translate(0, 0); } to { transform: translate(-16px, -9px); } }
+@keyframes fxcyber-heart {
+  0%, 100% { transform: scale(1);    opacity: 0.95; }
+  50%      { transform: scale(1.35); opacity: 1; }
+}
+@keyframes fxcyber-pulse {
+  0%   { transform: scale(0.6); opacity: 0; }
+  8%   { opacity: 0.7; }
+  45%  { transform: scale(3.2); opacity: 0; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+@keyframes fxcyber-breathe      { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.85; } }
+@keyframes fxcyber-breathe-soft { 0%, 100% { opacity: 0.32; } 50% { opacity: 0.5; } }
+@keyframes fxcyber-bar {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(830px); }
+}
+@keyframes fxcyber-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+/* ---- reduced motion: a complete static frame ---- */
+@media (prefers-reduced-motion: reduce) {
+  .fx-cyber *, .fx-cyber { animation: none !important; }
+  .fx-cyber-packets { display: none; }
+  .fx-cyber-bar { display: none; }
+  .fx-cyber-pulse { opacity: 0.35; transform: scale(1.8); }
+  .fx-cyber-sweep { transform: rotate(32deg); }
+}

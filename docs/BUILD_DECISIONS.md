@@ -19,6 +19,17 @@ The Consolidated Development Record (Part III §20 and Part VI §5) lists items 
 | 13 | Technical identifiers | None. The application does not read, log or store IP address, user agent, referrer or cookies; the request log holds method, path, status and duration. Hosting-platform access logs are outside the application and should be checked. The page makes no third-party requests. | `server/index.js` |
 | 14 | Field names | The export uses the data-dictionary names (`dec_1`…`dec_4`, `conf_n`, `lat_n`, `rp_2_raw`, `risk_taking_score`, `attn_pass`, `mc_*_correct`, `excl_*`, `analysis_sample`). See `docs/DATA_DICTIONARY.md`. | `server/export.js` |
 
+## Animated visuals (game presentation)
+
+The game layer is deliberately rich (a boot splash, an ambient particle field, HUD status chips, an animated scene above every incident, a decode effect on the analyst's lines, lock-in and stamp effects). The rules that keep it inert as an experimental factor:
+
+- **No information.** No scene, icon or animation shows a number, a severity, a trend, a gauge, a traffic-light colour, or anything that could be read as the "right" answer. The palette is amber and blue only. The five incident scenes are themed by domain (network map, route map, ledger, scales and seals, globe) and are the same in every condition because they only know the domain, never the condition or any decision.
+- **No feedback.** The lock-in effect on "Log decision" is identical whichever option was chosen; nothing on screen changes in response to the content of a decision.
+- **Same timing for everyone.** The decode effect on Dr. Vale's briefing finishes at a fixed 900 ms regardless of the text length, so the epistemic and aleatory briefings are revealed identically. The incident's situation report is readable from first paint; the scene above it is decorative and the latency clock still starts at render.
+- **Reduced motion.** Under `prefers-reduced-motion` the splash is skipped, the ambient canvas draws one static frame, and every effect sets its final state immediately.
+- **No third-party resources.** All art is inline SVG, CSS and Canvas in `public/fx/`; the page still makes no external request.
+- **Failure-safe.** Every effect is wrapped so that if it throws, the study flow continues unchanged.
+
 ## Other choices worth knowing
 
 - **Decision options** are rendered in the fixed order Increase / Maintain / Decrease with identical styling; each carries a small monochrome glyph (up arrow, two bars, down arrow) that only restates its label, and the selected option is highlighted in the same amber whichever it is. Nothing on screen reacts to the content of a decision: there is no score, meter, feedback or consequence narrative.

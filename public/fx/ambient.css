@@ -1,0 +1,26 @@
+/* THRESHOLD fx: "ambient" — full-viewport background canvas behind the desk.
+   Class prefix fx-ambient-. The canvas is painted by fx/ambient.js (mountAmbient); this file only
+   positions it. It never captures pointer events and sits under the desk (z-index 0 vs .desk 1). */
+
+.fx-ambient-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  /* a whisper of depth so the particle layer reads as "behind glass" */
+  opacity: 0.95;
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The JS paints one static frame and stops; nothing to animate here. */
+  .fx-ambient-canvas { opacity: 0.9; }
+}
+
+@media print {
+  .fx-ambient-canvas { display: none; }
+}

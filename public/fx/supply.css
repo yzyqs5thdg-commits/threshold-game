@@ -1,0 +1,172 @@
+/* THRESHOLD fx module: "supply" vignette (public/fx/supply.js).
+   Route-map banner for the Supply chain incident card. Decorative only.
+   Palette: ground/panel navies, --amber HUD accent, --signal blue. No red/green.
+   Container: give the wrapper an explicit height (about 200px desktop, 160px phone);
+   the SVG uses preserveAspectRatio="xMidYMid slice" and fills it. */
+
+.fx-supply {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #0a1020;
+}
+
+.fx-supply-text {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.3em;
+}
+.fx-supply-text-r { text-anchor: end; }
+
+/* ---------- lanes: slow dash drift, each lane at its own pace ---------- */
+.fx-supply-lane {
+  stroke-dasharray: 5 9;
+  opacity: 0.75;
+  animation: fxsupply-dash 9s linear infinite;
+}
+.fx-supply-lane-b { animation-duration: 11s; animation-direction: reverse; }
+.fx-supply-lane-c { animation-duration: 13s; }
+.fx-supply-lane-d { animation-duration: 10s; animation-direction: reverse; }
+.fx-supply-landroute {
+  stroke-dasharray: 2.5 6;
+  opacity: 0.8;
+  animation: fxsupply-dash-land 14s linear infinite;
+}
+@keyframes fxsupply-dash { to { stroke-dashoffset: -112; } }
+@keyframes fxsupply-dash-land { to { stroke-dashoffset: -102; } }
+
+/* ---------- moving glyphs along the lanes (CSS motion path) ---------- */
+.fx-supply-vessel {
+  offset-rotate: auto;
+  offset-distance: 0%;
+  animation: fxsupply-travel 16s linear infinite;
+}
+.fx-supply-hull { fill: #131d33; stroke: #7fb3ff; stroke-width: 1.2; stroke-linejoin: round; }
+.fx-supply-box { fill: #0a1020; stroke: #f3cf7a; stroke-width: 1; }
+.fx-supply-vessel-light { fill: #7fb3ff; opacity: 0.1; }
+.fx-supply-wake { fill: none; stroke: #7fb3ff; stroke-width: 1; stroke-linecap: round; stroke-dasharray: 3 3; opacity: 0.45; animation: fxsupply-wake 1.6s linear infinite; }
+.fx-supply-wake-land { stroke: #e9b94c; }
+@keyframes fxsupply-wake { to { stroke-dashoffset: -6; } }
+.fx-supply-depot { animation: fxsupply-depot 7s ease-in-out infinite; }
+.fx-supply-depot-2 { animation-delay: -2.3s; }
+.fx-supply-depot-3 { animation-delay: -4.6s; }
+@keyframes fxsupply-depot {
+  0%, 100% { stroke: #aab6d0; }
+  50%      { stroke: #f3cf7a; }
+}
+
+.fx-supply-v-a1 { offset-path: path('M205 70 Q 300 56 400 100'); animation-duration: 18s; animation-delay: -4s; }
+.fx-supply-v-a2 { offset-path: path('M205 70 Q 300 56 400 100'); animation-duration: 18s; animation-delay: -13s; animation-direction: reverse; }
+.fx-supply-v-b1 { offset-path: path('M640 35 Q 520 48 400 100'); animation-duration: 20s; animation-delay: -9s; }
+.fx-supply-v-c1 { offset-path: path('M120 85 Q 260 104 400 100'); animation-duration: 24s; animation-delay: -6s; animation-direction: reverse; }
+.fx-supply-v-d1 { offset-path: path('M400 100 Q 330 150 240 128'); animation-duration: 17s; animation-delay: -11s; }
+.fx-supply-t-1 { offset-path: path('M400 100 C 430 128 480 142 540 150 C 580 158 620 150 660 135'); animation-duration: 22s; animation-delay: -5s; }
+.fx-supply-t-2 { offset-path: path('M400 100 C 430 128 480 142 540 150 C 580 158 620 150 660 135'); animation-duration: 22s; animation-delay: -16s; animation-direction: reverse; }
+.fx-supply-t-1 .fx-supply-hull, .fx-supply-t-2 .fx-supply-hull { stroke: #e9b94c; }
+.fx-supply-t-1 .fx-supply-vessel-light, .fx-supply-t-2 .fx-supply-vessel-light { fill: #e9b94c; }
+
+@keyframes fxsupply-travel {
+  0%   { offset-distance: 0%;   opacity: 0; }
+  4%   { opacity: 1; }
+  96%  { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* ---------- ports: gentle breathing halos ---------- */
+.fx-supply-port-halo { fill: #7fb3ff; opacity: 0.1; animation: fxsupply-halo 6s ease-in-out infinite; }
+.fx-supply-port-ring { fill: none; stroke: #7fb3ff; stroke-width: 1.1; opacity: 0.8; }
+.fx-supply-port-dot { fill: #e8edf8; opacity: 0.9; }
+.fx-supply-port-mid .fx-supply-port-halo { animation-delay: -2s; }
+.fx-supply-port-late .fx-supply-port-halo { animation-delay: -4s; }
+@keyframes fxsupply-halo {
+  0%, 100% { opacity: 0.08; transform: scale(0.8); }
+  50%      { opacity: 0.22; transform: scale(1.15); }
+}
+
+/* ---------- main hub: expanding radial ping + counter-rotating orbit rings ---------- */
+.fx-supply-ping-ring {
+  transform-origin: 0 0;
+  transform: scale(0.15);
+  opacity: 0;
+  animation: fxsupply-ping 7.5s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+.fx-supply-ping-2 { animation-delay: -2.5s; }
+.fx-supply-ping-3 { animation-delay: -5s; }
+@keyframes fxsupply-ping {
+  0%   { transform: scale(0.15); opacity: 0; }
+  8%   { opacity: 0.75; }
+  70%  { opacity: 0.12; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.fx-supply-hub-orbit { transform-origin: 0 0; animation: fxsupply-spin 26s linear infinite; }
+.fx-supply-hub-orbit-2 { transform-origin: 0 0; animation: fxsupply-spin 40s linear infinite reverse; }
+@keyframes fxsupply-spin { to { transform: rotate(360deg); } }
+.fx-supply-hub-dot { animation: fxsupply-breathe 4s ease-in-out infinite; }
+@keyframes fxsupply-breathe {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1; }
+}
+.fx-supply-hubpool { animation: fxsupply-pool 9s ease-in-out infinite; }
+@keyframes fxsupply-pool {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1; }
+}
+
+/* ---------- compass needle: slow wander, never settles on a direction ---------- */
+.fx-supply-compass-needle { transform-origin: 0 0; animation: fxsupply-needle 19s ease-in-out infinite; }
+@keyframes fxsupply-needle {
+  0%   { transform: rotate(-18deg); }
+  35%  { transform: rotate(24deg); }
+  65%  { transform: rotate(-6deg); }
+  100% { transform: rotate(-18deg); }
+}
+
+/* ---------- sweep + cursor + HUD ---------- */
+.fx-supply-sweep {
+  transform: translateX(-200px);
+  animation: fxsupply-sweep 14s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  mix-blend-mode: screen;
+}
+@keyframes fxsupply-sweep {
+  0%   { transform: translateX(-200px); }
+  100% { transform: translateX(800px); }
+}
+.fx-supply-cursor {
+  transform: translate(330px, 60px);
+  animation: fxsupply-cursor 21s ease-in-out infinite;
+}
+@keyframes fxsupply-cursor {
+  0%, 12%  { transform: translate(330px, 60px); }
+  28%, 42% { transform: translate(470px, 128px); }
+  58%, 70% { transform: translate(290px, 118px); }
+  86%, 100% { transform: translate(330px, 60px); }
+}
+.fx-supply-text-blink { animation: fxsupply-blink 5s ease-in-out infinite; }
+@keyframes fxsupply-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+.fx-supply-coastglow { animation: fxsupply-coast 12s ease-in-out infinite; }
+@keyframes fxsupply-coast {
+  0%, 100% { opacity: 0.12; }
+  50%      { opacity: 0.24; }
+}
+
+/* ---------- reduced motion: a complete static frame ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .fx-supply *, .fx-supply { animation: none !important; }
+  .fx-supply-vessel { opacity: 1; }
+  .fx-supply-v-a1 { offset-distance: 38%; }
+  .fx-supply-v-a2 { offset-distance: 72%; }
+  .fx-supply-v-b1 { offset-distance: 55%; }
+  .fx-supply-v-c1 { offset-distance: 30%; }
+  .fx-supply-v-d1 { offset-distance: 60%; }
+  .fx-supply-t-1 { offset-distance: 35%; }
+  .fx-supply-t-2 { offset-distance: 78%; }
+  .fx-supply-ping-1 { transform: scale(0.55); opacity: 0.45; }
+  .fx-supply-ping-2 { transform: scale(1); opacity: 0.22; }
+  .fx-supply-ping-3 { transform: scale(1.4); opacity: 0.08; }
+  .fx-supply-port-halo { opacity: 0.15; transform: scale(1); }
+  .fx-supply-sweep { transform: translateX(260px); opacity: 0.6; }
+  .fx-supply-cursor { transform: translate(330px, 60px); }
+}

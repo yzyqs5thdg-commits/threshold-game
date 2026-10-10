@@ -1,0 +1,526 @@
+/* THRESHOLD fx: "effects" — HUD extras and screen-transition effects.
+   Class prefix fx-effects-, keyframe prefix fxeffects-. Palette: ground/panel/amber/signal tokens
+   plus transparent whites only. No inline style attributes anywhere; JS sets element.style for
+   positioning contexts and the stamp's resting transform. Under prefers-reduced-motion every
+   animation is removed and the artwork rests in its final state. */
+
+/* =========================================================================================
+   HUD extras (216px rail column)
+   ========================================================================================= */
+.fx-effects-hud {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  color: #7b89a8;
+  user-select: none;
+  pointer-events: none;
+}
+
+.fx-effects-hud-head,
+.fx-effects-hud-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.6rem;
+  letter-spacing: 0.24em;
+  color: #7b89a8;
+}
+.fx-effects-hud-head i {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(127, 179, 255, 0.45), rgba(127, 179, 255, 0.08));
+}
+.fx-effects-hud-foot { justify-content: space-between; }
+
+/* six tiny glyph blocks that light in a slow travelling wave */
+.fx-effects-hud-glyphs { display: inline-flex; gap: 3px; }
+.fx-effects-hud-glyphs i {
+  width: 5px;
+  height: 7px;
+  border-radius: 1px;
+  background: #7fb3ff;
+  opacity: 0.18;
+  animation: fxeffects-glyph 4.8s ease-in-out infinite;
+}
+.fx-effects-hud-glyphs i:nth-child(2) { animation-delay: 0.4s; }
+.fx-effects-hud-glyphs i:nth-child(3) { animation-delay: 0.8s; }
+.fx-effects-hud-glyphs i:nth-child(4) { animation-delay: 1.2s; }
+.fx-effects-hud-glyphs i:nth-child(5) { animation-delay: 1.6s; }
+.fx-effects-hud-glyphs i:nth-child(6) { animation-delay: 2.0s; }
+@keyframes fxeffects-glyph {
+  0%, 100% { opacity: 0.18; }
+  18% { opacity: 0.85; box-shadow: 0 0 6px rgba(127, 179, 255, 0.6); }
+  40% { opacity: 0.18; }
+}
+
+/* status chips */
+.fx-effects-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.fx-effects-chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 10px 6px 11px;
+  border: 1px solid #233150;
+  border-radius: 7px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.16));
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: #aab6d0;
+  overflow: hidden;
+}
+.fx-effects-chip::before {
+  /* faint left accent bar, like an indicator lamp housing */
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 2px;
+  border-radius: 1px;
+  background: rgba(233, 185, 76, 0.45);
+}
+.fx-effects-chip-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* breathing dot */
+.fx-effects-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e9b94c;
+  box-shadow: 0 0 0 2px rgba(233, 185, 76, 0.14), 0 0 8px rgba(233, 185, 76, 0.55);
+  animation: fxeffects-breathe 4.2s ease-in-out infinite;
+}
+.fx-effects-dot-small { width: 5px; height: 5px; }
+.fx-effects-chip-2 .fx-effects-dot { animation-delay: -1.4s; }
+.fx-effects-chip-3 .fx-effects-dot { animation-delay: -2.8s; }
+@keyframes fxeffects-breathe {
+  0%, 100% { opacity: 0.55; box-shadow: 0 0 0 2px rgba(233, 185, 76, 0.08), 0 0 4px rgba(233, 185, 76, 0.25); }
+  50% { opacity: 1; box-shadow: 0 0 0 3px rgba(233, 185, 76, 0.18), 0 0 12px rgba(233, 185, 76, 0.7); }
+}
+
+/* three equal activity squares that light in sequence — equal size so nothing reads as a level */
+.fx-effects-ticks { display: inline-flex; gap: 3px; flex: none; }
+.fx-effects-ticks i {
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: #7fb3ff;
+  opacity: 0.22;
+  animation: fxeffects-tick 2.6s ease-in-out infinite;
+}
+.fx-effects-ticks i:nth-child(2) { animation-delay: 0.3s; }
+.fx-effects-ticks i:nth-child(3) { animation-delay: 0.6s; }
+.fx-effects-chip-2 .fx-effects-ticks i { animation-delay: 0.9s; }
+.fx-effects-chip-2 .fx-effects-ticks i:nth-child(2) { animation-delay: 1.2s; }
+.fx-effects-chip-2 .fx-effects-ticks i:nth-child(3) { animation-delay: 1.5s; }
+.fx-effects-chip-3 .fx-effects-ticks i { animation-delay: 1.8s; }
+.fx-effects-chip-3 .fx-effects-ticks i:nth-child(2) { animation-delay: 2.1s; }
+.fx-effects-chip-3 .fx-effects-ticks i:nth-child(3) { animation-delay: 2.4s; }
+@keyframes fxeffects-tick {
+  0%, 100% { opacity: 0.22; }
+  20% { opacity: 0.9; }
+  45% { opacity: 0.22; }
+}
+
+/* waveform box */
+.fx-effects-wavebox {
+  position: relative;
+  height: 46px;
+  border: 1px solid #233150;
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+.fx-effects-wavebox::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(10, 16, 32, 0.55) 100%);
+}
+.fx-effects-wave {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.fx-effects-wave-a { animation: fxeffects-wave-scroll 9s linear infinite; }
+.fx-effects-wave-b { animation: fxeffects-wave-scroll 14s linear infinite reverse; }
+@keyframes fxeffects-wave-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-216px); }
+}
+/* reversed trace starts at -216 so it also stays inside the 2x-wide path */
+.fx-effects-wave-b { transform: translateX(-216px); }
+.fx-effects-wave-cursor { animation: fxeffects-wave-cursor 6s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+@keyframes fxeffects-wave-cursor {
+  0% { transform: translateX(0); opacity: 0; }
+  6% { opacity: 1; }
+  94% { opacity: 1; }
+  100% { transform: translateX(216px); opacity: 0; }
+}
+
+/* =========================================================================================
+   Incoming banner (above an incident card)
+   ========================================================================================= */
+.fx-effects-incoming {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+  margin: 0 0 12px;
+  padding: 7px 16px 7px 14px;
+  border: 1px solid #2f4169;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(233, 185, 76, 0.08), rgba(0, 0, 0, 0.25) 40%, rgba(0, 0, 0, 0.25));
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #aab6d0;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+  animation: fxeffects-incoming-settle 1.6s ease-out both;
+}
+@keyframes fxeffects-incoming-settle {
+  0% { border-color: rgba(233, 185, 76, 0.9); box-shadow: 0 0 22px rgba(233, 185, 76, 0.28), inset 0 0 18px rgba(233, 185, 76, 0.1); }
+  45% { border-color: rgba(233, 185, 76, 0.55); }
+  100% { border-color: #2f4169; box-shadow: 0 0 0 rgba(233, 185, 76, 0), inset 0 0 0 rgba(233, 185, 76, 0); }
+}
+.fx-effects-incoming::before {
+  /* scanline texture */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px);
+}
+.fx-effects-incoming-corner {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: 7px;
+  border: 1px solid rgba(233, 185, 76, 0.7);
+  animation: fxeffects-corner-in 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.fx-effects-incoming-corner-l { left: 3px; border-right: 0; border-radius: 4px 0 0 4px; }
+.fx-effects-incoming-corner-r { right: 3px; border-left: 0; border-radius: 0 4px 4px 0; }
+@keyframes fxeffects-corner-in {
+  from { opacity: 0; transform: scaleY(0.4); }
+  to { opacity: 1; transform: none; }
+}
+
+.fx-effects-incoming-chevrons { flex: none; display: block; margin-left: 8px; overflow: visible; }
+.fx-effects-chev {
+  animation: fxeffects-chev-in 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both,
+             fxeffects-chev-rest 4.5s ease-in-out 1.2s infinite;
+}
+.fx-effects-chev-2 { animation-delay: 110ms, 1.45s; }
+.fx-effects-chev-3 { animation-delay: 220ms, 1.7s; }
+@keyframes fxeffects-chev-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fxeffects-chev-rest {
+  0%, 100% { opacity: 0.45; }
+  30% { opacity: 1; }
+}
+
+.fx-effects-incoming-text { flex: none; display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.fx-effects-incoming-part {
+  animation: fxeffects-part-in 500ms ease-out both;
+}
+.fx-effects-incoming-part-1 { color: #e9b94c; animation-delay: 160ms; }
+.fx-effects-incoming-part-2 { color: #e8edf8; animation-delay: 300ms; }
+.fx-effects-incoming-part-3 { color: #aab6d0; animation-delay: 440ms; }
+.fx-effects-incoming-sep { color: #7b89a8; opacity: 0.8; animation: fxeffects-part-in 500ms ease-out 240ms both; }
+@keyframes fxeffects-part-in {
+  from { opacity: 0; transform: translateY(4px); filter: blur(2px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+.fx-effects-incoming-rule {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, rgba(127, 179, 255, 0.45) 0 6px, transparent 6px 12px);
+  opacity: 0.6;
+  animation: fxeffects-part-in 600ms ease-out 500ms both;
+}
+.fx-effects-incoming-tail {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.6rem;
+  color: #7b89a8;
+  animation: fxeffects-part-in 500ms ease-out 620ms both;
+}
+
+/* one sweep of light left → right, then gone */
+.fx-effects-incoming-sweep {
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 34%;
+  pointer-events: none;
+  transform: translateX(-120%) skewX(-18deg);
+  background: linear-gradient(90deg, rgba(243, 207, 122, 0) 0%, rgba(243, 207, 122, 0.16) 40%, rgba(243, 207, 122, 0.75) 52%, rgba(243, 207, 122, 0.16) 64%, rgba(243, 207, 122, 0) 100%);
+  mix-blend-mode: screen;
+  animation: fxeffects-sweep 1s cubic-bezier(0.4, 0, 0.3, 1) 380ms both;
+}
+@keyframes fxeffects-sweep {
+  from { transform: translateX(-120%) skewX(-18deg); opacity: 1; }
+  85% { opacity: 1; }
+  to { transform: translateX(340%) skewX(-18deg); opacity: 0; }
+}
+
+@media (max-width: 560px) {
+  .fx-effects-incoming { gap: 8px; padding: 6px 10px 6px 8px; font-size: 0.6rem; letter-spacing: 0.12em; }
+  .fx-effects-incoming-text { gap: 7px; }
+  .fx-effects-incoming-tail { display: none; }
+  .fx-effects-incoming-chevrons { margin-left: 4px; }
+}
+
+/* =========================================================================================
+   scanSweep(el): one-off scanline band top → bottom inside an overlay
+   ========================================================================================= */
+.fx-effects-scan {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fx-effects-scan::before {
+  /* faint scanline wash that fades out with the band */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(180deg, rgba(127, 179, 255, 0.05) 0 1px, transparent 1px 3px);
+  animation: fxeffects-scan-wash 520ms ease-out both;
+}
+@keyframes fxeffects-scan-wash {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.fx-effects-scan-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -24%;
+  height: 24%;
+  transform: translateY(0);
+  background: linear-gradient(180deg,
+    rgba(233, 185, 76, 0) 0%,
+    rgba(233, 185, 76, 0.05) 45%,
+    rgba(233, 185, 76, 0.16) 85%,
+    rgba(243, 207, 122, 0.6) 97%,
+    rgba(255, 255, 255, 0.9) 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 18px rgba(233, 185, 76, 0.55);
+  animation: fxeffects-scan 520ms cubic-bezier(0.3, 0.5, 0.45, 1) both;
+}
+@keyframes fxeffects-scan {
+  from { transform: translateY(0); opacity: 1; }
+  80% { opacity: 1; }
+  to { transform: translateY(540%); opacity: 0; }
+}
+
+/* =========================================================================================
+   decodeReveal(el): the text itself is driven by JS; this adds a faint signal tint while decoding
+   ========================================================================================= */
+.fx-effects-decoding {
+  text-shadow: 0 0 10px rgba(127, 179, 255, 0.35);
+  transition: text-shadow 400ms ease;
+}
+
+/* =========================================================================================
+   badgeActivate(el)
+   ========================================================================================= */
+.fx-effects-badge {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+.fx-effects-badge-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid rgba(243, 207, 122, 0.95);
+  box-shadow: 0 0 22px rgba(233, 185, 76, 0.55), inset 0 0 22px rgba(233, 185, 76, 0.25);
+  opacity: 0;
+  transform: scale(0.84);
+  animation: fxeffects-badge-ring 800ms cubic-bezier(0.25, 0.5, 0.35, 1) both;
+}
+.fx-effects-badge-ring-2 { animation-delay: 160ms; border-color: rgba(127, 179, 255, 0.8); box-shadow: 0 0 18px rgba(127, 179, 255, 0.4); }
+@keyframes fxeffects-badge-ring {
+  0% { opacity: 0; transform: scale(0.84); }
+  22% { opacity: 1; }
+  70% { opacity: 0.5; }
+  100% { opacity: 0; transform: scale(1); }
+}
+.fx-effects-badge-sweep {
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: 0;
+  width: 45%;
+  transform: translateX(-130%) skewX(-20deg);
+  background: linear-gradient(90deg, rgba(243, 207, 122, 0) 0%, rgba(243, 207, 122, 0.2) 42%, rgba(243, 207, 122, 0.85) 50%, rgba(243, 207, 122, 0.2) 58%, rgba(243, 207, 122, 0) 100%);
+  mix-blend-mode: screen;
+  animation: fxeffects-badge-sweep 640ms cubic-bezier(0.45, 0, 0.3, 1) 60ms both;
+}
+@keyframes fxeffects-badge-sweep {
+  from { transform: translateX(-130%) skewX(-20deg); }
+  to { transform: translateX(330%) skewX(-20deg); }
+}
+.fx-effects-badge-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid rgba(243, 207, 122, 0.9);
+  opacity: 0;
+  animation: fxeffects-badge-corner 800ms ease-out both;
+}
+.fx-effects-badge-corner-tl { left: 8px; top: 8px; border-right: 0; border-bottom: 0; --fxeffects-dx: -6px; --fxeffects-dy: -6px; }
+.fx-effects-badge-corner-tr { right: 8px; top: 8px; border-left: 0; border-bottom: 0; --fxeffects-dx: 6px; --fxeffects-dy: -6px; }
+.fx-effects-badge-corner-bl { left: 8px; bottom: 8px; border-right: 0; border-top: 0; --fxeffects-dx: -6px; --fxeffects-dy: 6px; }
+.fx-effects-badge-corner-br { right: 8px; bottom: 8px; border-left: 0; border-top: 0; --fxeffects-dx: 6px; --fxeffects-dy: 6px; }
+@keyframes fxeffects-badge-corner {
+  0% { opacity: 0; transform: translate(var(--fxeffects-dx), var(--fxeffects-dy)); }
+  25% { opacity: 1; transform: none; }
+  70% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translate(var(--fxeffects-dx), var(--fxeffects-dy)); }
+}
+.fx-effects-badge-active {
+  animation: fxeffects-badge-active 820ms ease-out both;
+}
+@keyframes fxeffects-badge-active {
+  0% { filter: brightness(1); }
+  22% { filter: brightness(1.35) saturate(1.15); }
+  100% { filter: brightness(1); }
+}
+/* chip shimmer: a diagonal highlight passes across the gold chip */
+.fx-effects-chip-shimmer { overflow: hidden; }
+.fx-effects-chip-shimmer::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  bottom: -40%;
+  left: 0;
+  width: 55%;
+  transform: translateX(-140%) skewX(-25deg);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0) 100%);
+  animation: fxeffects-chip-shimmer 700ms cubic-bezier(0.45, 0, 0.3, 1) 140ms both;
+}
+@keyframes fxeffects-chip-shimmer {
+  from { transform: translateX(-140%) skewX(-25deg); }
+  to { transform: translateX(300%) skewX(-25deg); }
+}
+
+/* =========================================================================================
+   lockIn(buttonEl)
+   ========================================================================================= */
+.fx-effects-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.fx-effects-lock-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(243, 207, 122, 0.95);
+  box-shadow: 0 0 20px rgba(233, 185, 76, 0.7), inset 0 0 12px rgba(233, 185, 76, 0.35);
+  opacity: 0;
+  animation: fxeffects-lock-ring 420ms cubic-bezier(0.25, 0.5, 0.4, 1) both;
+}
+.fx-effects-lock-ring-2 { animation-delay: 90ms; border-width: 1px; border-color: rgba(255, 255, 255, 0.75); box-shadow: none; }
+@keyframes fxeffects-lock-ring {
+  0% { opacity: 1; transform: scale(1); }
+  55% { opacity: 0.7; }
+  100% { opacity: 0; transform: scale(1.25, 1.65); }
+}
+.fx-effects-flash {
+  animation: fxeffects-flash 420ms ease-out both;
+}
+@keyframes fxeffects-flash {
+  0% { filter: brightness(1); }
+  25% { filter: brightness(1.3); }
+  100% { filter: brightness(1); }
+}
+
+/* =========================================================================================
+   stampIn(el)
+   ========================================================================================= */
+.fx-effects-stamp-in {
+  animation: fxeffects-stamp 620ms cubic-bezier(0.18, 0.9, 0.25, 1.15) both;
+}
+@keyframes fxeffects-stamp {
+  0% { opacity: 0; transform: var(--fxeffects-rest, rotate(0deg)) scale(1.6) rotate(5deg); }
+  55% { opacity: 1; transform: var(--fxeffects-rest, rotate(0deg)) scale(0.97) rotate(-1deg); box-shadow: 0 0 24px rgba(233, 185, 76, 0.6); }
+  75% { transform: var(--fxeffects-rest, rotate(0deg)) scale(1.02) rotate(0.5deg); }
+  100% { opacity: 1; transform: var(--fxeffects-rest, rotate(0deg)) scale(1) rotate(0deg); box-shadow: 0 0 0 rgba(233, 185, 76, 0); }
+}
+.fx-effects-stamp-wave {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.fx-effects-stamp-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid rgba(243, 207, 122, 0.9);
+  box-shadow: 0 0 14px rgba(233, 185, 76, 0.5);
+  opacity: 0;
+  animation: fxeffects-stamp-ring 520ms cubic-bezier(0.2, 0.6, 0.3, 1) 180ms both;
+}
+.fx-effects-stamp-ring-2 { animation-delay: 260ms; border-color: rgba(255, 255, 255, 0.6); box-shadow: none; }
+@keyframes fxeffects-stamp-ring {
+  0% { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.7, 2.1); }
+}
+
+/* =========================================================================================
+   Reduced motion: no animation anywhere; everything rests in its complete final state
+   ========================================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .fx-effects-hud *,
+  .fx-effects-incoming,
+  .fx-effects-incoming *,
+  .fx-effects-scan,
+  .fx-effects-scan *,
+  .fx-effects-badge *,
+  .fx-effects-badge-active,
+  .fx-effects-chip-shimmer::after,
+  .fx-effects-lock *,
+  .fx-effects-flash,
+  .fx-effects-stamp-in,
+  .fx-effects-stamp-wave * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .fx-effects-wave-b { transform: translateX(-216px); }
+  .fx-effects-wave-cursor { transform: translateX(96px); opacity: 1; }
+  .fx-effects-incoming-sweep { display: none; }
+  .fx-effects-chev { opacity: 1; }
+  .fx-effects-dot { opacity: 1; }
+}

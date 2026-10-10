@@ -9,8 +9,23 @@
 // "Submit my responses" on the closing screen. Only then is anything beyond the session's
 // existence sent to the server. Choosing "Withdraw" discards everything.
 
+import { VIGNETTES, mountAmbient, renderHudExtras, renderIncomingBanner, scanSweep, decodeReveal, badgeActivate, lockIn, stampIn } from './fx/index.js';
+
 const STORAGE_KEY = 'threshold.session.v1';
+const BOOT_KEY = 'threshold.booted.v1';
 const app = document.getElementById('app');
+
+// Decorative effects never gate the study flow: any failure is swallowed and the flow continues.
+const fx = (fn, ...args) => {
+  try {
+    const r = typeof fn === 'function' ? fn(...args) : undefined;
+    return r && typeof r.then === 'function' ? r.catch(() => {}) : Promise.resolve(r);
+  } catch {
+    return Promise.resolve();
+  }
+};
+const REDUCED_MOTION = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+let vignetteCleanup = null;
 const timelineEl = document.getElementById('timeline');
 const clockEl = document.getElementById('hud-time');
 
@@ -173,8 +188,14 @@ const PORTRAIT = `<svg viewBox="0 0 150 200" aria-hidden="true">
 const iconFor = (domain) => ICONS[domain] || ICONS.default;
 
 function render(html, { step, focus = true } = {}) {
+  if (vignetteCleanup) {
+    try { vignetteCleanup(); } catch { /* ignore */ }
+    vignetteCleanup = null;
+  }
   app.innerHTML = html;
   if (typeof step === 'number') setProgress(step);
+  const panel = app.querySelector('.panel');
+  if (panel) fx(scanSweep, panel);
   window.scrollTo(0, 0);
   if (focus) {
     const h = app.querySelector('h1, h2');
@@ -376,7 +397,9 @@ function renderProfile() {
       else profile[it.id] = v;
     }
     if (bad) return showError(form, 'Please answer every question to continue.');
-    go('style', { profile });
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    fx(badgeActivate, document.querySelector('.badge')).then(() => go('style', { profile }));
   });
 }
 
@@ -440,6 +463,7 @@ function renderBriefing() {
         </div>
       </div>
     </div>`, { step: 3 });
+  fx(decodeReveal, app.querySelector('.speech p'), { duration: 900 });
   document.getElementById('begin').addEventListener('click', () => go('item', { itemIndex: 0 }));
 }
 
@@ -455,8 +479,15 @@ function renderItem() {
   const m = state.materials;
 
   const code = `INC-${String(idx + 1).padStart(2, '0')}`;
+  const vignette = VIGNETTES[data.domain];
+  let banner = '';
+  try { banner = vignette?.render?.() || ''; } catch { banner = ''; }
+  let incoming = '';
+  try { incoming = renderIncomingBanner({ code, domain: data.domain }) || ''; } catch { incoming = ''; }
   render(`
+    ${incoming}
     <div class="panel incident">
+      <div class="incident__vignette" aria-hidden="true">${banner}</div>
       <div class="eyebrow">
         <span class="tag">${iconFor(data.domain)}${esc(data.domain)}</span>
         <span class="counter">${esc(code)} · ${idx + 1} of ${seq.length}</span>
@@ -487,6 +518,12 @@ function renderItem() {
         </div>
       </form>
     </div>`, { step: 4 + idx });
+
+  // Optional JS-driven animation inside the vignette (cleaned up on the next render).
+  const svg = app.querySelector('.incident__vignette svg');
+  if (svg && typeof vignette?.mount === 'function') {
+    try { vignetteCleanup = vignette.mount(svg) || null; } catch { vignetteCleanup = null; }
+  }
 
   // Latency clock starts when the scenario is painted.
   itemShownAt = performance.now();
@@ -525,14 +562,20 @@ function renderItem() {
     const latencyFirst = (firstChoiceAt - itemShownAt) / 1000;
     document.removeEventListener('visibilitychange', onVisibility);
 
-    if (kind === 'scenario') {
-      const decisions = state.decisions.filter((d) => d.scenarioId !== data.id);
-      decisions.push({ scenarioId: data.id, choice, confidence: conf, latency, latencyFirst, hidden: itemHidden });
-      go('item', { decisions, itemIndex: idx + 1 });
-    } else {
-      // Data-quality item: response recorded, confidence not analysed, not scored.
-      go('item', { attention: { choice, latency, confidence: conf }, itemIndex: idx + 1 });
-    }
+    const logBtn = confidenceForm.querySelector('button[type="submit"]');
+    logBtn.disabled = true;
+    for (const b of options) b.disabled = true;
+    const advance = () => {
+      if (kind === 'scenario') {
+        const decisions = state.decisions.filter((d) => d.scenarioId !== data.id);
+        decisions.push({ scenarioId: data.id, choice, confidence: conf, latency, latencyFirst, hidden: itemHidden });
+        go('item', { decisions, itemIndex: idx + 1 });
+      } else {
+        // Data-quality item: response recorded, confidence not analysed, not scored.
+        go('item', { attention: { choice, latency, confidence: conf }, itemIndex: idx + 1 });
+      }
+    };
+    fx(lockIn, logBtn).then(advance);
   });
 }
 
@@ -563,6 +606,7 @@ function renderManipulation() {
         </div>
       </form>
     </div>`, { step: 9 });
+  fx(decodeReveal, app.querySelector('.speech p'), { duration: 900 });
 
   const form = document.getElementById('mc-form');
   form.addEventListener('submit', (e) => {
@@ -611,6 +655,7 @@ function renderClosing() {
       <hr class="divider">
       <p class="contact">${esc(c.contact)}</p>
     </div>`, { step: 10 });
+  fx(stampIn, app.querySelector('.stamp'));
 
   const actions = document.getElementById('closing-actions');
   const confirmBox = document.getElementById('withdraw-confirm');
@@ -686,6 +731,7 @@ function renderSubmitted() {
       <hr class="divider">
       <p class="contact">${esc(c?.contact ?? '')}</p>
     </div>`, { step: 11 });
+  fx(stampIn, app.querySelector('.stamp'));
 }
 
 function renderWithdrawn() {
@@ -704,7 +750,48 @@ function renderWithdrawn() {
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
+function mountDesk() {
+  const canvas = document.getElementById('ambient');
+  if (canvas) fx(mountAmbient, canvas);
+  const extras = document.getElementById('hud-extras');
+  if (extras) {
+    try { extras.innerHTML = renderHudExtras() || ''; } catch { extras.innerHTML = ''; }
+  }
+}
+
+/** One-time "system boot" splash shown over the sign-in screen (purely decorative, skippable). */
+function bootSplash() {
+  let seen = false;
+  try { seen = sessionStorage.getItem(BOOT_KEY) === '1'; } catch { /* ignore */ }
+  if (seen || REDUCED_MOTION) return Promise.resolve();
+  try { sessionStorage.setItem(BOOT_KEY, '1'); } catch { /* ignore */ }
+  return new Promise((resolve) => {
+    const el = document.createElement('div');
+    el.className = 'boot';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = `
+      <div class="boot__inner">
+        <span class="mark mark--lg"></span>
+        <div class="boot__title">THRESHOLD</div>
+        <div class="boot__sub">Meridian Group · Risk operations desk</div>
+        <div class="boot__line"><i></i></div>
+        <div class="boot__log"><span>initialising secure desk</span><span>loading day-one schedule</span><span>link established</span></div>
+      </div>`;
+    document.body.appendChild(el);
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      el.classList.add('boot--out');
+      setTimeout(() => { el.remove(); resolve(); }, 420);
+    };
+    el.addEventListener('click', finish);
+    setTimeout(finish, 1700);
+  });
+}
+
 (async function boot() {
+  mountDesk();
   try {
     config = await api('/api/config');
   } catch {
@@ -717,5 +804,11 @@ function renderWithdrawn() {
     state = freshState();
     saveState();
   }
-  show();
+  if (state.screen === 'consent') {
+    const splash = bootSplash();
+    show();
+    await splash;
+  } else {
+    show();
+  }
 })();
