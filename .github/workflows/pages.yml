@@ -36,6 +36,11 @@ jobs:
       - run: npm test
       - name: Build site
         run: |
+          # Fall back to the committed deploy/site.config.json when the repository variables are not set.
+          if [ -z "$GAS_ENDPOINT" ] && [ -f deploy/site.config.json ]; then
+            GAS_ENDPOINT=$(node -p "require('./deploy/site.config.json').gasEndpoint || ''")
+            FOLLOWUP_URL=${FOLLOWUP_URL:-$(node -p "require('./deploy/site.config.json').followupFormUrl || ''")}
+          fi
           mkdir -p site/preview
           touch site/.nojekyll
           node scripts/build-standalone.js --mode=preview --out=site/preview/index.html

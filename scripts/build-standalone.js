@@ -24,7 +24,7 @@ const read = (p) => readFileSync(resolve(root, p), 'utf8');
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const m = a.match(/^--([^=]+)=(.*)$/); return m ? [m[1], m[2]] : [a.replace(/^--/, ''), true]; }));
 const mode = args.mode === 'participant' ? 'participant' : 'preview';
-if (mode === 'participant' && !args['allow-any-endpoint'] && !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(String(args.endpoint || ''))) {
+if (mode === 'participant' && !args['allow-any-endpoint'] && !/^https:\/\/script\.google\.com\/(a\/macros\/[^/]+\/|macros\/)s\/[^/]+\/exec$/.test(String(args.endpoint || ''))) {
   process.stderr.write('participant mode needs --endpoint=https://script.google.com/macros/s/<id>/exec\n');
   process.exit(1);
 }
