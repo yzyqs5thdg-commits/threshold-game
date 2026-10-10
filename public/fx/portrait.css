@@ -1,1 +1,75 @@
-/* placeholder */
+/* THRESHOLD fx: Dr. Vale portrait — motion.
+   Class prefix fx-portrait-, keyframe prefix fxportrait-. The .portrait container sets the size
+   (150x200 desktop, 96x128 phone); the SVG fills it (viewBox 150x200, slice).
+   Idle loop: the bust breathes (±1% about its base), the eyes blink about every 5 s, a thin signal
+   sweep crosses the panel about every 8 s, the hex backdrop drifts and the reticle ring crawls.
+   Nothing here varies with the participant, the condition or any decision. No filters on moving parts. */
+
+.fx-portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---- bust: slow breathing about the base (pivot is the translate sandwich in the markup) ---- */
+.fx-portrait-breathe {
+  transform-origin: 0 0;
+  animation: fxportrait-breathe 4.6s ease-in-out infinite;
+}
+
+/* ---- eyes: a short blink every ~5 s, closing on the eye line ---- */
+.fx-portrait-blink {
+  transform-origin: 0 0;
+  animation: fxportrait-blink 5.2s linear infinite;
+}
+
+/* ---- signal sweep: a thin horizontal line crosses the panel, then rests off-screen until the next pass ---- */
+.fx-portrait-sweep {
+  transform: translateY(-12px);
+  animation: fxportrait-sweep 8s linear infinite;
+}
+
+/* ---- backdrop: hex grid drifts, reticle ring crawls ---- */
+.fx-portrait-hexgrid {
+  animation: fxportrait-drift 22s ease-in-out infinite alternate;
+}
+.fx-portrait-ring {
+  transform-origin: 0 0;
+  transform-box: view-box;
+  animation: fxportrait-ring 48s linear infinite;
+}
+
+/* ---- keyframes ---- */
+@keyframes fxportrait-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.01, 1.012); }
+}
+@keyframes fxportrait-blink {
+  0%, 93%  { transform: scaleY(1); }
+  95.2%    { transform: scaleY(0.06); }
+  97.4%, 100% { transform: scaleY(1); }
+}
+@keyframes fxportrait-sweep {
+  0%   { transform: translateY(-12px); opacity: 0; }
+  2%   { opacity: 1; }
+  20%  { transform: translateY(212px); opacity: 1; }
+  21%, 100% { transform: translateY(212px); opacity: 0; }
+}
+@keyframes fxportrait-drift {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(-7px, -10px); }
+}
+@keyframes fxportrait-ring {
+  from { transform: translate(75px, 92px) rotate(0deg); }
+  to   { transform: translate(75px, 92px) rotate(360deg); }
+}
+
+/* ---- reduced motion: a complete static frame ---- */
+@media (prefers-reduced-motion: reduce) {
+  .fx-portrait *, .fx-portrait { animation: none !important; }
+  .fx-portrait-sweep { display: none; }
+  .fx-portrait-breathe, .fx-portrait-blink { transform: none; }
+  .fx-portrait-ring { transform: translate(75px, 92px) rotate(-20deg); }
+}

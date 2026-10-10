@@ -9,10 +9,18 @@
 
    Geometry: orthographic globe seen from a 22 degree elevation. Latitude rings are static ellipses
    (rotation about the polar axis leaves them in place). Meridians are unit circles under an animated
-   skewX + scale transform (SMIL animateTransform), which is the exact projection of a great circle
-   through the poles at longitude lambda; each has a bright front half and a dim back half so the
-   spin reads as a sphere turning rather than ellipses breathing. The three location markers are HUD
-   "locks" on the front face: identical glyphs, identical ring motion, only their phase differs. */
+   scale(R sin lambda, R cos beta) . skewY(delta) transform (two SMIL animateTransforms), which is the
+   exact projection of a great circle through the poles at longitude lambda; skewY keeps the unit
+   circle's (0,+-1) on the poles, so the two half-circles split there without a rotate. Each has a
+   bright front half and a dim back half (CSS stroke-opacity keyframes, see geo.css) so the spin reads
+   as a sphere turning rather than ellipses breathing. The three location markers are HUD "locks" on the
+   front face: identical glyphs, identical ring motion, only their phase differs.
+
+   Performance rules (see docs/BUILD_DECISIONS.md): no SVG filter on anything that moves. Glows on
+   moving parts are wider low-opacity strokes or radialGradient fills; feGaussianBlur is used only on
+   the static marker glyphs. SMIL is kept to what cannot be CSS (the meridian spin, the satellite
+   motion path); every fade is a CSS keyframe on an opacity property alone (opacity, or stroke-opacity
+   for the meridian halves: geo.css explains why). */
 
 const R = 78;                       // globe radius (viewBox units)
 const C = { x: 380, y: 100 };       // globe centre
@@ -50,12 +58,11 @@ function meridianFrame(lam) {
 
 const SAMPLES = 36;
 const FRAMES = Array.from({ length: SAMPLES + 1 }, (_, k) => meridianFrame((Math.PI * k) / SAMPLES));
-const SKEW_VALUES = FRAMES.map((f) => f2(f.alpha)).join(';');
-const SCALE_VALUES = FRAMES.map((f) => `${f2(f.a)},${f2(f.Rv)}`).join(';');
-const ROT_VALUES = FRAMES.map((f) => f2(f.delta)).join(';');
-// Right half-ellipse faces the viewer for lambda in (0,90), the left half for (90,180). Cross-fade at the limb.
-const FRONT_R = { values: '1;1;0;0;1', keyTimes: '0;0.47;0.5;0.97;1' };
-const FRONT_L = { values: '0;0;1;1;0', keyTimes: '0;0.47;0.5;0.97;1' };
+// scale(R sin lambda, R cos beta) . skewY(delta): the y scale is constant, only x breathes.
+const SCALE_VALUES = FRAMES.map((_, k) => `${f2(R * Math.sin((Math.PI * k) / SAMPLES))},${f2(R * CB)}`).join(';');
+const SKEWY_VALUES = FRAMES.map((f) => f2(f.delta)).join(';');
+// Right half-ellipse faces the viewer for lambda in (0,90), the left half for (90,180); the cross-fade
+// at the limb is the CSS keyframes fxgeo-mhalf-r / fxgeo-mhalf-l (same 18s period, delays per meridian).
 
 /* ---- fixed subject geometry ---------------------------------------------------------------- */
 
@@ -83,8 +90,10 @@ const ARCS = [
 ];
 
 // Deterministic star field (no Math.random: identical for every participant and every render).
+// Stars of the same variant share one twinkle (duration + phase), so they live in one group and the
+// group is what animates: five animated elements instead of one per star.
 function stars() {
-  const out = [];
+  const groups = Array.from({ length: 5 }, () => []);
   let s = 1337;
   const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
   for (let i = 0; i < 44; i++) {
@@ -93,10 +102,9 @@ function stars() {
     // keep the disc clear so stars read as background
     if (Math.hypot(x - C.x, y - C.y) < R + 8) continue;
     const r = 0.5 + rnd() * 0.9;
-    const v = 1 + (i % 5);
-    out.push(`<circle class="fx-geo-star fx-geo-star--v${v}" cx="${f2(x)}" cy="${f2(y)}" r="${f2(r)}" fill="#e8edf8"/>`);
+    groups[i % 5].push(`<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(r)}"/>`);
   }
-  return out.join('');
+  return groups.map((g, v) => `<g class="fx-geo-star fx-geo-star--v${v + 1}" fill="#e8edf8">${g.join('')}</g>`).join('');
 }
 
 /* ---- scene parts --------------------------------------------------------------------------- */
@@ -125,6 +133,16 @@ function defs() {
       <stop offset="0.5" stop-color="#182440" stop-opacity="0.55"/>
       <stop offset="1" stop-color="#0a1020" stop-opacity="0.95"/>
     </radialGradient>
+    <radialGradient id="fxgeo-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#7fb3ff" stop-opacity="0.08"/>
+      <stop offset="0.86" stop-color="#7fb3ff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#7fb3ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fxgeo-satglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#f3cf7a" stop-opacity="0.34"/>
+      <stop offset="0.38" stop-color="#7fb3ff" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#7fb3ff" stop-opacity="0"/>
+    </radialGradient>
     <radialGradient id="fxgeo-limb" cx="50%" cy="50%" r="50%">
       <stop offset="0.82" stop-color="#7fb3ff" stop-opacity="0"/>
       <stop offset="0.97" stop-color="#7fb3ff" stop-opacity="0.22"/>
@@ -141,16 +159,10 @@ function defs() {
       <stop offset="1" stop-color="#7fb3ff" stop-opacity="0"/>
     </linearGradient>
     <clipPath id="fxgeo-disc"><circle r="${R}"/></clipPath>
+    <!-- the only filter; applied to the static marker glyphs only, never to anything that moves -->
     <filter id="fxgeo-glow" x="-60%" y="-60%" width="220%" height="220%">
       <feGaussianBlur stdDeviation="2.4" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="fxgeo-glow-soft" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="1.2" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="fxgeo-blur" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="3"/>
     </filter>
   </defs>`;
 }
@@ -179,14 +191,16 @@ function background() {
 
 // Tilted satellite orbit; split into a back half (behind the globe) and a front half (in front).
 // The satellite is drawn twice on the same motion path: a dim copy behind the globe and a bright
-// copy in front that fades out while it is on the far side, so the globe genuinely occludes it.
+// copy in front that fades out while it is on the far side (CSS keyframe fxgeo-sat-front, same 24s
+// period and -6s phase as the motion path), so the globe genuinely occludes it. The glow is a
+// gradient-filled ellipse riding inside the group: no filter on a moving element.
 const ORBIT = { rx: 136, ry: 36, rot: -26 };
 const ORBIT_PATH = `M0,${ORBIT.ry} A${ORBIT.rx},${ORBIT.ry} 0 0 1 ${-ORBIT.rx},0 A${ORBIT.rx},${ORBIT.ry} 0 0 1 0,${-ORBIT.ry} A${ORBIT.rx},${ORBIT.ry} 0 0 1 ${ORBIT.rx},0 A${ORBIT.rx},${ORBIT.ry} 0 0 1 0,${ORBIT.ry}`;
 function satellite(front) {
-  const op = front ? 'values="1;1;0;0;1;1" keyTimes="0;0.22;0.27;0.73;0.78;1"' : 'values="0.35;0.35;0.35"';
   return `
-    <g class="fx-geo-sat" filter="url(#fxgeo-glow-soft)">
+    <g class="fx-geo-sat${front ? ' fx-geo-sat--front' : ''}" opacity="${front ? 1 : 0.35}">
       <g transform="rotate(${-ORBIT.rot})">
+        <ellipse rx="17" ry="7" fill="url(#fxgeo-satglow)"/>
         <rect x="-3" y="-3" width="6" height="6" fill="#0a1020" stroke="#f3cf7a" stroke-width="1.2"/>
         <line x1="-13" y1="0" x2="-5" y2="0" stroke="#7fb3ff" stroke-width="1.4"/>
         <line x1="5" y1="0" x2="13" y2="0" stroke="#7fb3ff" stroke-width="1.4"/>
@@ -195,7 +209,6 @@ function satellite(front) {
         <circle r="1.2" fill="#f3cf7a"/>
       </g>
       <animateMotion dur="24s" begin="-6s" repeatCount="indefinite" path="${ORBIT_PATH}"/>
-      <animate attributeName="opacity" dur="24s" begin="-6s" repeatCount="indefinite" calcMode="linear" ${op}/>
     </g>`;
 }
 function orbitBack() {
@@ -232,19 +245,17 @@ function latitudeRings() {
 function meridians() {
   const parts = [];
   for (let i = 0; i < MERIDIANS; i++) {
+    // Phase i/6 of a half turn; geo.css gives the half-circle fades the same -3s*i delay (fx-geo-meridian--v{i+1}).
     const begin = `-${f2((HALF_TURN * i) / MERIDIANS)}s`;
-    const anim = (type, values, extra = '') =>
-      `<animateTransform attributeName="transform" type="${type}" dur="${HALF_TURN}s" begin="${begin}" repeatCount="indefinite" calcMode="linear" values="${values}" ${extra}/>`;
-    const fade = (spec) =>
-      `<animate attributeName="opacity" dur="${HALF_TURN}s" begin="${begin}" repeatCount="indefinite" calcMode="linear" values="${spec.values}" keyTimes="${spec.keyTimes}"/>`;
+    const anim = (type, values) =>
+      `<animateTransform attributeName="transform" type="${type}" dur="${HALF_TURN}s" begin="${begin}" repeatCount="indefinite" calcMode="linear" values="${values}"/>`;
+    // Each half fades (CSS, stroke-opacity) between front (1) and back (0.16) brightness; the back half
+    // is dim, not hidden, so no extra full circle is needed underneath.
     parts.push(`
-      <g class="fx-geo-meridian">${anim('skewX', SKEW_VALUES)}
-        <g>${anim('scale', SCALE_VALUES)}
-          <circle r="1" fill="none" stroke="#7fb3ff" stroke-width="0.8" opacity="0.16" vector-effect="non-scaling-stroke"/>
-          <g>${anim('rotate', ROT_VALUES)}
-            <path d="M0,-1 A1,1 0 0 1 0,1" fill="none" stroke="#7fb3ff" stroke-width="1" opacity="1" vector-effect="non-scaling-stroke">${fade(FRONT_R)}</path>
-            <path d="M0,-1 A1,1 0 0 0 0,1" fill="none" stroke="#7fb3ff" stroke-width="1" opacity="0" vector-effect="non-scaling-stroke">${fade(FRONT_L)}</path>
-          </g>
+      <g class="fx-geo-meridian fx-geo-meridian--v${i + 1}">${anim('scale', SCALE_VALUES)}
+        <g>${anim('skewY', SKEWY_VALUES)}
+          <path class="fx-geo-mhalf fx-geo-mhalf--r" d="M0,-1 A1,1 0 0 1 0,1" fill="none" stroke="#7fb3ff" stroke-width="1" stroke-opacity="1" vector-effect="non-scaling-stroke"/>
+          <path class="fx-geo-mhalf fx-geo-mhalf--l" d="M0,-1 A1,1 0 0 0 0,1" fill="none" stroke="#7fb3ff" stroke-width="1" stroke-opacity="0.16" vector-effect="non-scaling-stroke"/>
         </g>
       </g>`);
   }
@@ -255,7 +266,7 @@ function globe() {
   const [, py] = project(90, 0);
   return `
   <g class="fx-geo-globe" transform="translate(${C.x},${C.y}) rotate(${TILT})">
-    <circle r="${R + 14}" fill="#7fb3ff" opacity="0.08" filter="url(#fxgeo-blur)"/>
+    <circle r="${R + 20}" fill="url(#fxgeo-aura)"/>
     <circle r="${R}" fill="url(#fxgeo-sphere)"/>
     <g clip-path="url(#fxgeo-disc)">
       ${latitudeRings()}
@@ -277,7 +288,8 @@ function arcs() {
     ${ARCS.map((d, i) => `
       <path d="${d}" stroke="#e9b94c" stroke-width="1.1" opacity="0.5"/>
       <path class="fx-geo-light fx-geo-light--tail fx-geo-light--v${i + 1}" d="${d}" pathLength="100" stroke="#e9b94c" stroke-width="1.8" stroke-dasharray="22 78" opacity="0.7"/>
-      <path class="fx-geo-light fx-geo-light--head fx-geo-light--v${i + 1}" d="${d}" pathLength="100" stroke="#f3cf7a" stroke-width="2.6" stroke-dasharray="5 95" opacity="1" filter="url(#fxgeo-glow)"/>`).join('')}
+      <path class="fx-geo-light fx-geo-light--head fx-geo-light--v${i + 1}" d="${d}" pathLength="100" stroke="#f3cf7a" stroke-width="7" stroke-dasharray="5 95" opacity="0.22"/>
+      <path class="fx-geo-light fx-geo-light--head fx-geo-light--v${i + 1}" d="${d}" pathLength="100" stroke="#f3cf7a" stroke-width="2.6" stroke-dasharray="5 95" opacity="1"/>`).join('')}
   </g>`;
 }
 
@@ -410,13 +422,44 @@ export function render() {
 }
 
 /** Optional: freezes the SMIL (meridian spin, satellite) when the participant prefers reduced motion,
- *  and pauses it while the tab is hidden. CSS animations are handled by the stylesheet. Returns a cleanup. */
+ *  and pauses it while the tab is hidden. CSS animations are handled by the stylesheet. Returns a cleanup.
+ *
+ *  Sync: the meridian half-circle fades and the satellite front/back fade are CSS keyframes that must
+ *  stay in phase with the SMIL transforms. CSS animations run on the wall clock (a hidden tab does not
+ *  stop them) whereas pauseAnimations() freezes the SMIL clock, so every unpause seeks SMIL to the CSS
+ *  animations' current time. While paused, SMIL is sampled once so the frozen frame is complete. */
+const STILL_TIME = 18; // s: meridians at their phase-0 pose, satellite in front of the globe
+
 export function mount(svgEl) {
   if (!svgEl || typeof svgEl.pauseAnimations !== 'function') return () => {};
   const mq = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const now = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
+  const probe = svgEl.querySelector('.fx-geo-mhalf');
+  let cssStart = now();
+  const cssTime = () => {
+    try {
+      const a = probe && typeof probe.getAnimations === 'function' ? probe.getAnimations()[0] : null;
+      if (a && typeof a.currentTime === 'number') return a.currentTime / 1000;
+    } catch { /* ignore */ }
+    return (now() - cssStart) / 1000;
+  };
+  let wasReduced = !!(mq && mq.matches);
   const apply = () => {
-    const still = (mq && mq.matches) || document.hidden;
-    try { if (still) svgEl.pauseAnimations(); else svgEl.unpauseAnimations(); } catch { /* ignore */ }
+    const reduced = !!(mq && mq.matches);
+    const still = reduced || document.hidden;
+    try {
+      if (still) {
+        svgEl.pauseAnimations();
+        // A pause before the first frame would leave the transforms unapplied; seek to force one sample.
+        svgEl.setCurrentTime(reduced ? STILL_TIME : svgEl.getCurrentTime());
+      } else {
+        // CSS animations restart from zero when the reduced-motion stylesheet stops applying.
+        if (wasReduced) cssStart = now();
+        svgEl.setCurrentTime(cssTime());
+        svgEl.unpauseAnimations();
+      }
+    } catch { /* ignore */ }
+    wasReduced = reduced;
   };
   apply();
   if (mq && typeof mq.addEventListener === 'function') mq.addEventListener('change', apply);

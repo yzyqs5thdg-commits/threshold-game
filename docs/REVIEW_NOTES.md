@@ -19,7 +19,7 @@ An adversarial review (five independent lenses, each finding re-tested by two re
 | Code (low) | `audit.js` declared a helper named `document`, shadowing the global. | Renamed. |
 | Code (low) | The standalone bundler had no parse check, so a stray `export` form would ship a blank page. | The build now parses the assembled module and fails loudly. |
 | Perf | Server build took ~18 s to first screen on slow 3G: 20 uncompressed requests over serial round trips. | Static assets are gzip-compressed (the client script drops from 37 KB to 11 KB) and the effects modules are `modulepreload`ed. Hosts that terminate HTTP/2 (Render does) remove the connection limit as well. |
-| Perf | HUD telemetry ran 22 infinite animations, one of them a transform-animated blurred group; the globe scene blurred moving elements and ran 34 SMIL animators. | Blur removed from anything that moves (replaced by wide low-opacity strokes and radial gradients); glyph and dot pulses animate opacity only; SMIL load reduced. |
+| Perf | HUD telemetry ran 22 infinite animations, one of them a transform-animated blurred group; the globe scene blurred moving elements and ran 34 SMIL animators. | Blur removed from anything that moves (replaced by wide low-opacity strokes and radial gradients); glyph and dot pulses animate opacity only; HUD animators 21 → 10; globe SMIL animators 34 → 14 and renderer main-thread CPU on that scene roughly halved (55 % → 30 % in the headless harness) with a pixel-level look difference under 0.2 per channel. |
 
 ## Refuted
 

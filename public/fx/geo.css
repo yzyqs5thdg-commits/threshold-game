@@ -1,7 +1,9 @@
 /* THRESHOLD fx: "geo" vignette — styles and motion.
    Class prefix fx-geo-, keyframe prefix fxgeo-. Palette: ground/panel/amber/signal tokens only.
    The container decides the size; the SVG fills it (viewBox 760x200, slice).
-   The globe spin and satellite are SMIL (see geo.js); everything here is CSS. */
+   The globe spin and satellite motion are SMIL (see geo.js); everything here is CSS, including the
+   fades that must stay in phase with that SMIL (meridian halves: 18s period, satellite: 24s period;
+   mount() in geo.js keeps the two clocks aligned). Every fade is a keyframe on opacity only. */
 
 .fx-geo {
   display: block;
@@ -16,7 +18,7 @@
   font-weight: 500;
 }
 
-/* ---- background: grid drifts, star field twinkles, concentric rings crawl ---- */
+/* ---- background: grid drifts, star field twinkles (one group per variant), concentric rings crawl ---- */
 .fx-geo-grid {
   animation: fxgeo-drift 16s ease-in-out infinite alternate;
 }
@@ -39,6 +41,23 @@
 .fx-geo-scanline {
   animation: fxgeo-scanline 7s cubic-bezier(.45,.05,.55,.95) infinite;
 }
+
+/* ---- meridians: each half-circle is bright while it faces the viewer and dim behind.
+   Period and phase match the SMIL spin in geo.js (18s half turn, meridian i starts 3s*i in).
+   The fade is on stroke-opacity, not opacity: Chromium promotes a CSS opacity animation on an SVG
+   element to a composited layer, and these paths use non-scaling-stroke under a near-singular
+   transform (the meridian seen edge-on), which gives that layer a gigantic bounds and pegs the
+   renderer. stroke-opacity is a paint-only property, identical in effect on a stroke-only path. ---- */
+.fx-geo-mhalf--r { animation: fxgeo-mhalf-r 18s linear infinite; }
+.fx-geo-mhalf--l { animation: fxgeo-mhalf-l 18s linear infinite; }
+.fx-geo-meridian--v2 .fx-geo-mhalf { animation-delay: -3s; }
+.fx-geo-meridian--v3 .fx-geo-mhalf { animation-delay: -6s; }
+.fx-geo-meridian--v4 .fx-geo-mhalf { animation-delay: -9s; }
+.fx-geo-meridian--v5 .fx-geo-mhalf { animation-delay: -12s; }
+.fx-geo-meridian--v6 .fx-geo-mhalf { animation-delay: -15s; }
+
+/* ---- satellite: the front copy fades out while it is on the far side of the globe (24s orbit, -6s phase) ---- */
+.fx-geo-sat--front { animation: fxgeo-sat-front 24s linear infinite; animation-delay: -6s; }
 
 /* ---- markers: three expanding rings per marker, identical, staggered only by phase ---- */
 .fx-geo-ring {
@@ -153,6 +172,21 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.35; }
 }
+@keyframes fxgeo-mhalf-r {
+  0%, 47% { stroke-opacity: 1; }
+  50%, 97% { stroke-opacity: 0.16; }
+  100% { stroke-opacity: 1; }
+}
+@keyframes fxgeo-mhalf-l {
+  0%, 47% { stroke-opacity: 0.16; }
+  50%, 97% { stroke-opacity: 1; }
+  100% { stroke-opacity: 0.16; }
+}
+@keyframes fxgeo-sat-front {
+  0%, 22% { opacity: 1; }
+  27%, 73% { opacity: 0; }
+  78%, 100% { opacity: 1; }
+}
 
 /* ---- reduced motion: a complete static frame. SMIL is paused by mount() in geo.js. ---- */
 @media (prefers-reduced-motion: reduce) {
@@ -166,4 +200,7 @@
   .fx-geo-ring--c { display: none; }
   .fx-geo-ping { display: none; }
   .fx-geo-radar { transform: rotate(40deg); }
+  /* frozen pose (mount() parks SMIL at its phase-0 frame): meridians 4-6 are past the limb, so their left half faces the viewer */
+  .fx-geo-meridian--v4 .fx-geo-mhalf--r, .fx-geo-meridian--v5 .fx-geo-mhalf--r, .fx-geo-meridian--v6 .fx-geo-mhalf--r { stroke-opacity: 0.16; }
+  .fx-geo-meridian--v4 .fx-geo-mhalf--l, .fx-geo-meridian--v5 .fx-geo-mhalf--l, .fx-geo-meridian--v6 .fx-geo-mhalf--l { stroke-opacity: 1; }
 }
