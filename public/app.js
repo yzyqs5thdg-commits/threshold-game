@@ -11,10 +11,24 @@
 
 const STORAGE_KEY = 'threshold.session.v1';
 const app = document.getElementById('app');
-const progressFill = document.getElementById('progress-fill');
-const progressBar = document.querySelector('.progress');
+const timelineEl = document.getElementById('timeline');
+const clockEl = document.getElementById('hud-time');
 
-const TOTAL_STEPS = 11; // consent, profile, style, briefing, 5 items, end-of-day, closing
+// The day timeline in the HUD. Cosmetic and identical for every participant: step -> node, clock.
+const TIMELINE = [
+  { label: 'Sign-in', time: '07:45' },
+  { label: 'Onboarding', time: '08:00' },
+  { label: 'Briefing', time: '08:45' },
+  { label: 'Incident 01', time: '09:30' },
+  { label: 'Incident 02', time: '11:00' },
+  { label: 'Incident 03', time: '12:30' },
+  { label: 'Incident 04', time: '14:00' },
+  { label: 'Incident 05', time: '15:30' },
+  { label: 'Debrief', time: '17:00' },
+  { label: 'Sign-off', time: '17:30' },
+];
+const STEP_TO_NODE = [0, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // step 11 = everything done
+const STEP_CLOCK = ['07:45', '08:00', '08:20', '08:45', '09:30', '11:00', '12:30', '14:00', '15:30', '17:00', '17:30', '17:45'];
 
 // Optional hooks used by the standalone (no-server) build: a replacement for the network
 // layer and a callback after each screen renders. Absent in the normal deployment.
@@ -110,10 +124,53 @@ async function api(path, { method = 'GET', body } = {}) {
 }
 
 function setProgress(step) {
-  const pct = Math.round((step / TOTAL_STEPS) * 100);
-  progressFill.style.width = `${pct}%`;
-  progressBar.setAttribute('aria-valuenow', String(pct));
+  if (!timelineEl) return;
+  const node = STEP_TO_NODE[Math.min(step, STEP_TO_NODE.length - 1)];
+  timelineEl.innerHTML = TIMELINE.map((t, i) => {
+    const cls = i < node ? 'done' : i === node ? 'current' : '';
+    return `<li class="${cls}" ${i === node ? 'aria-current="step"' : ''}>${esc(t.label)}<span class="sub">${esc(t.time)}</span></li>`;
+  }).join('');
+  if (clockEl) clockEl.textContent = STEP_CLOCK[Math.min(step, STEP_CLOCK.length - 1)];
 }
+
+// ---------------------------------------------------------------------------
+// Visual vocabulary: domain icons, neutral option glyphs, the analyst's portrait
+// ---------------------------------------------------------------------------
+const ICONS = {
+  Cybersecurity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>',
+  'Supply chain': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="7" height="7" rx="1"/><rect x="14" y="7" width="7" height="7" rx="1"/><path d="M10 10.5h4M6.5 14v4h11v-4"/></svg>',
+  'Internal audit': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 12l2.2 2.2L15.5 9.5"/></svg>',
+  Regulatory: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 7h14M7 7l-3 6a3 3 0 006 0zM17 7l-3 6a3 3 0 006 0zM8 21h8"/></svg>',
+  Geopolitical: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>',
+  default: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>',
+};
+// One glyph per option, drawn in the same stroke and colour so none reads as the "right" one.
+const OPTION_GLYPHS = {
+  increase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  maintain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14"/></svg>',
+  decrease: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
+};
+const PORTRAIT = `<svg viewBox="0 0 150 200" aria-hidden="true">
+  <defs>
+    <linearGradient id="pbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a2a4d"/><stop offset="1" stop-color="#0a1120"/></linearGradient>
+    <linearGradient id="prim" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9b94c" stop-opacity="0"/><stop offset="1" stop-color="#e9b94c"/></linearGradient>
+    <linearGradient id="pskin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a5d86"/><stop offset="1" stop-color="#2a3a5e"/></linearGradient>
+  </defs>
+  <rect width="150" height="200" fill="url(#pbg)"/>
+  <g stroke="#2a3b60" stroke-width="1"><path d="M0 40h150M0 80h150M0 120h150M0 160h150" opacity=".5"/></g>
+  <ellipse cx="75" cy="178" rx="62" ry="46" fill="#1d2b4a"/>
+  <path d="M30 200c0-30 20-44 45-44s45 14 45 44z" fill="#243760"/>
+  <path d="M75 156c-10 0-18 6-22 14 6-3 14-4 22-4s16 1 22 4c-4-8-12-14-22-14z" fill="#f3cf7a" opacity=".9"/>
+  <rect x="68" y="134" width="14" height="24" rx="6" fill="url(#pskin)"/>
+  <ellipse cx="75" cy="106" rx="28" ry="34" fill="url(#pskin)"/>
+  <path d="M47 100c0-22 12-36 28-36s28 14 28 36c-4-14-12-20-28-20s-24 6-28 20z" fill="#111a2f"/>
+  <path d="M100 86c6 10 6 28 0 40" stroke="url(#prim)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M60 110h10M80 110h10" stroke="#9fb1d6" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M61 104c3-3 7-3 10 0M79 104c3-3 7-3 10 0" stroke="#0e1628" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M69 122c3 3 9 3 12 0" stroke="#7c8db0" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="M58 118h-6v-12M98 118h6v-12" stroke="#7c8db0" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+const iconFor = (domain) => ICONS[domain] || ICONS.default;
 
 function render(html, { step, focus = true } = {}) {
   app.innerHTML = html;
@@ -185,7 +242,7 @@ function show() {
 
 function renderClosed() {
   render(`
-    <div class="card">
+    <div class="panel">
       <h1>This study is now closed</h1>
       <p>Thank you for your interest. Data collection for this study has finished and no new sessions can be started.</p>
       <p class="contact">Questions: Jana Chamsi Bacha and Meher Jain, CU_ERM_Research@columbia.edu.</p>
@@ -195,33 +252,34 @@ function renderClosed() {
 function renderConsent() {
   const c = config.consent;
   render(`
-    <div class="card">
-      <p class="kicker">Research study · Columbia University IRB-ACYY3579</p>
+    <div class="panel">
+      <p class="kicker">Before your first day · Research study</p>
       <h1>${esc(c.title)}</h1>
-      <p class="muted">${esc(c.subtitle)}. Please read the information below before deciding whether to take part. You can also <a href="/consent" target="_blank" rel="noopener">open a printable copy</a>.</p>
-
-      <div class="consent-doc" tabindex="0" aria-label="Consent form text">
-        ${c.sections.map((s) => `<h3>${esc(s.heading)}</h3>${paragraphs(s.body)}`).join('')}
+      <p class="muted">You are about to step into the role of Chief Risk Officer at Meridian Group. First, the paperwork: please read the consent form below and sign it to begin. You can also <a href="/consent" target="_blank" rel="noopener">open a printable copy</a>.</p>
+      <div class="paper">
+        <h2>${esc(c.subtitle)}</h2>
+        <p class="small">Columbia University IRB-ACYY3579</p>
+        <div class="consent-doc" tabindex="0" aria-label="Consent form text">
+          ${c.sections.map((s) => `<h3>${esc(s.heading)}</h3>${paragraphs(s.body)}`).join('')}
+        </div>
+        <p class="statement">${esc(c.statement)}</p>
+        <form id="consent-form" novalidate>
+          <div class="grid-2">
+            <div class="field">
+              <label for="fullName">Full name (your electronic signature)</label>
+              <input id="fullName" name="fullName" type="text" autocomplete="name" required maxlength="200">
+            </div>
+            <div class="field">
+              <label for="consentDate">Date</label>
+              <input id="consentDate" name="consentDate" type="date" required value="${todayIso()}">
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn" id="agree">${esc(c.agreeLabel)}</button>
+            <button type="button" class="btn btn--secondary" id="decline">${esc(c.declineLabel)}</button>
+          </div>
+        </form>
       </div>
-
-      <p class="statement">${esc(c.statement)}</p>
-
-      <form id="consent-form" novalidate>
-        <div class="grid-2">
-          <div class="field">
-            <label for="fullName">Full name (your electronic signature)</label>
-            <input id="fullName" name="fullName" type="text" autocomplete="name" required maxlength="200">
-          </div>
-          <div class="field">
-            <label for="consentDate">Date</label>
-            <input id="consentDate" name="consentDate" type="date" required value="${todayIso()}">
-          </div>
-        </div>
-        <div class="actions">
-          <button type="submit" class="btn" id="agree">${esc(c.agreeLabel)}</button>
-          <button type="button" class="btn btn--secondary" id="decline">${esc(c.declineLabel)}</button>
-        </div>
-      </form>
     </div>`, { step: 0 });
 
   const form = document.getElementById('consent-form');
@@ -256,36 +314,56 @@ function renderConsent() {
 function renderDeclined() {
   clearState();
   render(`
-    <div class="card">
+    <div class="panel">
       <h1>Thank you</h1>
       <p>You have chosen not to take part. No information has been recorded. You may close this window.</p>
       <p class="contact">Questions about the study: Jana Chamsi Bacha and Meher Jain, CU_ERM_Research@columbia.edu.</p>
     </div>`, { step: 0 });
 }
 
+function badgeHtml(items, values) {
+  const filled = items.filter((it) => values[it.id]).length;
+  return `
+    <aside class="badge" aria-label="Your executive badge">
+      <div class="badge__top"><span class="badge__org">Meridian Group</span><span class="badge__chip" aria-hidden="true"></span></div>
+      <div class="badge__role">Chief Risk Officer</div>
+      <div class="badge__sub">Executive access · Day 1</div>
+      ${items.map((it) => `<div class="badge__row ${values[it.id] ? '' : 'empty'}" data-badge="${esc(it.id)}"><span>${esc(it.label)}</span><span>${esc(values[it.id] || '—')}</span></div>`).join('')}
+      <div class="badge__bars" aria-hidden="true">${items.map((_, i) => `<i class="${i < filled ? 'on' : ''}"></i>`).join('')}</div>
+    </aside>`;
+}
+
 function renderProfile() {
   const items = config.profileItems;
   render(`
-    <div class="card">
-      <p class="kicker">Meridian Group · Executive onboarding</p>
-      <h1>Your CRO profile</h1>
-      <p class="muted">Welcome to Meridian Group. Before your first day begins, please complete your profile. These questions describe participants in aggregate only.</p>
-      <form id="profile-form" novalidate>
-        ${items.map((it) => `
-          <div class="field" data-field="${esc(it.id)}">
-            <label for="${esc(it.id)}">${esc(it.label)}</label>
-            <select id="${esc(it.id)}" name="${esc(it.id)}" required>
-              <option value="">Select…</option>
-              ${it.options.map((o) => `<option value="${esc(o)}" ${state.profile[it.id] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}
-            </select>
-          </div>`).join('')}
-        <div class="actions actions--end">
-          <button type="submit" class="btn">Continue</button>
-        </div>
-      </form>
+    <div class="panel">
+      <p class="kicker">Onboarding · Executive access</p>
+      <h1>Set up your executive badge</h1>
+      <p class="muted">Welcome to Meridian Group. Security needs a few details before your badge is activated. These describe participants in aggregate only.</p>
+      <div class="onboard">
+        <form id="profile-form" novalidate>
+          ${items.map((it) => `
+            <div class="field" data-field="${esc(it.id)}">
+              <label for="${esc(it.id)}">${esc(it.label)}</label>
+              <select id="${esc(it.id)}" name="${esc(it.id)}" required>
+                <option value="">Select…</option>
+                ${it.options.map((o) => `<option value="${esc(o)}" ${state.profile[it.id] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+              </select>
+            </div>`).join('')}
+          <div class="actions actions--end">
+            <button type="submit" class="btn">Activate badge</button>
+          </div>
+        </form>
+        <div id="badge-slot">${badgeHtml(items, state.profile)}</div>
+      </div>
     </div>`, { step: 1 });
 
   const form = document.getElementById('profile-form');
+  form.addEventListener('change', () => {
+    const values = {};
+    for (const it of items) if (form[it.id].value) values[it.id] = form[it.id].value;
+    document.getElementById('badge-slot').innerHTML = badgeHtml(items, values);
+  });
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const profile = {};
@@ -311,8 +389,8 @@ function likert(name, selected) {
 function renderStyle() {
   const s = config.style;
   render(`
-    <div class="card">
-      <p class="kicker">Meridian Group · Executive onboarding</p>
+    <div class="panel">
+      <p class="kicker">Onboarding · Calibration</p>
       <h1>${esc(s.heading)}</h1>
       <p class="muted">${esc(s.instruction)}</p>
       <form id="style-form" novalidate>
@@ -322,7 +400,7 @@ function renderStyle() {
             ${likert(it.id, state.style[it.id])}
           </fieldset>`).join('')}
         <div class="actions actions--end">
-          <button type="submit" class="btn">Continue</button>
+          <button type="submit" class="btn">Report to the strategy desk</button>
         </div>
       </form>
     </div>`, { step: 2 });
@@ -346,21 +424,20 @@ function renderStyle() {
 
 function renderBriefing() {
   const m = state.materials;
-  const initials = m.organisation.analyst.replace(/^Dr\.\s*/, '').slice(0, 1).toUpperCase();
   render(`
-    <div class="card">
-      <p class="kicker">Meridian Group · Day one</p>
+    <div class="panel">
+      <p class="kicker">Day 1 · 08:45 · Secure line</p>
       <h1>Briefing from the strategy desk</h1>
-      <div class="analyst">
-        <div class="avatar" aria-hidden="true">${esc(initials)}</div>
+      <div class="comms">
+        <div class="portrait"><span class="portrait__live">Live</span>${PORTRAIT}</div>
         <div>
-          <div class="analyst__meta"><span class="analyst__name">${esc(m.organisation.analyst)}</span> · ${esc(m.organisation.analystTitle)}</div>
-          <div class="speech">${esc(m.briefing)}</div>
+          <div class="comms__meta"><span class="comms__name">${esc(m.organisation.analyst)}</span> · ${esc(m.organisation.analystTitle)}</div>
+          <div class="speech"><p>${esc(m.briefing)}</p></div>
+          <p class="muted mt-18">Over the course of today you will face a series of situations from across the group. For each one, decide how Meridian Group’s risk exposure should change.</p>
+          <div class="actions actions--end">
+            <button type="button" class="btn" id="begin">Begin the day</button>
+          </div>
         </div>
-      </div>
-      <p class="muted mt-18">Over the course of today you will face a series of situations from across the group. For each one, decide how Meridian Group’s risk exposure should change.</p>
-      <div class="actions actions--end">
-        <button type="button" class="btn" id="begin">Begin the day</button>
       </div>
     </div>`, { step: 3 });
   document.getElementById('begin').addEventListener('click', () => go('item', { itemIndex: 0 }));
@@ -377,18 +454,26 @@ function renderItem() {
   const { kind, data } = seq[idx];
   const m = state.materials;
 
+  const code = `INC-${String(idx + 1).padStart(2, '0')}`;
   render(`
-    <div class="card scenario">
-      <div class="eyebrow"><span class="tag">${esc(data.domain)}</span><span class="counter">${idx + 1} of ${seq.length}</span></div>
-      <h1>${esc(data.title)}</h1>
-      <div class="scenario__body">
+    <div class="panel incident">
+      <div class="eyebrow">
+        <span class="tag">${iconFor(data.domain)}${esc(data.domain)}</span>
+        <span class="counter">${esc(code)} · ${idx + 1} of ${seq.length}</span>
+      </div>
+      <div class="incident__head">
+        <div class="incident__icon">${iconFor(data.domain)}</div>
+        <h1>${esc(data.title)}</h1>
+      </div>
+      <div class="sitrep">
+        <div class="sitrep__label">Situation report</div>
         <p>${esc(data.context)}</p>
         <p>${esc(data.framing)}</p>
       </div>
       <div class="decision">
-        <h2 class="small" id="decision-label">Your decision</h2>
+        <div class="decision__label"><h2 id="decision-label">Your call</h2><span class="counter">Risk exposure</span></div>
         <div class="options" role="group" aria-labelledby="decision-label">
-          ${m.decisionOptions.map((o) => `<button type="button" class="option" data-value="${esc(o.value)}" aria-pressed="false">${esc(o.label)}</button>`).join('')}
+          ${m.decisionOptions.map((o) => `<button type="button" class="option" data-value="${esc(o.value)}" aria-pressed="false"><span class="option__glyph">${OPTION_GLYPHS[o.value] || ''}</span><span>${esc(o.label)}</span></button>`).join('')}
         </div>
       </div>
       <form id="confidence" class="confidence" hidden novalidate>
@@ -398,7 +483,7 @@ function renderItem() {
             <label><input type="radio" name="confidence" value="${n}"><span class="n">${n}</span><span class="t">${n === 1 ? esc(m.confidence.anchors.low) : n === 5 ? esc(m.confidence.anchors.high) : ''}</span></label>`).join('')}</div>
         </fieldset>
         <div class="actions actions--end">
-          <button type="submit" class="btn">Continue</button>
+          <button type="submit" class="btn">Log decision</button>
         </div>
       </form>
     </div>`, { step: 4 + idx });
@@ -453,12 +538,19 @@ function renderItem() {
 
 function renderManipulation() {
   const mc = state.materials.manipulationCheck;
+  const m = state.materials;
   render(`
-    <div class="card">
-      <p class="kicker">Meridian Group · Day one</p>
+    <div class="panel">
+      <p class="kicker">Day 1 · 17:00 · Secure line</p>
       <h1>${esc(mc.heading)}</h1>
-      <p class="muted">${esc(mc.intro)}</p>
-      <form id="mc-form" novalidate>
+      <div class="comms">
+        <div class="portrait"><span class="portrait__live">Live</span>${PORTRAIT}</div>
+        <div>
+          <div class="comms__meta"><span class="comms__name">${esc(m.organisation.analyst)}</span> · ${esc(m.organisation.analystTitle)}</div>
+          <div class="speech"><p>${esc(mc.intro)}</p></div>
+        </div>
+      </div>
+      <form id="mc-form" novalidate class="mt-18">
         ${mc.items.map((it) => `
           <fieldset class="field" data-field="${esc(it.id)}">
             <legend>${esc(it.question)}</legend>
@@ -467,7 +559,7 @@ function renderManipulation() {
             </div>
           </fieldset>`).join('')}
         <div class="actions actions--end">
-          <button type="submit" class="btn">Continue</button>
+          <button type="submit" class="btn">Sign off for the day</button>
         </div>
       </form>
     </div>`, { step: 9 });
@@ -494,7 +586,8 @@ function renderClosing() {
   const debrief = config.immediateDebrief ? config.immediateDebriefText : null;
   const [p1, p2, p3, p4] = c.paragraphs;
   render(`
-    <div class="card">
+    <div class="panel">
+      <div class="stamp">Day 1 complete</div>
       <h1>Thank you</h1>
       ${paragraphs([p1, p2], 'lead')}
       ${debrief
@@ -581,7 +674,8 @@ function renderSubmitted() {
   const c = state.materials?.closing;
   clearState();
   render(`
-    <div class="card">
+    <div class="panel">
+      <div class="stamp">Session closed</div>
       <h1>Your responses have been submitted</h1>
       <p class="lead">Thank you for taking part. Your session is complete and you may close this window.</p>
       ${config.followupFormUrl
@@ -598,7 +692,8 @@ function renderWithdrawn() {
   const c = state.materials?.closing;
   clearState();
   render(`
-    <div class="card">
+    <div class="panel">
+      <div class="stamp">Session closed</div>
       <h1>Your responses have been withdrawn</h1>
       <p class="lead">Your responses were deleted and will not be used. Thank you for your time. You may close this window.</p>
       <hr class="divider">
@@ -613,7 +708,7 @@ function renderWithdrawn() {
   try {
     config = await api('/api/config');
   } catch {
-    render(`<div class="card"><h1>Unable to load</h1><p>The study page could not be loaded. Please refresh or try again later.</p></div>`, { step: 0 });
+    render(`<div class="panel"><h1>Unable to load</h1><p>The study page could not be loaded. Please refresh or try again later.</p></div>`, { step: 0 });
     return;
   }
   if (config.studyClosed && state.screen === 'consent') return renderClosed();

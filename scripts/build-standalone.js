@@ -29,17 +29,17 @@ const css = read('public/styles.css');
 
 const extraCss = `
 /* standalone preview additions */
-.preview { background: #fff7e6; border-bottom: 1px solid #f0dcb0; color: #5a4a1e; font-size: 0.88rem; }
-.preview__inner { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
-.preview__inner strong { font-weight: 650; }
+.preview { position: relative; z-index: 2; background: #2a2412; border-bottom: 1px solid #5a4a1e; color: #f3e3b0; font-size: 0.86rem; }
+.preview__inner { max-width: 1180px; margin: 0 auto; padding: 9px 16px; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.preview__inner strong { font-weight: 700; color: #ffd978; }
 .preview label { display: inline-flex; align-items: center; gap: 6px; }
-.preview select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1px solid #d8c48f; background: #fff; color: inherit; }
-.record { margin-top: 16px; }
-.record table { width: 100%; border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.preview select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1px solid #7a6530; background: #1a1709; color: inherit; }
+.preview input { accent-color: #e9b94c; }
+.record table { width: 100%; border-collapse: collapse; font-size: 0.88rem; font-variant-numeric: tabular-nums; }
 .record th, .record td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.record th { color: var(--ink-3); font-weight: 600; width: 42%; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.82rem; }
+.record th { color: var(--ink-3); font-weight: 600; width: 42%; font-family: var(--mono); font-size: 0.8rem; }
 .record__wrap { overflow-x: auto; }
-.record .pill { display: inline-block; background: #e9effa; color: var(--steel); border-radius: 999px; padding: 2px 10px; font-weight: 600; font-size: 0.85rem; }
+.record .pill { display: inline-block; background: rgba(233,185,76,0.15); color: var(--amber); border-radius: 999px; padding: 2px 10px; font-weight: 600; font-size: 0.85rem; }
 `;
 
 const glue = `
@@ -109,7 +109,7 @@ window.__THRESHOLD_HOOKS__ = {
       const rows = EXPORT_COLUMNS.filter((k) => r[k] !== null && r[k] !== undefined && r[k] !== '')
         .map((k) => '<tr><th>' + escapeHtml(k) + '</th><td>' + escapeHtml(r[k]) + '</td></tr>').join('');
       const card = document.createElement('div');
-      card.className = 'card record';
+      card.className = 'panel record';
       card.innerHTML =
         '<p class="kicker">Researcher preview</p>' +
         '<h2>Session record</h2>' +
@@ -121,7 +121,7 @@ window.__THRESHOLD_HOOKS__ = {
     }
     if (screen === 'withdrawn' || screen === 'declined') {
       const div = document.createElement('div');
-      div.className = 'card';
+      div.className = 'panel';
       div.innerHTML = '<p class="kicker">Researcher preview</p><p class="muted small">Nothing was recorded for this session.</p><div class="actions"><button type="button" class="btn" id="play-again">Play again</button></div>';
       appEl.appendChild(div);
       document.getElementById('play-again').addEventListener('click', restart);
@@ -140,26 +140,11 @@ document.getElementById('preview-debrief').addEventListener('change', (e) => {
 });
 `;
 
-const html = `<title>THRESHOLD</title>
-<style>
-${css}
-${extraCss}
-</style>
-<a class="skip" href="#app">Skip to content</a>
-<header class="topbar">
-  <div class="topbar__inner">
-    <div class="brand">
-      <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name">Meridian Group</span>
-      <span class="brand__sep" aria-hidden="true">·</span>
-      <span class="brand__app">THRESHOLD</span>
-    </div>
-    <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-      <div class="progress__fill" id="progress-fill"></div>
-    </div>
-  </div>
-</header>
-<div class="preview" role="region" aria-label="Researcher preview controls">
+// Shell markup comes from public/index.html (everything inside <body>, minus the script tag),
+// with the researcher preview bar inserted above the desk.
+const indexHtml = read('public/index.html');
+const bodyInner = indexHtml.slice(indexHtml.indexOf('<body>') + 6, indexHtml.indexOf('</body>')).replace(/<script[^>]*><\/script>/, '').trim();
+const previewBar = `<div class="preview" role="region" aria-label="Researcher preview controls">
   <div class="preview__inner">
     <span><strong>Researcher preview.</strong> Runs entirely in your browser; nothing is recorded or sent.</span>
     <label for="preview-condition">Condition for the next session
@@ -173,13 +158,15 @@ ${extraCss}
     </label>
     <label><input type="checkbox" id="preview-debrief"> Show immediate debrief (Appendix C.2) on the closing screen</label>
   </div>
-</div>
-<main id="app" class="app" tabindex="-1">
-  <div class="card card--center"><p class="muted">Loading…</p></div>
-</main>
-<footer class="footer">
-  <p>Columbia University IRB-ACYY3579 · Questions: CU_ERM_Research@columbia.edu</p>
-</footer>
+</div>`;
+
+const html = `<title>THRESHOLD</title>
+<style>
+${css}
+${extraCss}
+</style>
+${previewBar}
+${bodyInner}
 <script type="module">
 ${content}
 ${consent}

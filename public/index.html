@@ -5,35 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark">
   <title>THRESHOLD — Decision-Making in Organizational Risk Scenarios</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <a class="skip" href="#app">Skip to content</a>
-  <header class="topbar">
-    <div class="topbar__inner">
-      <div class="brand">
-        <span class="brand__mark" aria-hidden="true"></span>
-        <span class="brand__name">Meridian Group</span>
-        <span class="brand__sep" aria-hidden="true">·</span>
-        <span class="brand__app">THRESHOLD</span>
+  <div class="desk">
+    <aside class="hud" aria-label="Session status">
+      <div class="hud__brand">
+        <span class="mark" aria-hidden="true"></span>
+        <div>
+          <div class="hud__org">Meridian Group</div>
+          <div class="hud__app">THRESHOLD</div>
+        </div>
       </div>
-      <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div class="progress__fill" id="progress-fill"></div>
+      <div class="hud__readout" aria-live="polite">
+        <span class="hud__label">CRO desk · Day 1</span>
+        <span class="hud__time" id="hud-time">07:45</span>
       </div>
-    </div>
-  </header>
+      <ol class="timeline" id="timeline" aria-label="Day timeline"></ol>
+      <div class="hud__foot">Columbia University IRB-ACYY3579<br><a href="/consent" target="_blank" rel="noopener">Consent form</a> · <span class="hud__mail">CU_ERM_Research@columbia.edu</span></div>
+    </aside>
 
-  <main id="app" class="app" tabindex="-1">
-    <div class="card card--center">
-      <p class="muted">Loading…</p>
-    </div>
-  </main>
-
-  <footer class="footer">
-    <p>Columbia University IRB-ACYY3579 · <a href="/consent" target="_blank" rel="noopener">Consent form (printable)</a> · Questions: <a href="mailto:CU_ERM_Research@columbia.edu">CU_ERM_Research@columbia.edu</a></p>
-  </footer>
+    <main id="app" class="stage" tabindex="-1">
+      <div class="panel panel--center"><p class="muted">Loading…</p></div>
+    </main>
+  </div>
 
   <script type="module" src="/app.js"></script>
 </body>

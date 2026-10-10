@@ -21,7 +21,8 @@ The Consolidated Development Record (Part III §20 and Part VI §5) lists items 
 
 ## Other choices worth knowing
 
-- **Decision options** are rendered in the fixed order Increase / Maintain / Decrease with identical neutral styling; the selected option is highlighted in the brand navy. No colour, icon or wording distinguishes the three beyond their labels.
+- **Decision options** are rendered in the fixed order Increase / Maintain / Decrease with identical styling; each carries a small monochrome glyph (up arrow, two bars, down arrow) that only restates its label, and the selected option is highlighted in the same amber whichever it is. Nothing on screen reacts to the content of a decision: there is no score, meter, feedback or consequence narrative.
+- **Game presentation.** The participant works at a "CRO operations desk": a HUD with a day clock and a timeline (Sign-in, Onboarding, Briefing, Incidents 01–05, Debrief, Sign-off), an executive badge that fills in during onboarding, Dr. Vale on a "secure line" portrait panel, and each scenario as an incident card with a situation report. All of it is identical across conditions and the clock times are fixed labels, not measured time. The data-quality item is "Incident 03" in exactly the same template as the four scored scenarios.
 - **Changing a decision** is allowed until Continue is pressed; the confidence rating appears only after a first choice.
 - **Confidence scale** labels only the end points (1 = not at all confident, 5 = very confident), as in Appendix B.5.
 - **Scenario text with a corrected typo.** Appendix B, Scenario 3, condition D reads "taken due non-compliance"; the build reads "taken due to non-compliance" so that B and D differ only in the intended ways. Every other sentence is as in the protocol, including small protocol-level wording differences between C and D in Scenarios 3 and 4.

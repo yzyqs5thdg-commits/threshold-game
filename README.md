@@ -2,7 +2,7 @@
 
 Browser-based decision simulation for the Columbia University SPS study **Decision-Making in Organizational Risk Scenarios** (Project THRESHOLD, IRB-ACYY3579). It delivers the 2 × 2 between-subjects experiment described in the Stand-Alone Research Protocol v1.3: uncertainty type (epistemic vs. aleatory) × outcome framing (gain vs. loss).
 
-Participants play the newly appointed Chief Risk Officer of Meridian Group, receive a briefing from Dr. Vale, make four risk-exposure decisions with confidence ratings, pass through one data-quality item and two manipulation-check items, and choose on the closing screen whether to submit or withdraw their responses.
+Participants play the newly appointed Chief Risk Officer of Meridian Group from a "CRO operations desk" (HUD with day clock and incident timeline, executive badge onboarding, Dr. Vale on a secure line, incident cards), receive a briefing from Dr. Vale, make four risk-exposure decisions with confidence ratings, pass through one data-quality item and two manipulation-check items, and choose on the closing screen whether to submit or withdraw their responses.
 
 All instrument text comes verbatim from Protocol v1.3, Appendix B and C. Build choices that the protocol left open are listed, with the reasoning, in [`docs/BUILD_DECISIONS.md`](docs/BUILD_DECISIONS.md). Export columns are documented in [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
 
