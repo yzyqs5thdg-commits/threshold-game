@@ -1,0 +1,12 @@
+line_item,fy2025_end,fy2026_end,units,source_id,confidence,note
+Cash and cash equivalents,604.0,874.8,USD millions,SIGPR26Q4;SIG10K26,A,"as of January 31, 2026"
+Inventories,,1940.1,USD millions,SIGPR26Q4,A,"approximately flat year over year"
+Operating lease right-of-use assets,1102.4,1146.6,USD millions,SIG10K26,A,
+Total assets,,5952.1,USD millions,SIG10K26,B,
+Accounts payable,767.0,772.1,USD millions,SIGPR26Q4,A,
+Accrued expenses and other current liabilities,,387.3,USD millions,SIGPR26Q4,B,
+Operating lease liabilities (non-current),,930.4,USD millions,SIGPR26Q4,B,
+Long-term debt,0.0,0.0,USD millions,SIG10K26;SIGCASE2,B,"no funded debt; senior notes repaid in Fiscal 2025; ABL revolver undrawn"
+Total liabilities,3874.8,3985.9,USD millions,SIGPR26Q4,B,
+Total shareholders' equity,,1966.2,USD millions,derived,C,"= total assets 5,952.1 - total liabilities 3,985.9"
+"Property, plant and equipment, goodwill, intangibles, deferred revenue",,,USD millions,,,"not retrieved; excluded from the cash-basis projection per the Session 5 guidelines"

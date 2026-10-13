@@ -1,0 +1,17 @@
+line_item,fy2024,fy2025,fy2026,units,source_id,confidence,note
+Sales,7171.1,6703.8,6813.6,USD millions,SIGPR26Q4;SIGPR24Q4,A/B,
+Cost of sales,,-4078.2,-4119.0,USD millions,SIGPR26Q4,B,FY2026 and FY2025 from press-release / 10-K excerpts
+Gross margin,,2625.0,2694.6,USD millions,SIGPR26Q4;SIG10K26,A/C,"10-K: 39.5% of sales FY2026 vs 39.2% FY2025; FY2026 dollar figure = 6,813.6 - 4,119.0"
+"Selling, general and administrative expenses",,-2122.6,-2173.2,USD millions,SIGPR26Q4;SIG10K26,A,31.9% of sales FY2026 vs 31.7%; increase driven mainly by reset of incentive compensation
+"Other operating income (expense), net",,,-128.3,USD millions,derived,C,"= operating income 393.1 - gross margin 2,694.6 + SG&A 2,173.2; includes asset impairments and restructuring (GAAP-to-adjusted bridge = 515.0 - 393.1 = 121.9)"
+Operating income (GAAP),,110.7,393.1,USD millions,SIGPR26Q4,A,5.8% of sales FY2026 vs 1.7%
+Operating income (adjusted non-GAAP),,,515.0,USD millions,SIGPR26Q4,A,
+"Interest income (expense), net",,9.8,4.0,USD millions,SIGPR26Q4,A,
+"Other non-operating income, net",,3.7,1.0,USD millions,SIGPR26Q4,A,
+Income before income taxes,,124.2,398.1,USD millions,SIGPR26Q4,A,
+Income taxes,,-63.0,-103.7,USD millions,SIGPR26Q4,A,effective tax rate 26.0% FY2026 vs 50.7% FY2025
+Net income,810.4,61.2,294.4,USD millions,SIGPR26Q4;SIG10K26,A/B,FY2024 figure from press reports (includes large deferred-tax benefit); not re-verified in this session
+Diluted EPS (GAAP),15.01,,7.08,USD per share,SIGPR26Q4,A,FY2024 EPS from FY2024 10-K income-statement excerpt (includes $4.94/share Bermuda CITA deferred-tax benefit); adjusted diluted EPS FY2026 9.60
+Diluted weighted average shares (implied),,,41.6,millions,derived,C,= 294.4 / 7.08; Q2 FY2027 diluted weighted average 39.3M; FY2027 guidance assumes ~38.8M
+Operating cash flow,546.9,,678.8,USD millions,SIGPR26Q4;SIGPR24Q4,B,
+Capital expenditures,,,-153.5,USD millions,SIGPR26Q4,B,investing outflows approx. 157.5

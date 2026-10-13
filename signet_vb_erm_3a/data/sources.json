@@ -1,0 +1,167 @@
+{
+  "_note": "All sources accessed 2026-10-13 from the Claude Code environment. Direct fetches of sec.gov, signetjewelers.com and q4cdn.com were blocked by the environment's network policy, so figures were extracted from web-search result excerpts of those documents and of their verbatim re-publications (Business Wire, Nasdaq, Morningstar, StreetInsider). Every figure is tagged with a confidence flag in the CSV files: A = quoted verbatim from the primary document excerpt; B = from a verbatim re-publication or a second-hand summary of the primary document; C = derived by arithmetic from A/B figures; D = team estimate / allocation (documented in the Assumptions & Sources tab).",
+  "sources": [
+    {
+      "id": "SIG10K26",
+      "apa": "Signet Jewelers Limited. (2026a). Annual report on Form 10-K for the fiscal year ended January 31, 2026. U.S. Securities and Exchange Commission.",
+      "url": "https://www.sec.gov/Archives/edgar/data/832988/000083298826000055/sig-20260131.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIGPR26Q4",
+      "apa": "Signet Jewelers Limited. (2026b, March 19). Signet Jewelers reports fourth quarter and full year Fiscal 2026 results [Press release; Form 8-K Exhibit 99.1]. U.S. Securities and Exchange Commission.",
+      "url": "https://www.sec.gov/Archives/edgar/data/832988/000083298826000054/fy27ex9913x19x26pressrelea.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIGPR27Q2",
+      "apa": "Signet Jewelers Limited. (2026c, September 9). Signet Jewelers reports second quarter Fiscal 2027 results [Press release; Form 8-K Exhibit 99.1]. U.S. Securities and Exchange Commission.",
+      "url": "https://www.sec.gov/Archives/edgar/data/0000832988/000083298826000227/fy27ex99109x09x26pressrele.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIG10Q27Q2",
+      "apa": "Signet Jewelers Limited. (2026d). Quarterly report on Form 10-Q for the quarterly period ended August 1, 2026. U.S. Securities and Exchange Commission.",
+      "url": "https://www.sec.gov/Archives/edgar/data/0000832988/000083298826000229/sig-20260801.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIG10Q27Q1",
+      "apa": "Signet Jewelers Limited. (2026e). Quarterly report on Form 10-Q for the quarterly period ended May 2, 2026. U.S. Securities and Exchange Commission.",
+      "url": "https://www.sec.gov/Archives/edgar/data/0000832988/000083298826000159/sig-20260502.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIGAR26",
+      "apa": "Signet Jewelers Limited. (2026f). Fiscal 2026 annual report.",
+      "url": "https://s26.q4cdn.com/755441662/files/doc_financials/annual/SIG-fy26-AR.pdf",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIG10K25",
+      "apa": "Signet Jewelers Limited. (2025a). Annual report on Form 10-K for the fiscal year ended February 1, 2025. U.S. Securities and Exchange Commission.",
+      "url": "https://www.sec.gov/Archives/edgar/data/832988/000083298825000018/sig-20250201.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIGPR25Q4",
+      "apa": "Signet Jewelers Limited. (2025b, March 19). Signet Jewelers reports fourth quarter and Fiscal 2025 results [Press release]. Business Wire.",
+      "url": "https://www.businesswire.com/news/home/20250319542686/en/Signet-Jewelers-Reports-Fourth-Quarter-and-Fiscal-2025-Results",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIGPR24Q4",
+      "apa": "Signet Jewelers Limited. (2024, March 20). Signet Jewelers reports fourth quarter and Fiscal 2024 results [Press release; Form 8-K Exhibit 99.1]. U.S. Securities and Exchange Commission.",
+      "url": "https://www.sec.gov/Archives/edgar/data/832988/000083298824000076/fy25ex9913x20x24pressrelea.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "CNBC26",
+      "apa": "CNBC. (2026, September 9). Signet shares soar as jeweler lifts annual profit forecast.",
+      "url": "https://www.cnbc.com/2026/09/09/signet-shares-soar-as-jeweler-lifts-annual-profit-forecast.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "YAHOOSIG",
+      "apa": "Yahoo Finance. (2026). Signet Jewelers Limited (SIG) analysis and historical quotes.",
+      "url": "https://finance.yahoo.com/quote/SIG/analysis/",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "MKTBEAT",
+      "apa": "MarketBeat. (2026). Signet Jewelers (SIG) stock price, news and analysis.",
+      "url": "https://www.marketbeat.com/stocks/NYSE/SIG/",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "GOOGFIN",
+      "apa": "Google Finance. (2026). Signet Jewelers Ltd (SIG) stock price and news.",
+      "url": "https://www.google.com/finance/quote/SIG:NYSE",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "STOCKAN",
+      "apa": "StockAnalysis. (2026). Signet Jewelers (SIG) statistics, valuation and forecast.",
+      "url": "https://stockanalysis.com/stocks/sig/statistics/",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "WSZ",
+      "apa": "WallStreetZen. (2026). Signet Jewelers stock forecast and predictions.",
+      "url": "https://www.wallstreetzen.com/stocks/us/nyse/sig/stock-forecast",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "FOOL",
+      "apa": "The Motley Fool. (2026). Signet Jewelers (SIG) stock price and news.",
+      "url": "https://www.fool.com/quote/nyse/sig/",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "H15",
+      "apa": "Board of Governors of the Federal Reserve System. (2026a, October 9). H.15 selected interest rates (daily).",
+      "url": "https://www.federalreserve.gov/releases/h15/",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "FOMCSEP",
+      "apa": "Board of Governors of the Federal Reserve System. (2026b, September 16). Summary of economic projections.",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomcprojtabl20260916.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "DAMOD",
+      "apa": "Damodaran, A. (2026). Implied equity risk premium update (October 1, 2026). NYU Stern School of Business.",
+      "url": "https://pages.stern.nyu.edu/~adamodar/New_Home_Page/home.htm",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "IMFWEO",
+      "apa": "International Monetary Fund. (2026a, January). World economic outlook update: Global growth steady amid trade pressures.",
+      "url": "https://www.imf.org/en/Publications/WEO",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "IMFIRL",
+      "apa": "International Monetary Fund. (2026b, June 29). IMF Executive Board concludes 2026 Article IV consultation with Ireland [Press release No. 26/225].",
+      "url": "https://www.imf.org/en/news/articles/2026/06/29/pr26225-ireland-imf-executive-board-concludes-2026-article-iv-consultation",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "BOC",
+      "apa": "Bank of Canada. (2026, July 15). Monetary policy report: July 2026.",
+      "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2026-07-15/projections/",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "ECIRL",
+      "apa": "European Commission. (2026, May). Economic forecast for Ireland (Spring 2026).",
+      "url": "https://economy-finance.ec.europa.eu/economic-surveillance-eu-member-states/country-pages-including-country-reports/ireland/economic-forecast-ireland_en",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIGCASE2",
+      "apa": "Jain, M., Razzaque, Z., Weng, S., Chamsi Bacha, J., & Chan, A. (2026). Signet Jewelers Limited: Enterprise risk management program review (Case Assignment #2) [Unpublished course paper]. Columbia University.",
+      "url": "https://docs.google.com/document/d/1Qr6z5GyjssLGEcddoUETzNGfa9EOANAFN8yzgKIu-rs/edit",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SEGAL",
+      "apa": "Segal, S. (2011). Corporate value of enterprise risk management: The next step in business management. John Wiley & Sons.",
+      "url": "",
+      "accessed": ""
+    },
+    {
+      "id": "BOEPRESS",
+      "apa": "Vanguard. (2026, August 11). Vanguard economic and market outlook: United Kingdom.",
+      "url": "https://externalcrewnet.vanguard.com/content/corporatesite/us/en/corp/vemo/vemo-united-kingdom.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "SIG10K24",
+      "apa": "Signet Jewelers Limited. (2024). Annual report on Form 10-K for the fiscal year ended February 3, 2024. U.S. Securities and Exchange Commission.",
+      "url": "https://www.sec.gov/Archives/edgar/data/832988/000083298824000083/sig-20240203.htm",
+      "accessed": "2026-10-13"
+    }
+  ]
+}

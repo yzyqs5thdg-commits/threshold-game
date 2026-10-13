@@ -1,0 +1,10 @@
+item,value,as_of,units,source_id,confidence,note
+SIG closing share price,105.22,2026-10-09,USD,YAHOOSIG,B,"prior close $100.58 on 2026-10-02"
+Shares outstanding (estimate used),37.5,2026-10-09,millions,MKTBEAT;GOOGFIN,D,"MarketBeat 38.32M; Google Finance 37.29M; Q2 FY2027 diluted weighted average 39.3M before the $125M ASR"
+Market capitalization (estimate used),3945.8,2026-10-09,USD millions,derived,C,"= 105.22 x 37.5; aggregators show $3.75-3.92B on Oct 2"
+Trailing P/E,11.76,2026-10-02,x,GOOGFIN,B,"trailing EPS $8.69"
+Beta (5-year, vs S&P 500),1.10-1.44,2026-10,x,MKTBEAT;GOOGFIN;FOOL,B,"MarketBeat 1.10, Google 1.12, Motley Fool 1.44"
+Analyst 12-month price target (consensus),110.64-125.56,2026-10,USD,MKTBEAT;WSZ,B,
+10-year U.S. Treasury constant-maturity yield,5.24,2026-10-09,percent,H15,A,"5.31 on Oct 5 (highest since 2002), 5.27 Oct 6, 5.28 Oct 7, 5.22 Oct 8"
+Implied equity risk premium (S&P 500),4.20,2026-10-01,percent,DAMOD,B,"trailing 12-month cash yield with adjusted payout"
+Federal funds target range,3.75-4.00,2026-09-17,percent,FOMCSEP,B,

@@ -1,0 +1,9 @@
+item,fy2024,fy2025,fy2026,h1_fy2027,units,source_id,confidence,note
+Common share repurchases,139.3,138.0,205.2,169.9,USD millions,SIG10K26;SIGPR26Q4;SIG10Q27Q2,A/B,"FY2026: approx. 3.1M shares at approx. $66; Q2 FY2027: 1,031,103 shares at $84.57"
+Preferred share repurchase,,813.8,,,USD millions,SIGPR26Q4,B,"FY2025 redemption/repurchase of the convertible preferred shares"
+Common dividends paid,41.1,48.6,51.9,26.8,USD millions,SIGPR26Q4;SIG10K26;SIG10Q27Q2,A/B,"FY2024 figure is dividends declared"
+Preferred dividends paid,,18.5,,,USD millions,SIGPR26Q4,B,
+Dividends declared per common share,0.92,1.16,1.28,0.70,USD per share,SIG10K26;SIGPR26Q4,A,"quarterly $0.23 FY2024; $0.35 per quarter declared for FY2027"
+Net income (GAAP),810.4,61.2,294.4,,USD millions,SIGPR26Q4,A/B,
+Total common distributions / net income,0.22,3.05,0.87,,ratio,derived,C,"FY2026: (205.2+51.9)/294.4; FY2025 distorted by $61.2M net income after $371.7M impairments; H1 FY2027 distributions $196.7M vs. H1 net income approx. $84M (diluted EPS $2.11 x 39.8M)"
+Remaining repurchase authorization,,723.0,517.9,,USD millions,SIG10K26;SIG10K25,A,"$125M accelerated share repurchase announced September 2026"

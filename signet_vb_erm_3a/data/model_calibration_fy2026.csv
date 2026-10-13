@@ -1,0 +1,26 @@
+line_item,north_america,international,other_corporate,total,reported_total,basis,confidence
+Store merchandise sales,4179.8,307.8,0.0,4487.6,,"= merchandise sales less e-commerce; merchandise = segment sales less services",D
+E-commerce merchandise sales,1423.8,61.6,0.0,1485.4,1485.4,"21.8% of consolidated sales (SIGAR26); International share assumed 15% of its sales, remainder to North America",D
+Services revenue,760.0,41.0,0.0,801.0,803.5,"services 803.5 consolidated (SIG10K26) less approx. 2.5 assumed inside Other; International attach assumed 11.1% of merchandise",D
+Other (non-retail) revenue,0.0,0.0,39.6,39.6,39.6,"Other reportable segment sales (diamond sourcing)",A
+Total sales,6363.6,410.4,39.6,6813.6,6813.6,"reported segment sales",A/C
+Cost of sales,3803.5,279.1,36.4,4119.0,4119.0,"International gross margin assumed 32.0%, Other 8.0%; North America = residual (40.2% GM)",D
+Gross profit,2560.1,131.3,3.2,2694.6,2694.6,,C
+Variable SG&A,1272.7,61.6,0.0,1334.3,,"20.0% of NA sales, 15.0% of International sales (store payroll, advertising, credit)",D
+Fixed SG&A,731.5,51.4,56.0,838.9,,"residual of segment SG&A; corporate & unallocated 56.0 (FY2025: 54.8 per SIG10K25 segment table, grown approx. 2%)",D
+Total SG&A,2004.2,113.0,56.0,2173.2,2173.2,"International assumed 27.5% of sales (FY2025: 27.6%)",D/A
+"Other operating income/(expense), net",-103.3,-2.0,-23.0,-128.3,-128.3,"impairments and restructuring; segment split assumed so that segment operating income ties to reported",D
+Operating income,452.6,16.3,-75.8,393.1,393.1,"reported segment operating income (SIG10K26; SIGPR26Q4)",A/C
+Net interest and other non-operating income,4.7,0.3,0.0,5.0,5.0,"4.0 net interest + 1.0 other non-operating, allocated by sales share",D
+Income before income taxes,457.3,16.6,-75.8,398.1,398.1,,C
+Income taxes,119.1,4.3,-19.7,103.7,103.7,"consolidated 26.0% effective rate applied by segment; rounding placed in North America",D
+Net income,338.2,12.3,-56.1,294.4,294.4,,C
+Cash and cash equivalents (invested assets),817.0,52.7,5.1,874.8,874.8,"allocated by FY2026 sales share (93.4% / 6.0% / 0.6%)",D
+Inventory (non-depreciating operating asset),1812.0,116.9,11.2,1940.1,1940.1,"allocated by FY2026 sales share",D
+Debt,0.0,0.0,0.0,0.0,0.0,"no funded debt at January 31, 2026",A
+"Other liabilities, net (calibration plug)",792.7,51.1,4.9,848.7,,"= simplified assets 2,814.9 less reported shareholders' equity 1,966.2; allocated by sales share",D
+Shareholders' equity,1836.3,118.5,11.4,1966.2,1966.2,"ties to reported total shareholders' equity",C
+Stores at beginning of year,2379,263,0,2642,2642,,A
+Stores opened,14,0,0,14,14,,A
+Stores closed,64,10,0,74,74,,A
+Stores at end of year,2329,253,0,2582,2582,,A

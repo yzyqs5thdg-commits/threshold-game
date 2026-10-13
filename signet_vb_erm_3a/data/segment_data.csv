@@ -1,0 +1,24 @@
+metric,segment,fy2024,fy2025,fy2026,units,source_id,confidence,note
+sales,North America,6703.8,6299.1,6363.6,USD millions,SIG10K26;SIG10K25,B/C,"FY2026 NA = consolidated 6,813.6 less International 410.4 less Other 39.6 (search excerpt gives 'about $6.36 billion, +1.0%'); FY2025/FY2024 from FY2025 10-K segment table"
+sales,International,430.7,373.2,410.4,USD millions,SIG10K26;SIG10K25;SIGPR26Q4,A,"FY2026 +10.0% reported, +2.6% same-store"
+sales,Other (diamond sourcing),,31.5,39.6,USD millions,SIG10K26;SIG10K25,A,"FY2024 Other not retrieved (consolidated FY2024 sales approx. 7,171 per press reports)"
+sales,Consolidated,7171.1,6703.8,6813.6,USD millions,SIGPR26Q4;SIGPR25Q4;SIGPR24Q4,A/B,"FY2024 was a 53-week year (53rd week added $103.2M)"
+operating_income_gaap,North America,677.0,173.7,452.6,USD millions,SIG10K26;SIG10K25;SIGPR26Q4,A,"FY2025 includes $371.7M impairments; FY2026 includes digital-brand impairments (approx. $91.3M per 10-K excerpt) and restructuring"
+operating_income_gaap,International,13.1,1.0,16.3,USD millions,SIG10K26;SIG10K25;SIGPR26Q4,A,"FY2025 includes $5.2M restructuring and $2.6M divestiture loss; FY2024 includes $12.3M divestiture gain"
+operating_income_gaap,Other + Corporate/unallocated,,-64.0,-75.8,USD millions,derived,C,"Consolidated less NA less International"
+operating_income_gaap,Consolidated,,110.7,393.1,USD millions,SIGPR26Q4,A,"FY2024 consolidated operating income not retrieved in this session"
+operating_income_adjusted,North America,709.4,551.2,560.3,USD millions,SIGPR26Q4;SIGPR25Q4,A,
+operating_income_adjusted,International,2.0,9.5,,USD millions,SIGPR25Q4,A,"FY2026 International adjusted OI not retrieved"
+operating_income_adjusted,Consolidated,,,515.0,USD millions,SIGPR26Q4,A,
+sga,North America,,1964.7,,USD millions,SIG10K25,A,"FY2025 10-K segment table (ASU 2023-07 significant segment expenses); FY2026 segment SG&A not retrieved"
+sga,International,,103.1,,USD millions,SIG10K25,A,
+sga,Other + Corporate/unallocated,,54.8,,USD millions,SIG10K25,C,"51.3 corporate/unallocated + residual 3.5 to reconcile to consolidated 2,122.6"
+stores_begin,North America,,,2379,count,SIG10K26,A,"as of February 1, 2025"
+stores_opened,North America,,,14,count,SIG10K26,A,
+stores_closed,North America,,,64,count,SIG10K26,A,
+stores_end,North America,,,2329,count,SIG10K26,A,"as of January 31, 2026; 2,282 as of August 1, 2026 (3 opened / 50 closed in H1 FY2027)"
+stores_begin,International,,,263,count,SIG10K26,A,
+stores_opened,International,,,0,count,SIG10K26,A,
+stores_closed,International,,,10,count,SIG10K26,A,
+stores_end,International,,,253,count,SIG10K26,A,"252 as of August 1, 2026 (2 opened / 3 closed in H1 FY2027)"
+stores_end,Consolidated,,2642,2582,count,SIG10K26,A,"2,534 stores and 4.0 million sq ft of selling space at August 1, 2026 (SIG10Q27Q2)"

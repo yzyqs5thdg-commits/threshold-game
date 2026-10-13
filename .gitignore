@@ -10,3 +10,6 @@ exports/
 
 # built standalone preview (regenerate with npm run build:standalone)
 dist/
+
+# Capstone Assignment 3(a): research data must be tracked even though the study app ignores data/
+!signet_vb_erm_3a/data/

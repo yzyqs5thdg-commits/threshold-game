@@ -1,0 +1,12 @@
+economy,indicator,2026,2027,2028,units,source_id,confidence,note
+United States,Real GDP growth (FOMC median),2.3,2.4,2.2,percent,FOMCSEP,A,"September 2026 SEP"
+United States,PCE inflation (FOMC median),3.7,2.3,2.1,percent,FOMCSEP,A,"core PCE 3.4 / 2.5 / 2.2"
+United States,Real GDP growth (IMF),2.4,2.0,,percent,IMFWEO,B,"January 2026 WEO update"
+Canada,Real GDP growth (Bank of Canada),0.7,1.8,1.8,percent,BOC,B,"July 2026 Monetary Policy Report"
+Canada,CPI inflation (Bank of Canada),2.5,2.0,,percent,BOC,B,
+United Kingdom,Real GDP growth (IMF),1.3,1.5,,percent,IMFWEO,B,"January 2026 WEO update"
+Ireland,Modified domestic demand growth (IMF Article IV),2.5,2.5,,percent,IMFIRL,B,"headline GDP distorted by multinationals"
+Ireland,Modified domestic demand growth (European Commission),2.8,3.0,,percent,ECIRL,B,"Spring 2026 forecast"
+World,Headline inflation (IMF),3.8,3.4,,percent,IMFWEO,B,
+United Kingdom,CPI inflation (Bank of England; secondary coverage),3.1,3.0,1.7,percent,BOEPRESS,B,"approx. 3% in early 2027 falling toward 1.7% by 2028; Vanguard year-end 2026 forecast 3.1%; Bank Rate 3.75%"
+United Kingdom,Real GDP growth (Oxford Economics via press),0.4,1.0,,percent,BOEPRESS,B,"private forecast; IMF January 2026 had 1.3 / 1.5"
