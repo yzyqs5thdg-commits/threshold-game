@@ -816,7 +816,7 @@ def build_checks(wb):
     seg_sum = "+".join(f"{q(sh)}{CL}{R['val_base']}" for sh in S)
     f = f"=ABS({q(T)}{CL}{R['val_base']}-({seg_sum}))"
     checks.append(("Company baseline value = sum of the three segment values", f"{f}<{tol}", f, f"< {tol}"))
-    f = "=" + "+".join(f"SUMPRODUCT(ISERROR({q(sh)}A1:{L(COL_NOTE)}{MAX_ROW_SCAN})*1)" for sh in S + [T, "Summary & Chart", "Assumptions & Sources"])
+    f = "=" + "+".join(f"SUMPRODUCT(ISERROR({q(sh)}A1:{L(COL_NOTE)}{MAX_ROW_SCAN})*1)" for sh in S + [T, "Summary & Chart", "Assumptions & Sources", "Appx A - Summary"])
     checks.append(("No #REF!, #DIV/0!, #VALUE!, #N/A or #NAME? anywhere in the model, summary and assumptions tabs (Cover excluded to avoid a circular reference with its status cell)", f"{f}=0", f, "0 error cells"))
     checks.append((f"FY2027E total sales inside management guidance ${g['sales_lo']:,.0f}-{g['sales_hi']:,.0f}M",
                    f"=AND({q(T)}{CF}{R['sales']}>={g['sales_lo']},{q(T)}{CF}{R['sales']}<={g['sales_hi']})", f"={q(T)}{CF}{R['sales']}", f"{g['sales_lo']:,.0f} - {g['sales_hi']:,.0f}"))
@@ -891,6 +891,10 @@ def build_cover(wb):
         ("Total Company", "Same layout; assumptions blank; every financial line = sum of the three segments; EPS, ROE, payout and the actual-market-valuation check."),
         ("Summary & Chart", "Segment value table, native chart 'Signet Baseline Company Value by Business Segment ($M)', sales/net income chart, sensitivity table."),
         ("Checks", "Formula-driven TRUE/FALSE integrity checks feeding the status cell above."),
+        ("Appx A - Summary", "One-page team summary: live key figures, sensitivities, approach, open questions, double-check list."),
+        ("Appx B - Design Memo", "The design decisions behind the model (segment structure, drivers, valuation approach, discount rate)."),
+        ("Appx C - Research Notes", "Data pulled for the model with APA 7th citations and the full reference list."),
+        ("Appx D - Data", "Every extracted data table (segments, income statement, balance sheet, capital return, KPIs, guidance, market, macro, calibration) with source IDs and confidence flags."),
     ]
     for t, d in tabs:
         setc(ws, r, 2, t, font=F_LBL); setc(ws, r, 3, d, font=F_LBL, align=Alignment(wrap_text=True, vertical="top")); r += 1
@@ -1033,6 +1037,241 @@ def build_assumptions(wb):
     return ws
 
 
+
+# ----------------------------------------------------------------------------------------------------------------
+# 7. APPENDIX TABS: the markdown deliverables and the data/ folder rendered inside the workbook
+# ----------------------------------------------------------------------------------------------------------------
+import re as _re
+
+APPX_WIDTHS = {"B": 36, "C": 18, "D": 18, "E": 18, "F": 18, "G": 18, "H": 18}
+APPX_CHARS_PER_LINE = 125  # approx. characters per line across merged B:H at Calibri 10
+
+
+def _clean_md(t: str) -> str:
+    t = _re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1 (\2)", t)   # links -> text (url)
+    t = t.replace("**", "").replace("`", "")
+    return t.strip()
+
+
+def _safe(v):
+    return (" " + v) if isinstance(v, str) and v.startswith("=") else v
+
+
+def _num(v):
+    """Convert '1,234.5', '(263.4)', '104.7%', '$105.22' to numbers; leave other text alone."""
+    if not isinstance(v, str):
+        return v, None
+    t = v.strip()
+    if not t or t in ("-", "–", "n/r", "n/a"):
+        return t, None
+    neg = t.startswith("(") and t.endswith(")")
+    core = t.strip("()").replace(",", "").replace("$", "").strip()
+    pct = core.endswith("%")
+    core = core.rstrip("%").strip()
+    try:
+        x = float(core)
+    except ValueError:
+        return v, None
+    if neg:
+        x = -x
+    if pct:
+        return x / 100.0, "pct"
+    return x, ("num" if ("." in core or abs(x) >= 1000) else "cnt")
+
+
+def md_items(md: str):
+    lines = md.splitlines()
+    i, para, table = 0, [], []
+    def flush_para():
+        nonlocal para
+        if para:
+            yield ("p", _clean_md(" ".join(para))); para = []
+    def flush_table():
+        nonlocal table
+        if table:
+            yield ("table", table); table = []
+    while i < len(lines):
+        ln = lines[i].rstrip()
+        if ln.startswith("|"):
+            yield from flush_para()
+            cells = [c.strip() for c in ln.strip("|").split("|")]
+            if not all(_re.fullmatch(r":?-{2,}:?", c) for c in cells):
+                table.append([_clean_md(c) for c in cells])
+        else:
+            yield from flush_table()
+            if not ln.strip():
+                yield from flush_para()
+            elif ln.startswith("#"):
+                yield from flush_para()
+                level = len(ln) - len(ln.lstrip("#"))
+                yield (f"h{min(level, 3)}", _clean_md(ln.lstrip("#")))
+            elif _re.match(r"^(\s*[-*]\s+|\s*\d+\.\s+)", ln):
+                yield from flush_para()
+                yield ("li", _clean_md(_re.sub(r"^(\s*[-*]\s+|\s*\d+\.\s+)", "", ln)))
+            else:
+                para.append(ln.strip())
+        i += 1
+    yield from flush_para()
+    yield from flush_table()
+
+
+def _text_row(ws, r, text, font=F_LBL, bullet=False):
+    txt = ("• " + text) if bullet else _safe(text)
+    c = setc(ws, r, 2, txt, font=font, align=Alignment(wrap_text=True, vertical="top"))
+    ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=8)
+    ws.row_dimensions[r].height = max(14.5, 13.5 * (len(txt) // APPX_CHARS_PER_LINE + 1))
+    return r + 1
+
+
+def _table_rows(ws, r, rows):
+    ncol = max(len(x) for x in rows)
+    for j, h in enumerate(rows[0]):
+        setc(ws, r, 2 + j, h, font=F_HDR, fill=FILL_HDR, align=Alignment(wrap_text=True, vertical="center",
+             horizontal="left" if j == 0 else "center"))
+    ws.row_dimensions[r].height = 28
+    r += 1
+    for row in rows[1:]:
+        for j in range(ncol):
+            raw = row[j] if j < len(row) else ""
+            val, fmt = _num(raw) if j > 0 else (raw, None)
+            val = _safe(val)
+            setc(ws, r, 2 + j, val, font=F_LBL, fmt=fmt, bold=False,
+                 align=Alignment(wrap_text=True, vertical="top", horizontal="right" if fmt else "left"))
+        ws.row_dimensions[r].height = max(14.5, 13.5 * (max(len(str(x)) for x in row) // 34 + 1))
+        r += 1
+    return r + 1
+
+
+def md_to_sheet(ws, md: str, title_override=None):
+    for col, w in APPX_WIDTHS.items():
+        ws.column_dimensions[col].width = w
+    ws.column_dimensions["A"].width = 3
+    r = 1
+    for kind, payload in md_items(md):
+        if kind == "h1":
+            setc(ws, r, 2, title_override or payload, font=F_TITLE); r += 2
+        elif kind == "h2":
+            section(ws, r, payload, cols=8); r += 1
+        elif kind == "h3":
+            setc(ws, r, 2, payload, font=F_LBLB); r += 1
+        elif kind == "p":
+            r = _text_row(ws, r, payload)
+        elif kind == "li":
+            r = _text_row(ws, r, payload, bullet=True)
+        elif kind == "table":
+            r = _table_rows(ws, r, payload)
+    ws.print_area = f"A1:H{r}"
+    ws.page_setup.orientation = "landscape"; ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_setup.fitToWidth = 1; ws.page_setup.fitToHeight = 0
+    return r
+
+
+def build_appendix(wb):
+    segs = INPUTS["segments"]
+    # ---- Appendix A: model summary (live key figures + the markdown text)
+    ws = wb.create_sheet("Appx A - Summary")
+    r = 1
+    setc(ws, r, 2, "Appendix A - One-page model summary (live key figures, then the team summary text)", font=F_TITLE); r += 2
+    section(ws, r, "Key figures (live links to the model tabs)", cols=8); r += 1
+    heads = ["Business segment", "Baseline value ($M)", "% of total", "Discount rate", "FY2026A sales ($M)", "FY2027E operating income ($M)", "FY2027E net income ($M)"]
+    for j, h in enumerate(heads):
+        setc(ws, r, 2 + j, h, font=F_HDR, fill=FILL_HDR, align=Alignment(wrap_text=True, horizontal="center"))
+    ws.row_dimensions[r].height = 30; r += 1
+    r0 = r
+    for k in SEG_ORDER:
+        sh = segs[k]["sheet"]
+        setc(ws, r, 2, segs[k]["title"], font=F_LBL)
+        setc(ws, r, 3, f"={q(sh)}{CL}{R['val_base']}", font=F_LK, fmt="numb")
+        setc(ws, r, 4, f"=IF($C${r0 + 3}=0,0,C{r}/$C${r0 + 3})", font=F_FX, fmt="pct")
+        setc(ws, r, 5, f"={q(sh)}{CL}{R['dr_used']}", font=F_LK, fmt="pct")
+        setc(ws, r, 6, f"={q(sh)}{CL}{R['sales']}", font=F_LK, fmt="num")
+        setc(ws, r, 7, f"={q(sh)}{CF}{R['oi']}", font=F_LK, fmt="num")
+        setc(ws, r, 8, f"={q(sh)}{CF}{R['ni']}", font=F_LK, fmt="num")
+        r += 1
+    setc(ws, r, 2, "Total company", font=F_LBLB)
+    for col in (3, 4, 6, 7, 8):
+        setc(ws, r, col, f"=SUM({L(col)}{r0}:{L(col)}{r - 1})", font=F_FX, fmt="pct" if col == 4 else "numb", bold=True)
+    r += 1
+    for label, ref, fmt in (("Market capitalization ($M, Oct 9, 2026)", f"={q('Total Company')}{CL}{R['mv_cap']}", "numb"),
+                            ("Model value / market cap - 1", f"={q('Total Company')}{CL}{R['mv_under']}", "pct"),
+                            ("Model value per share ($)", f"={q('Total Company')}{CL}{R['mv_vps']}", "price"),
+                            ("FY2027E total sales ($M)", f"={q('Total Company')}{CF}{R['sales']}", "numb"),
+                            ("FY2027E diluted EPS ($)", f"={q('Total Company')}{CF}{R['eps']}", "eps")):
+        setc(ws, r, 2, label, font=F_LBL); setc(ws, r, 3, ref, font=F_LK, fmt=fmt); r += 1
+    r += 1
+    md = open(os.path.join(ROOT, "model_summary.md"), encoding="utf-8").read()
+    md = md.split("\n", 1)[1]  # drop the H1 (already titled above)
+    sub = wb.create_sheet("_tmp"); wb.remove(sub)
+    # render the markdown below the live block
+    for col, w in APPX_WIDTHS.items():
+        ws.column_dimensions[col].width = w
+    ws.column_dimensions["A"].width = 3
+    for kind, payload in md_items(md):
+        if kind == "h2":
+            section(ws, r, payload, cols=8); r += 1
+        elif kind == "h3":
+            setc(ws, r, 2, payload, font=F_LBLB); r += 1
+        elif kind == "p":
+            r = _text_row(ws, r, payload)
+        elif kind == "li":
+            r = _text_row(ws, r, payload, bullet=True)
+        elif kind == "table":
+            r = _table_rows(ws, r, payload)
+    ws.print_area = f"A1:H{r}"; ws.page_setup.orientation = "landscape"
+    ws.sheet_properties.pageSetUpPr.fitToPage = True; ws.page_setup.fitToWidth = 1; ws.page_setup.fitToHeight = 0
+    # ---- Appendix B: design memo, Appendix C: research notes
+    for name, fname, title in (("Appx B - Design Memo", "design_memo.md", "Appendix B - Design memo (segment structure, drivers, valuation approach, discount rate)"),
+                               ("Appx C - Research Notes", "research_notes.md", "Appendix C - Research notes: data pulled for the model, with APA 7th citations and reference list")):
+        wsx = wb.create_sheet(name)
+        md_to_sheet(wsx, open(os.path.join(ROOT, fname), encoding="utf-8").read(), title_override=title)
+    # ---- Appendix D: every file in data/ as a table
+    wsd = wb.create_sheet("Appx D - Data")
+    setc(wsd, 1, 2, "Appendix D - Extracted data (one table per file in data/; confidence: A verbatim from primary excerpt, B re-publication/summary, C derived, D team estimate)", font=F_TITLE)
+    r = 3
+    order = ["model_calibration_fy2026.csv", "segment_data.csv", "income_statement.csv", "balance_sheet.csv", "capital_return.csv",
+             "operating_kpis.csv", "guidance_fy2027.csv", "market_data.csv", "macro.csv"]
+    for fname in order:
+        path = os.path.join(ROOT, "data", fname)
+        if not os.path.exists(path):
+            continue
+        rows = list(csv.reader(open(path, encoding="utf-8")))
+        section(wsd, r, fname, cols=12); r += 1
+        for j, h in enumerate(rows[0]):
+            setc(wsd, r, 2 + j, h, font=F_HDR, fill=FILL_HDR, align=Alignment(wrap_text=True, vertical="center"))
+        wsd.row_dimensions[r].height = 28; r += 1
+        for row in rows[1:]:
+            for j, raw in enumerate(row):
+                val, fmt = _num(raw) if j > 0 else (raw, None)
+                val = _safe(val)
+                setc(wsd, r, 2 + j, val, font=F_LBL, fmt=fmt, align=Alignment(wrap_text=True, vertical="top", horizontal="right" if fmt else "left"))
+            longest = max((len(x) for x in row), default=0)
+            wsd.row_dimensions[r].height = max(14.5, 13.5 * (longest // 44 + 1)) if longest > 40 else 14.5
+            r += 1
+        r += 1
+    src = json.load(open(os.path.join(ROOT, "data", "sources.json"), encoding="utf-8"))
+    section(wsd, r, "sources.json", cols=12); r += 1
+    for j, h in enumerate(["id", "APA 7th reference", "url", "accessed"]):
+        setc(wsd, r, 2 + j, h, font=F_HDR, fill=FILL_HDR)
+    r += 1
+    for s_ in src["sources"]:
+        for j, k in enumerate(["id", "apa", "url", "accessed"]):
+            setc(wsd, r, 2 + j, _safe(s_.get(k, "")), font=F_LBL, align=Alignment(wrap_text=True, vertical="top"))
+        wsd.row_dimensions[r].height = max(14.5, 13.5 * (len(s_.get("apa", "")) // 60 + 1))
+        r += 1
+    r += 1
+    section(wsd, r, "Note on sources", cols=12); r += 1
+    setc(wsd, r, 2, src["_note"], font=F_LBL, align=Alignment(wrap_text=True, vertical="top"))
+    wsd.merge_cells(start_row=r, start_column=2, end_row=r, end_column=12)
+    wsd.row_dimensions[r].height = 13.5 * (len(src["_note"]) // 170 + 1)
+    wsd.column_dimensions["A"].width = 3; wsd.column_dimensions["B"].width = 40
+    for col in "CDEFG":
+        wsd.column_dimensions[col].width = 15
+    for col in "HIJKL":
+        wsd.column_dimensions[col].width = 46
+    wsd.column_dimensions["C"].width = 22
+    wsd.print_area = f"A1:L{r}"; wsd.page_setup.orientation = "landscape"
+    wsd.sheet_properties.pageSetUpPr.fitToPage = True; wsd.page_setup.fitToWidth = 1; wsd.page_setup.fitToHeight = 0
+
 # ----------------------------------------------------------------------------------------------------------------
 # 6. WORKBOOK ASSEMBLY, RECALC, VERIFY, SENSITIVITY
 # ----------------------------------------------------------------------------------------------------------------
@@ -1048,7 +1287,9 @@ def build_workbook(out_path, overrides=None, snapshot=None, sens_rows=None):
     build_checks(wb)
     build_assumptions(wb)
     build_cover(wb)
-    order = ["Cover", "Assumptions & Sources", "Model - NA", "Model - INTL", "Model - OTHER", "Total Company", "Summary & Chart", "Checks"]
+    build_appendix(wb)
+    order = ["Cover", "Assumptions & Sources", "Model - NA", "Model - INTL", "Model - OTHER", "Total Company", "Summary & Chart", "Checks",
+             "Appx A - Summary", "Appx B - Design Memo", "Appx C - Research Notes", "Appx D - Data"]
     wb._sheets = [wb[n] for n in order]
     wb.active = 0
     wb.calculation.fullCalcOnLoad = True

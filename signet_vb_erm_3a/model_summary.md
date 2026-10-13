@@ -1,6 +1,6 @@
 # Signet Baseline VB-ERM Model (Assignment 3a): One-Page Summary for Team #2
 
-Workbook: `Team2_Signet_VB-ERM_Baseline_3a.xlsx` (8 tabs: Cover, Assumptions & Sources, Model - NA, Model - INTL, Model - OTHER, Total Company, Summary & Chart, Checks). Built October 13, 2026 from `build/build_model.py`; recalculated in LibreOffice; all 32 integrity checks TRUE. $ millions.
+Workbook: `Team2_Signet_VB-ERM_Baseline_3a.xlsx` (8 model tabs: Cover, Assumptions & Sources, Model - NA, Model - INTL, Model - OTHER, Total Company, Summary & Chart, Checks; plus four appendix tabs holding this summary, the design memo, the research notes and all extracted data). Built October 13, 2026 from `build/build_model.py`; recalculated in LibreOffice; all 32 integrity checks TRUE. $ millions.
 
 ## Baseline company value by segment
 
