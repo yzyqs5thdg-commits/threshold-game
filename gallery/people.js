@@ -96,7 +96,7 @@ function headFront(g, who, o = {}) {
 
 /* a whole person seen from the side. o: dir, phase, walk 0..1, run, air, cheer, outfit (coat | run | skirt), sc, expr, medal, bib */
 function figure(g, x, y, who, o = {}) {
-  const k = WHO[who], c = OUT[o.outfit || 'coat'][who], t = o.t == null ? G.time : o.t, dir = o.dir || 1, sc = o.sc || 1.3, run = !!o.run, cheer = !!o.cheer, air = !!o.air, fit = o.outfit || 'coat';
+  const k = WHO[who], c = o.colors || OUT[o.outfit || 'coat'][who], t = o.t == null ? G.time : o.t, dir = o.dir || 1, sc = o.sc || 1.3, run = !!o.run, cheer = !!o.cheer, air = !!o.air, fit = o.outfit || 'coat';
   const walk = cheer ? 0 : run ? 1 : (o.walk || 0), ph = o.phase || 0, moving = run || walk > .05;
   const bob = cheer ? Math.abs(Math.sin(t * 6)) * 3 : moving ? Math.abs(Math.sin(ph)) * 2.2 * walk : Math.sin(t * 1.7) * .6;
   g.save(); g.translate(x, y); g.scale(sc, sc);

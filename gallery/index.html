@@ -64,11 +64,15 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .paper .keep { color: var(--ok); font-weight: 700; }
 .paper .toast { font-family: var(--display); font-style: italic; font-size: 1.4em; line-height: 1.3; text-wrap: balance; max-width: 16em; }
 .cork { display: block; }
-#rhud, #chud, #dhud, #mhud, #xhud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
-#rhud .krow, #chud .krow, #dhud .krow, #mhud .krow, #xhud .krow { flex: none; align-items: center; }
-#xhud .krow { flex: 0 1 auto; }
-#xhud .step { flex: 1 1 9em; min-width: 9em; }
-#xbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
+#rhud, #chud, #dhud, #mhud, #xhud, #bhud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
+#rhud .krow, #chud .krow, #dhud .krow, #mhud .krow, #xhud .krow, #bhud .krow { flex: none; align-items: center; }
+.xnav { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.xnav[hidden] { display: none; }
+.paper .xnav button { margin: 0; padding: .45em 1em; font-size: .85em; background: none; color: var(--ink); border: 1.5px solid var(--ink-soft); }
+.paper .xnav button:disabled { opacity: .35; cursor: default; }
+#xhud .krow, #bhud .krow { flex: 0 1 auto; }
+#xhud .step, #bhud .step { flex: 1 1 9em; min-width: 9em; }
+#xbar, #bbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 .xcard { max-width: 30em; gap: 8px; padding: 18px 20px 20px; }
 .xcard img, .xcard video { display: block; max-width: 100%; max-height: 50vh; border-radius: 8px; background: var(--night); }
 .xcard h2 { font-size: 1.55em; }
@@ -259,6 +263,39 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
   </div>
 </div>
 
+<div id="bui" hidden>
+  <div class="over" id="bhud">
+    <p class="pill step" id="bstep" aria-live="polite"></p>
+    <div class="krow">
+      <span class="pill" id="bshells">Shells 0 of 7</span>
+      <button class="small" id="bsound" type="button" aria-pressed="true">Sound on</button>
+      <button class="small" id="bleave" type="button">Leave</button>
+    </div>
+  </div>
+  <div class="over" id="bbar"><button id="banchor" type="button" hidden>Drop anchor</button></div>
+  <div class="over sheet" id="bview" hidden>
+    <div class="paper xcard">
+      <img id="bimg" alt="" hidden>
+      <video id="bvid" playsinline controls preload="none" hidden></video>
+      <p class="xno" id="bno"></p>
+      <h2 id="btitle"></h2>
+      <p id="btext"></p>
+      <div class="xnav" id="bnav"><button id="bprev" type="button">Previous</button><button id="bnext" type="button">Next</button></div>
+      <button id="bclose" type="button">Back to the boat</button>
+    </div>
+  </div>
+  <div class="over sheet" id="bend" hidden>
+    <div class="paper">
+      <h2>The Bahamas</h2>
+      <p>We left in the morning, came home under a pink sky, and then there was pasta.</p>
+      <p class="keep">Keepsake found: the conch shell</p>
+      <p class="note">Your note to Jana about the Bahamas goes here.</p>
+      <button id="bstay" type="button">Stay a while</button>
+      <button id="bback" type="button" class="alt">Back downstairs</button>
+    </div>
+  </div>
+</div>
+
 <div class="over sheet" id="door" hidden>
   <div class="paper">
     <h2>Where to?</h2>
@@ -268,6 +305,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
     <button id="dchai" type="button">Chai coffee</button>
     <button id="ddump" type="button">Spicy Village</button>
     <button id="dmedal" type="button">The medal room</button>
+    <button id="dbahamas" type="button">The Bahamas</button>
     <button id="dmexico" type="button">The Mexico wing</button>
     <button id="dstay" type="button" class="alt">Stay outside</button>
   </div>
@@ -864,7 +902,7 @@ const KEYS = { ArrowRight: 1, d: 1, D: 1, ArrowLeft: -1, a: -1, A: -1 };
 addEventListener('keydown', e => { if (onRoad() && KEYS[e.key]) { if (!started) begin(); keyDir = KEYS[e.key]; e.preventDefault(); } });
 addEventListener('keyup', e => { if (KEYS[e.key] === keyDir) keyDir = 0; });
 enter.addEventListener('click', () => { door.hidden = false; target = null; document.getElementById('dkitchen').focus(); });
-for (const [id, to] of [['dkitchen', 'kitchen'], ['droof', 'rooftop'], ['dchai', 'chai'], ['ddump', 'dumplings'], ['dmedal', 'medal'], ['dmexico', 'mexico'], ['dstay', null]]) document.getElementById(id).addEventListener('click', () => { door.hidden = true; if (to) go(to); });
+for (const [id, to] of [['dkitchen', 'kitchen'], ['droof', 'rooftop'], ['dchai', 'chai'], ['ddump', 'dumplings'], ['dmedal', 'medal'], ['dbahamas', 'bahamas'], ['dmexico', 'mexico'], ['dstay', null]]) document.getElementById(id).addEventListener('click', () => { door.hidden = true; if (to) go(to); });
 
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); if (scene && scene.resize) scene.resize(); }, 120); });
 
@@ -915,4 +953,5 @@ const G = window.G = {
 <script src="dumplings.js"></script>
 <script src="medal.js"></script>
 <script src="museum.js"></script>
+<script src="bahamas.js"></script>
 <script>window.G.boot();</script>
