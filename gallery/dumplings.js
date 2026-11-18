@@ -181,34 +181,19 @@ function person(g, who, t) {
   g.fillStyle = '#8a2d22'; rr(g, -60, seat, 98, 12, 5); g.fill(); rr(g, -60, hy + 28, 15, 74, 6); g.fill(); g.fillStyle = 'rgba(255,190,150,.2)'; g.fillRect(-58, seat + 1, 94, 2);
   /* shin and shoe, mostly under the table */
   g.fillStyle = k.pants; rr(g, 44, seat - 14, 22, fl - seat + 6, 9); g.fill(); g.fillStyle = k.shoe; rr(g, 42, fl - 10, 38, 12, 6); g.fill();
-  /* long hair down her back */
-  g.fillStyle = k.hair; g.beginPath(); g.moveTo(-2, hy - 33); g.bezierCurveTo(-40, hy - 36, -46, hy + 8, -38 - wv * 6, hy + 46); g.bezierCurveTo(-30 + wv * 4, hy + 74, -50 - wv * 4, hy + 100, -38, hy + 130);
-  g.lineTo(-10, hy + 126); g.bezierCurveTo(-18, hy + 90, -6, hy + 60, -12, hy + 18); g.closePath(); g.fill();
-  for (const [o, w] of [[-8, 2.2], [-17, 1.6]]) { g.strokeStyle = k.hi; g.lineWidth = w; g.beginPath(); g.moveTo(-20 + o * .4, hy - 14); g.bezierCurveTo(-34 + o * .3 - wv * 4, hy + 30, -22 + o + wv * 6, hy + 70, -26 + o * .6 - wv * 3, hy + 122); g.stroke(); }
   g.fillStyle = k.pants; rr(g, -22, seat - 26, 90, 28, 14); g.fill();
   /* sweater */
   const sw = g.createLinearGradient(-30, 0, 28, 0); sw.addColorStop(0, k.top[1]); sw.addColorStop(1, k.top[0]); g.fillStyle = sw;
   g.beginPath(); g.moveTo(-26, seat + 2); g.quadraticCurveTo(-34, hy + 90, -24, hy + 52); g.quadraticCurveTo(-14, hy + 36, 4, hy + 38); g.quadraticCurveTo(24, hy + 44, 26, hy + 74); g.quadraticCurveTo(28, seat - 30, 22, seat + 2); g.closePath(); g.fill();
   if (who === 'j') { g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 3; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(-18 + i * 12, hy + 60); g.lineTo(-22 + i * 12, seat - 6); g.stroke(); } }
-  g.fillStyle = k.skin; g.fillRect(-5, hy + 22, 15, 22); g.fillStyle = k.collar; ell(g, 3, hy + 41, 15, 6); g.fill();
+  g.fillStyle = G.people[who].skin; g.fillRect(-4, hy + 22, 15, 22); g.fillStyle = k.collar; ell(g, 3, hy + 41, 15, 6); g.fill();
   if (who === 'j') { g.strokeStyle = '#e9c15a'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-3, hy + 36); g.quadraticCurveTo(8, hy + 46, 14, hy + 38); g.stroke(); }
-  /* head in profile */
-  g.fillStyle = k.skin; g.beginPath(); g.arc(2, hy, 30, 0, TAU); g.fill(); g.beginPath(); g.moveTo(29, hy - 4); g.quadraticCurveTo(39, hy + 6, 30, hy + 10); g.fill();
-  g.fillStyle = k.hair; g.beginPath(); g.moveTo(25, hy - 18); g.quadraticCurveTo(8, hy - 41, -14, hy - 31); g.quadraticCurveTo(-37, hy - 12, -30, hy + 24); g.lineTo(-12, hy + 24); g.quadraticCurveTo(-16, hy - 4, 2, hy - 14); g.quadraticCurveTo(14, hy - 20, 25, hy - 18); g.fill();
-  G.hair(g, -9, hy - 12, { len: 122, w: 10.5, flow: 0, hang: .02, curl: .12, wave: wv * .7, col: k.hair, dark: k.hair, hi: k.hi, lo: 'rgba(0,0,0,.28)', t: t + (who === 'f' ? 1.3 : 0) });
-  if (who === 'j') { g.fillStyle = '#e9c15a'; g.beginPath(); g.arc(1, hy + 21, 3.4, 0, TAU); g.fill(); } else { g.strokeStyle = '#e9c15a'; g.lineWidth = 2; g.beginPath(); g.arc(1, hy + 23, 4.6, 0, TAU); g.stroke(); }
-  g.strokeStyle = k.brow; g.lineWidth = who === 'j' ? 2.8 : 2.4; g.beginPath(); g.moveTo(10, hy - 12); g.quadraticCurveTo(17, hy - 16, 24, hy - 11); g.stroke();
-  if (f !== 'smile' || blink) { g.strokeStyle = '#231a1c'; g.lineWidth = 2.2; g.beginPath(); g.arc(17, hy, 5, Math.PI * 1.15, Math.PI * 1.85); g.stroke(); }
-  else { g.fillStyle = who === 'j' ? '#4a2c1c' : '#2b1c18'; ell(g, 18, hy - 3, 3.4, 4.6); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(19.2, hy - 4.6, 1.2, 0, TAU); g.fill(); }
-  g.fillStyle = `rgba(224,104,98,${f === 'yum' ? .5 : .3})`; ell(g, 11, hy + 11, f === 'yum' ? 10 : 7, f === 'yum' ? 6.4 : 4.4); g.fill();
-  const lip = who === 'j' ? '#c4606a' : '#8e3a3a';
-  if (f === 'laugh') { g.fillStyle = '#7a1c24'; g.beginPath(); g.moveTo(15, hy + 12); g.quadraticCurveTo(22, hy + 27, 30, hy + 11); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.fillRect(18, hy + 12, 10, 2.6); }
-  else { g.strokeStyle = lip; g.lineWidth = 2.2; g.beginPath(); g.moveTo(17, hy + 15); g.quadraticCurveTo(23, hy + 20, 29, hy + 13); g.stroke(); }
+  G.head(g, who, { x: 4, y: hy, r: 32, len: 124, hang: .02, curl: .2, expr: f === 'laugh' ? 'joy' : f === 'yum' ? 'yum' : 'smile', blink, t });
   g.restore();
 }
 /* where each of them is holding her chopsticks, and what is on them */
 function tip(who, t) {
-  const d = who === 'j' ? 1 : -1, x = who === 'j' ? L.jx : L.fx, pl = who === 'j' ? L.pj : L.pf, rest = [pl.x - d * 8, pl.y - 36], mouth = [x + d * 32, L.hy + 14], a = D.act[who];
+  const d = who === 'j' ? 1 : -1, x = who === 'j' ? L.jx : L.fx, pl = who === 'j' ? L.pj : L.pf, rest = [pl.x - d * 8, pl.y - 36], mouth = [x + d * 30, L.hy + 20], a = D.act[who];
   if (D.phase === 'noodles' && D.slurping) { const u = G.RM ? .5 : .5 + .5 * Math.sin(t * 4.2 + (who === 'f' ? 1.6 : 0)), from = [L.noodle.x - d * 22, L.noodle.y - 12]; return { p: [lerp(from[0], mouth[0], u), lerp(from[1], mouth[1], u)], carry: 'noodles', up: u, d, x }; }
   if (!a) return { p: rest, carry: null, up: 0, d, x };
   const dd = D.dump[a.i], from = [pl.x + dd.px, pl.y + dd.py - 6]; let p, carry = null, up = 0;
@@ -224,7 +209,7 @@ function arm(g, who, t) {
   g.lineCap = 'round'; g.strokeStyle = k.top[0]; g.lineWidth = 20; g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo((sx + hx) / 2 - d * 6, Math.max(sy, hyy) + 34, hx, hyy); g.stroke();
   sticks(g, T.p[0], T.p[1], hx + (hx - T.p[0]) * .5, hyy + (hyy - T.p[1]) * .5);
   if (typeof T.carry === 'number') { const dd = D.dump[T.carry]; dumpling(g, T.p[0], T.p[1] + 3, dd.rot, dd.vin, dd.chi, true, L.ds + .08); }
-  g.fillStyle = k.skin; g.beginPath(); g.arc(hx, hyy, 10, 0, TAU); g.fill();
+  g.fillStyle = G.people[who].skin; g.beginPath(); g.arc(hx, hyy, 10, 0, TAU); g.fill();
 }
 
 /* ------------------------------------------------------------------ play */

@@ -106,30 +106,7 @@ function shoe(g, x, y, col) {
 
 /* ------------------------------------------------------------------ the two runners */
 function runner(g, x, y, who, ph, air, cheer, sc, medalOn) {
-  const k = LOOK[who]; g.save(); g.translate(x, y); g.scale(sc, sc); g.rotate(cheer ? 0 : .12); g.lineCap = 'round'; g.lineJoin = 'round';
-  const leg = (p, col, front) => {
-    let th = .95 * Math.sin(p), bend = .3 + 1.05 * Math.max(0, Math.cos(p + .4)); if (air) { th = front ? .95 : -.55; bend = 1.15; } if (cheer) { th = front ? .1 : -.1; bend = 0; }
-    const kx = Math.sin(th) * 26, ky = -52 + Math.cos(th) * 26, fx = kx + Math.sin(th - bend) * 26, fy = ky + Math.cos(th - bend) * 26;
-    g.strokeStyle = col; g.lineWidth = 8.6; g.beginPath(); g.moveTo(0, -52); g.lineTo(kx, ky); g.lineTo(fx, fy); g.stroke();
-    g.fillStyle = '#17161a'; g.save(); g.translate(fx, fy); g.rotate(-(th - bend) * .7); ell(g, 4, 1, 8.4, 4.4); g.fill(); g.fillStyle = '#f4f1e8'; g.fillRect(-4, 3.4, 16, 2); g.restore();
-  };
-  const arm = (p, col, side) => {
-    let a = -.9 * Math.sin(p), f = a + 1.5; if (cheer) { a = side * 2.5 + Math.sin(G.time * 9 + side) * .12; f = a; }
-    const ex = Math.sin(a) * 16, ey = -93 + Math.cos(a) * 16, hx = ex + Math.sin(f) * 15, hy = ey + Math.cos(f) * 15;
-    g.strokeStyle = col; g.lineWidth = 7.6; g.beginPath(); g.moveTo(0, -93); g.lineTo(ex, ey); g.lineTo(hx, hy); g.stroke(); g.fillStyle = k.skin; g.beginPath(); g.arc(hx, hy, 3.6, 0, TAU); g.fill();
-  };
-  leg(ph + Math.PI, k.dark, false); arm(ph + Math.PI, k.dark, -1);
-  leg(ph, k.legs, true);
-  g.fillStyle = k.jacket; g.beginPath(); g.moveTo(-9, -100); g.quadraticCurveTo(-11, -74, -10, -50); g.lineTo(10, -50); g.quadraticCurveTo(11, -74, 9, -100); g.closePath(); g.fill();
-  g.fillStyle = '#fdfbf4'; rr(g, -4, -80, 14, 11, 1.5); g.fill(); g.fillStyle = '#17161a'; g.fillRect(-2, -77, 10, 3); g.fillStyle = '#4a3a8c'; g.fillRect(-4, -72, 14, 3);
-  if (medalOn) { g.strokeStyle = '#e8641c'; g.lineWidth = 2.6; g.beginPath(); g.moveTo(-5, -100); g.lineTo(2, -86); g.lineTo(8, -100); g.stroke(); g.fillStyle = '#f2cf62'; g.beginPath(); g.moveTo(2, -90); g.lineTo(7, -85); g.lineTo(2, -80); g.lineTo(-3, -85); g.fill(); }
-  arm(ph, k.jacket, 1);
-  G.hair(g, -6, -117, { len: 60, w: 10.5, flow: cheer ? .04 : air ? .4 : .5, wave: k.wave, col: k.hair, dark: k.hdark, hi: k.hi, lo: k.lo, t: G.time + (who === 'f' ? 1.3 : 0) });
-  g.fillStyle = k.hair; ell(g, -3, -111, 12, 13); g.fill(); g.fillStyle = k.skin; g.beginPath(); g.arc(2, -112, 11.2, 0, TAU); g.fill();
-  g.fillStyle = k.hair; g.beginPath(); g.moveTo(11, -120); g.quadraticCurveTo(3, -128, -8, -123); g.quadraticCurveTo(-13, -113, -9, -102); g.lineTo(-3, -103); g.quadraticCurveTo(-5, -113, 2, -119); g.quadraticCurveTo(7, -122, 11, -120); g.fill();
-  g.fillStyle = '#2b2024'; if (cheer) { g.strokeStyle = '#2b2024'; g.lineWidth = 1.4; g.beginPath(); g.arc(7.6, -111, 2.2, Math.PI * 1.1, Math.PI * 1.9); g.stroke(); } else { ell(g, 8, -112, 1.3, 1.8); g.fill(); }
-  g.strokeStyle = '#8e3a3a'; g.lineWidth = 1.4; g.beginPath(); g.arc(7, -107, 3, .15 * Math.PI, .8 * Math.PI); g.stroke(); g.fillStyle = 'rgba(232,120,110,.4)'; ell(g, 5, -106, 3, 2); g.fill();
-  g.restore();
+  G.figure(g, x, y, who, { dir: 1, phase: ph, run: true, air, cheer, outfit: 'run', sc: sc * 1.08, medal: medalOn });
 }
 
 /* ------------------------------------------------------------------ play */
@@ -217,7 +194,6 @@ function drawRunScene(g, t) {
   for (const o of M.obs) { const x = o.x - d + jx; if (x < -80 || x > VW + 80) continue; if (o.kind === 'cone') cone(x, Y(FEET - 2), 1); else { const r = R(o.x | 0); g.fillStyle = 'rgba(40,30,30,.2)'; ell(g, x, Y(FEET - 3), 44, 6); g.fill(); for (let i = 0; i < 46; i++) { const a = r() * Math.PI, k = Math.sqrt(r()); dab(g, x + Math.cos(a) * k * 40, Y(FEET - 2) - Math.sin(a) * k * 20, 5 + r() * 4, 2.6 + r() * 2, r() * 3, ['#d9a53a', '#c66c32', '#e8c860', '#a8582c'][r() * 4 | 0], 1); } g.globalAlpha = 1; } }
   /* the two of them */
   const still = M.phase !== 'run' && M.v < 30, fin = M.phase !== 'run', wob = M.slow > 0 ? Math.sin(t * 30) * 3 : 0;
-  g.fillStyle = 'rgba(40,30,60,.22)'; ell(g, jx - 52, Y(FEET + 12), 22 - M.fy * .06, 4.6); g.fill(); ell(g, jx, Y(FEET - 2), 24 - M.y * .06, 5); g.fill();
   runner(g, jx - 52, Y(FEET + 14 + M.fy), 'f', M.ph + 1.9, M.fy > 0, still, 1.12, M.phase === 'medal' || (fin && M.ft > 1.5));
   runner(g, jx + wob, Y(FEET + M.y), 'j', M.ph, M.y > 0, still, 1.2, M.phase === 'medal' || (fin && M.ft > 1.5));
   if (sp) tile(g, sp.vergeNear, Y(46) - 22, d + 140); else { g.fillStyle = '#869843'; g.fillRect(0, Y(46), VW, 46); }
