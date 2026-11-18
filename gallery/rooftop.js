@@ -180,40 +180,43 @@ function drawTable(g) {
 }
 
 /* ------------------------------------------------------------------ the two of them, seen from behind */
+const LOOK = {
+  /* Jana: navy coat with a cream collar, long wavy brown hair with lighter streaks */
+  j: { coat: '#232a45', dark: '#191e35', skin: '#f0c7a6', hair: '#573726', hi: 'rgba(196,142,88,.9)', lo: 'rgba(58,34,22,.55)', wave: 1, len: 140 },
+  /* her friend: tan trench coat, long black hair */
+  f: { coat: '#cdb48e', dark: '#a98f69', skin: '#c99a74', hair: '#17141a', hi: 'rgba(86,78,104,.85)', lo: 'rgba(0,0,0,.5)', wave: .4, len: 130 }
+};
 function drawPerson(g, x, who, t) {
-  const d = who === 'j' ? 1 : -1, coat = who === 'j' ? '#232a45' : '#33403c', dark = who === 'j' ? '#191e35' : '#252f2c';
+  const d = who === 'j' ? 1 : -1, k = LOOK[who];
   g.fillStyle = 'rgba(40,30,40,.3)'; ell(g, x, Y(34), 62, 11); g.fill();
   g.fillStyle = '#24252a'; rr(g, x - 54, Y(106), 108, 74, 9); g.fill(); g.fillStyle = 'rgba(255,255,255,.08)'; rr(g, x - 54, Y(106), 108, 8, 5); g.fill();
   /* outer arm, then the coat */
-  g.strokeStyle = dark; g.lineWidth = 21; g.lineCap = 'round'; g.beginPath(); g.moveTo(x - d * 33, Y(204)); g.quadraticCurveTo(x - d * 46, Y(170), x - d * 40, Y(128)); g.stroke();
-  const gr = g.createLinearGradient(x - 46, 0, x + 46, 0); gr.addColorStop(0, d > 0 ? dark : coat); gr.addColorStop(1, d > 0 ? coat : dark);
+  g.strokeStyle = k.dark; g.lineWidth = 21; g.lineCap = 'round'; g.beginPath(); g.moveTo(x - d * 33, Y(204)); g.quadraticCurveTo(x - d * 46, Y(170), x - d * 40, Y(128)); g.stroke();
+  const gr = g.createLinearGradient(x - 46, 0, x + 46, 0); gr.addColorStop(0, d > 0 ? k.dark : k.coat); gr.addColorStop(1, d > 0 ? k.coat : k.dark);
   g.fillStyle = gr; g.beginPath(); g.moveTo(x - 46, Y(98)); g.bezierCurveTo(x - 50, Y(160), x - 44, Y(206), x - 30, Y(218)); g.lineTo(x + 30, Y(218)); g.bezierCurveTo(x + 44, Y(206), x + 50, Y(160), x + 46, Y(98)); g.closePath(); g.fill();
   g.strokeStyle = 'rgba(0,0,0,.2)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x, Y(206)); g.lineTo(x, Y(100)); g.stroke();
-  if (who === 'j') {
-    /* cream collar, then long wavy hair down her back */
-    const r = R(12); for (let i = 0; i < 46; i++) { const a = r() * TAU, k = Math.sqrt(r()); dab(g, x + Math.cos(a) * k * 37, Y(214) + Math.sin(a) * k * 11, 6 + r() * 4, 4.5 + r() * 3, 0, r() < .5 ? '#f4ead6' : '#e2d5bc', 1); } g.globalAlpha = 1;
-    g.fillStyle = '#f0c7a6'; ell(g, x + 5, Y(250), 20, 22); g.fill();
-    const sw = Math.sin(t * 1.3) * 2.2 * (G.RM ? 0 : 1), sw2 = Math.sin(t * 1.7 + 1) * 1.8 * (G.RM ? 0 : 1);
-    g.fillStyle = '#573726'; g.beginPath(); g.moveTo(x - 16, Y(266)); g.bezierCurveTo(x - 10, Y(282), x + 18, Y(282), x + 22, Y(262));
-    g.bezierCurveTo(x + 26, Y(236), x + 14, Y(226), x + 26 + sw, Y(198)); g.bezierCurveTo(x + 36 + sw, Y(176), x + 22 + sw2, Y(160), x + 26 + sw2, Y(140));
-    g.quadraticCurveTo(x + 2, Y(128), x - 24 + sw2, Y(140)); g.bezierCurveTo(x - 20 + sw2, Y(162), x - 34 + sw, Y(178), x - 26 + sw, Y(200)); g.bezierCurveTo(x - 16, Y(226), x - 26, Y(244), x - 16, Y(266)); g.closePath(); g.fill();
-    g.lineCap = 'round'; for (let i = 0; i < 9; i++) { const ox = -18 + i * 5 + r() * 3, hi = i % 3 === 1; g.strokeStyle = hi ? 'rgba(196,142,88,.9)' : 'rgba(58,34,22,.55)'; g.lineWidth = hi ? 2.4 : 1.6; g.beginPath(); g.moveTo(x + ox * .7, Y(268 - Math.abs(ox) * .4)); g.bezierCurveTo(x + ox + 5, Y(236), x + ox - 6 + sw * .6, Y(200), x + ox * 1.25 + sw, Y(172)); g.quadraticCurveTo(x + ox * 1.3 + 5 + sw2, Y(156), x + ox * 1.25 + sw2, Y(144)); g.stroke(); }
-    g.fillStyle = '#f0c7a6'; ell(g, x + 21, Y(248), 4.6, 9); g.fill(); g.fillStyle = '#e9c15a'; g.beginPath(); g.arc(x + 22, Y(238), 2.6, 0, TAU); g.fill();
-  } else {
-    /* her friend: a placeholder until I know what they look like */
-    g.fillStyle = dark; ell(g, x, Y(216), 32, 9); g.fill();
-    g.fillStyle = '#e8c3a2'; ell(g, x - 4, Y(250), 20, 22); g.fill();
-    g.fillStyle = '#2b2226'; ell(g, x - 3, Y(240), 20, 13); g.fill();
-    g.fillStyle = '#8e2a2a'; g.beginPath(); g.ellipse(x - 3, Y(254), 22, 21, 0, Math.PI, 0); g.fill(); g.fillStyle = '#7a2222'; rr(g, x - 25, Y(256), 44, 9, 3); g.fill();
-    g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = 1; for (let i = 0; i < 8; i++) { g.beginPath(); g.moveTo(x - 22 + i * 5.6, Y(256)); g.lineTo(x - 22 + i * 5.6, Y(247)); g.stroke(); }
-    g.fillStyle = '#e8c3a2'; ell(g, x - 21, Y(246), 4.4, 8); g.fill();
-  }
+  if (who === 'f') { g.fillStyle = k.dark; g.fillRect(x - 47, Y(152), 94, 9); g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(x - 47, Y(152), 94, 1.4); rr(g, x - 8, Y(155), 16, 15, 2); g.fillStyle = '#8f7650'; g.fill(); }
+  g.save(); g.translate(x, 0); g.scale(d, 1);
+  const r = R(who === 'j' ? 12 : 29);
+  if (who === 'j') { for (let i = 0; i < 46; i++) { const a = r() * TAU, q = Math.sqrt(r()); dab(g, Math.cos(a) * q * 37, Y(214) + Math.sin(a) * q * 11, 6 + r() * 4, 4.5 + r() * 3, 0, r() < .5 ? '#f4ead6' : '#e2d5bc', 1); } g.globalAlpha = 1; }
+  else { g.fillStyle = k.dark; ell(g, 0, Y(215), 34, 9); g.fill(); g.fillStyle = k.coat; ell(g, 0, Y(218), 30, 7); g.fill(); }
+  g.fillStyle = k.skin; ell(g, 5, Y(250), 20, 22); g.fill();
+  const still = G.RM ? 0 : 1, sw = Math.sin(t * 1.3 + d) * 2.2 * still, sw2 = Math.sin(t * 1.7 + 1 + d) * 1.8 * still, W = v => 24 + (v - 24) * k.wave, E = k.len;
+  g.fillStyle = k.hair; g.beginPath(); g.moveTo(-16, Y(266)); g.bezierCurveTo(-10, Y(282), 18, Y(282), 22, Y(262));
+  g.bezierCurveTo(W(26), Y(236), W(14), Y(226), W(26) + sw, Y(198)); g.bezierCurveTo(W(36) + sw, Y(176), W(22) + sw2, Y(160), W(26) + sw2, Y(E));
+  g.quadraticCurveTo(2, Y(E - 12), -W(24) + sw2, Y(E)); g.bezierCurveTo(-W(20) + sw2, Y(162), -W(34) + sw, Y(178), -W(26) + sw, Y(200)); g.bezierCurveTo(-W(16), Y(226), -W(26), Y(244), -16, Y(266)); g.closePath(); g.fill();
+  g.lineCap = 'round'; for (let i = 0; i < 9; i++) { const ox = -18 + i * 5 + r() * 3, hi = i % 3 === 1, bend = 6 * k.wave; g.strokeStyle = hi ? k.hi : k.lo; g.lineWidth = hi ? 2.4 : 1.6; g.beginPath(); g.moveTo(ox * .7, Y(268 - Math.abs(ox) * .4)); g.bezierCurveTo(ox + bend, Y(236), ox - bend + sw * .6, Y(200), ox * 1.25 + sw, Y(172)); g.quadraticCurveTo(ox * 1.3 + bend + sw2, Y(156), ox * 1.25 + sw2, Y(E + 4)); g.stroke(); }
+  g.fillStyle = k.skin; ell(g, 21, Y(248), 4.6, 9); g.fill();
+  if (who === 'j') { g.fillStyle = '#e9c15a'; g.beginPath(); g.arc(22, Y(238), 2.6, 0, TAU); g.fill(); }
+  else { g.strokeStyle = '#e9c15a'; g.lineWidth = 1.8; g.beginPath(); g.arc(22.5, Y(236), 4, 0, TAU); g.stroke(); }
+  g.restore();
 }
 function drawArm(g, x, who, hx, hy) {
-  const d = who === 'j' ? 1 : -1, sx = x + d * 30, sy = Y(204), mx = (sx + hx) / 2, my = (sy + hy) / 2 + 26;
-  g.lineCap = 'round'; g.strokeStyle = who === 'j' ? '#232a45' : '#33403c'; g.lineWidth = 19; g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(mx, my, hx, hy); g.stroke();
+  const d = who === 'j' ? 1 : -1, k = LOOK[who], sx = x + d * 30, sy = Y(204), mx = (sx + hx) / 2, my = (sy + hy) / 2 + 26;
+  g.lineCap = 'round'; g.strokeStyle = k.coat; g.lineWidth = 19; g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(mx, my, hx, hy); g.stroke();
   if (who === 'j') { g.strokeStyle = '#f1e6d0'; g.lineWidth = 20; g.beginPath(); g.moveTo(lerp(mx, hx, .7), lerp(my, hy, .78)); g.lineTo(hx, hy); g.stroke(); }
-  g.fillStyle = who === 'j' ? '#f0c7a6' : '#e8c3a2'; g.beginPath(); g.arc(hx + d * 5, hy - 3, 7.5, 0, TAU); g.fill();
+  else { g.strokeStyle = k.dark; g.lineWidth = 19.5; g.beginPath(); g.moveTo(lerp(mx, hx, .86), lerp(my, hy, .9)); g.lineTo(hx, hy); g.stroke(); }
+  g.fillStyle = k.skin; g.beginPath(); g.arc(hx + d * 5, hy - 3, 7.5, 0, TAU); g.fill();
 }
 
 /* ------------------------------------------------------------------ play */
