@@ -78,7 +78,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .paper .xnav button:disabled { opacity: .35; cursor: default; }
 #xhud .krow, #bhud .krow, #fhud .krow, #shud .krow, #uhud .krow, #tbhud .krow, #ghud .krow { flex: 0 1 auto; align-items: center; }
 #xhud .step, #bhud .step, #fhud .step, #shud .step, #uhud .step, #tbhud .step, #ghud .step { flex: 1 1 9em; min-width: 9em; }
-#xbar, #bbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
+#xbar, #bbar, #gbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 .xcard { max-width: 30em; gap: 8px; padding: 18px 20px 20px; }
 .xcard img, .xcard video { display: block; max-width: 100%; max-height: 50vh; border-radius: 8px; background: var(--night); }
 .xcard h2 { font-size: 1.55em; }
@@ -444,27 +444,25 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
   <div class="over" id="ghud">
     <p class="pill step" id="gstep" aria-live="polite"></p>
     <div class="krow">
-      <span class="pill" id="gcount">Blossoms 0 of 13</span>
+      <span class="pill" id="gcount">Memories 0 of 13</span>
       <button class="small" id="gsound" type="button" aria-pressed="true">Sound on</button>
       <button class="small" id="gleave" type="button">Leave</button>
     </div>
   </div>
+  <div class="over" id="gbar"><button id="glook" type="button" hidden>Look closer</button></div>
   <div class="over sheet" id="gview" hidden>
     <div class="paper xcard">
       <img id="gimg" alt="" hidden>
       <video id="gvid" playsinline controls preload="none" hidden></video>
-      <p class="xno" id="gno"></p>
-      <h2 id="gtitle"></h2>
-      <p id="gtext"></p>
-      <button id="gclose" type="button">Back to the garden</button>
+      <button id="gclose" type="button">Back to the park</button>
     </div>
   </div>
   <div class="over sheet" id="gend" hidden>
     <div class="paper">
-      <h2>You've got a friend</h2>
-      <p>The wall said it first, and it was right.</p>
+      <h2>A year in Central Park</h2>
+      <p>Every season of it, with you.</p>
       <p class="keep">Keepsake found: the pressed blossom</p>
-      <p class="note">Your note to Jana about the garden goes here.</p>
+      <p class="note">Your note to Jana about Central Park goes here.</p>
       <button id="gstay" type="button">Stay a while</button>
       <button id="gback" type="button" class="alt">Back downstairs</button>
     </div>
@@ -483,7 +481,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
     <button id="dcity" type="button">The city</button>
     <button id="dun" type="button">The General Assembly</button>
     <button id="dtable" type="button">Table for two</button>
-    <button id="dgarden" type="button">The blossom garden</button>
+    <button id="dgarden" type="button">Central Park</button>
     <button id="dfront" type="button">The front door</button>
     <button id="dbahamas" type="button">The Bahamas</button>
     <button id="dmexico" type="button">The Mexico wing</button>
