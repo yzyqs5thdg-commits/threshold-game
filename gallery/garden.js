@@ -1,4 +1,4 @@
-/* The blossom garden. A cherry tree in full bloom by the lake; five blossoms each hold a memory from the park.
+/* The blossom garden. A cherry tree in full bloom by the lake; thirteen blossoms each hold a memory from the park, in every season.
    When every one has been opened, evening falls, the lanterns light, and the garden wall says what it has to say. */
 (() => {
 'use strict';
@@ -11,10 +11,17 @@ const BLOOMS = [
   { id: 'pink', media: 'photo', title: 'Under the pink tree', text: 'Eyes closed, hair flying, nose in a blossom.' },
   { id: 'white', media: 'photo', title: 'White blossom', text: 'Sitting on the rock under a whole tree of white.' },
   { id: 'park', media: 'clip', title: 'The park in bloom', text: 'The whole park had the same idea we did.' },
-  { id: 'lake', media: 'clip', title: 'The lake', text: 'Still water, a tower behind the trees, and the birds on their branch.' }
+  { id: 'lake', media: 'clip', title: 'The lake', text: 'Still water, a tower behind the trees, and the birds on their branch.' },
+  { id: 'flowers', media: 'photo', title: 'The flower garden', text: 'Laughing over your shoulder, with every colour of flower behind you.' },
+  { id: 'rock', media: 'photo', title: 'On the rock', text: 'Sunglasses pushed up, the lake behind you, and that sideways smile.' },
+  { id: 'tarot', media: 'photo', title: 'Cards in the park', text: 'The deck fanned across the picnic table, in the last gold light.' },
+  { id: 'story', media: 'photo', title: 'Mid-story', text: 'Both hands up, telling it properly. The bottles were listening.' },
+  { id: 'bench', media: 'photo', title: 'Our favorite park', text: 'The bench said it for someone else. It is ours too.' },
+  { id: 'autumn', media: 'photo', title: 'Autumn walk', text: 'Thumbs up, leaves everywhere, the sun right behind you.' },
+  { id: 'sleds', media: 'clip', title: 'Sled day', text: 'Two red sleds, carried back up the hill for another go.' },
+  { id: 'snow', media: 'photo', title: 'Snow fight', text: 'Sitting in the snow, with most of it in the air.' }
 ];
-const SPOTS = [[-.55, -.3], [0, -.62], [.55, -.28], [-.3, .34], [.42, .38]];
-const BRANCH = [[-.7, -.05], [-.45, -.5], [-.15, -.72], [.2, -.6], [.5, -.35], [.75, 0], [.45, .3], [.1, .1], [-.25, -.15], [-.55, .35], [-.1, .5], [.25, .62], [-.82, .4]];
+const SPOTS = [[-.7, -.05], [-.45, -.5], [-.15, -.72], [.2, -.6], [.5, -.35], [.75, 0], [.45, .3], [.1, .1], [-.25, -.15], [-.55, .35], [-.1, .5], [.25, .62], [-.82, .4]];
 let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false, view = null, endShown = false, finT = 0;
 const open = new Set(), parts = [], moth = { x: 0, y: 0 }; let fin = 0;
 const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
@@ -25,7 +32,7 @@ function layout() {
   S = Math.min(G.W / 430, G.H / 720); VW = G.W / S; VH = G.H / S; const wide = VW >= 760, cxm = VW / 2, gy = VH - (wide ? 110 : 120);
   const c = wide ? { x: cxm - 170, y: 250, rx: 340, ry: 180 } : { x: VW * .45, y: 300, rx: 185, ry: 170 };
   const wall = wide ? { x: cxm + 210, y: gy - 300, w: 360, h: 300 } : { x: VW - 205, y: gy - 300, w: 197, h: 300 };
-  L = { wide, cxm, gy, c, wall, tx: wide ? c.x : VW * .3, spots: SPOTS.map(([u, v]) => [c.x + u * c.rx, c.y + v * c.ry]), branches: BRANCH.map(([u, v]) => [c.x + u * c.rx, c.y + v * c.ry]) };
+  L = { wide, cxm, gy, c, wall, tx: wide ? c.x : VW * .3, spots: SPOTS.map(([u, v]) => [c.x + u * c.rx, c.y + v * c.ry]) };
   const key = `${Math.round(VW)}x${Math.round(VH)}`; if (!SPR || SPR.key !== key) SPR = { key, bg: G.spr(VW, VH, drawScene, clamp(S * G.DPR, 1, 2.5)) };
   $('gui').style.fontSize = clamp(16 * S, 13, 18) + 'px';
 }
@@ -49,7 +56,7 @@ function drawScene(g, w, h) {
   /* trunk, branches, and a cloud of blossom */
   const tx = L.tx; g.lineCap = 'round'; g.strokeStyle = '#5a3c30'; g.lineWidth = 34; g.beginPath(); g.moveTo(tx, gy + 6); g.quadraticCurveTo(tx - 8, gy - 110, tx + (c.x - tx) * .5, c.y + c.ry * .5); g.stroke();
   g.strokeStyle = 'rgba(255,220,200,.18)'; g.lineWidth = 6; g.beginPath(); g.moveTo(tx - 9, gy); g.quadraticCurveTo(tx - 16, gy - 110, tx + (c.x - tx) * .5 - 8, c.y + c.ry * .5); g.stroke();
-  const bx = tx + (c.x - tx) * .5, by = c.y + c.ry * .5; for (const [x, y] of L.branches) { g.strokeStyle = '#5a3c30'; g.lineWidth = 5 + r() * 5; g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo(lerp(bx, x, .5) + (r() - .5) * 60, lerp(by, y, .5) - 30, x, y); g.stroke(); }
+  const bx = tx + (c.x - tx) * .5, by = c.y + c.ry * .5; for (const [x, y] of L.spots) { g.strokeStyle = '#5a3c30'; g.lineWidth = 5 + r() * 5; g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo(lerp(bx, x, .5) + (r() - .5) * 60, lerp(by, y, .5) - 30, x, y); g.stroke(); }
   for (let i = 0; i < c.rx * c.ry / 34; i++) { const a = r() * TAU, d = Math.sqrt(r()); dab(g, c.x + Math.cos(a) * d * c.rx * 1.04, c.y + Math.sin(a) * d * c.ry * 1.04, 9 + r() * 12, 7 + r() * 9, r() * 3, PINK[r() * 5 | 0], .78); } g.globalAlpha = 1;
 }
 function flower(g, x, y, s, t, on, i) {
@@ -86,7 +93,7 @@ function frame(dt) {
   const wc = W.x + W.w / 2, sc = L.wide ? 1.35 : 1.1, sp = L.wide ? 52 : 40;
   G.figure(g, wc - sp, gy + 12, 'j', { dir: 1, outfit: 'coat', sc, expr: fin >= 1 ? 'joy' : 'smile' }); G.figure(g, wc + sp, gy + 12, 'f', { dir: -1, outfit: 'coat', sc, expr: fin > .5 ? 'joy' : 'smile' });
   /* blossoms, falling petals */
-  L.spots.forEach(([x, y], i) => flower(g, x, y, L.wide ? 1.5 : 1.3, t, open.has(i), i));
+  L.spots.forEach(([x, y], i) => flower(g, x, y, L.wide ? 1.15 : 1, t, open.has(i), i));
   if (!G.RM) { const pr = R(8); for (let i = 0; i < 34; i++) { const x = wrap(pr() * (VW + 100) + Math.sin(t * .7 + i) * 30 + t * 8, VW + 100) - 50, y = wrap(pr() * VH + t * (22 + pr() * 26), VH + 40) - 20; g.save(); g.translate(x, y); g.rotate(t * (1 + pr()) + i); g.fillStyle = PINK[i % 5]; g.globalAlpha = .9; g.beginPath(); g.ellipse(0, 0, 4.4, 2.4, 0, 0, TAU); g.fill(); g.restore(); } }
   for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.life -= dt; p.vy += 120 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += dt * 5; if (p.life <= 0) { parts.splice(i, 1); continue; } g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.globalAlpha = Math.min(1, p.life * 1.6); g.fillStyle = p.c; g.beginPath(); g.ellipse(0, 0, 5, 2.6, 0, 0, TAU); g.fill(); g.restore(); }
   g.globalAlpha = 1;
