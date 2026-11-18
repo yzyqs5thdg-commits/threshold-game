@@ -11,6 +11,8 @@
   --ink-soft: #5c5870;     /* secondary text on paper */
   --lamp: #f2b45c;         /* the one accent: lamplight */
   --title: #fff8e6;        /* words set straight on the painting */
+  --ok: #4c8a3f;           /* a ticked box */
+  --miss: #b8402e;         /* not on the ticket */
   --display: "Fraunces", "Iowan Old Style", Georgia, serif;
   --ui: "Nunito", "Avenir Next", system-ui, sans-serif;
 }
@@ -40,11 +42,24 @@ button:focus-visible { outline: 3px solid var(--lamp); outline-offset: 3px; }
 #hint { font-size: 14px; color: var(--ink); background: var(--paper); border-radius: 999px; padding: 8px 16px; opacity: 0; transition: opacity .8s ease; box-shadow: 0 4px 16px rgba(28, 39, 72, .3); text-align: center; }
 #enter { opacity: 0; transform: translateY(8px); transition: opacity .5s ease, transform .5s ease; visibility: hidden; }
 #enter.on { opacity: 1; transform: none; visibility: visible; }
-#card { justify-content: center; background: var(--night); opacity: 0; visibility: hidden; transition: opacity 1.4s ease, visibility 0s 1.4s; text-align: center; gap: 14px; }
-#card.on { opacity: 1; visibility: visible; transition: opacity 1.4s ease; pointer-events: auto; }
-#card h2 { font-family: var(--display); font-style: italic; font-weight: 400; font-size: clamp(30px, 6vw, 52px); margin: 0; color: var(--title); text-wrap: balance; }
-#card p { margin: 0; max-width: 34ch; font-size: 16px; line-height: 1.5; color: var(--title); opacity: .82; }
-#card button { margin-top: 12px; }
+button.quiet { background: none; box-shadow: none; color: var(--title); font-weight: 500; font-size: 15px; padding: 8px 14px; text-decoration: underline; text-underline-offset: 4px; text-shadow: 0 1px 10px rgba(28, 39, 72, .7); }
+#fade { background: var(--night); opacity: 0; transition: opacity .6s ease; z-index: 5; }
+#fade.on { opacity: 1; }
+/* kitchen */
+#khud { align-items: flex-end; gap: 8px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
+.krow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.pill { font-size: .9em; font-weight: 700; color: var(--ink); background: var(--paper); border-radius: 999px; padding: .45em 1em; box-shadow: 0 4px 14px rgba(28, 39, 72, .28); font-variant-numeric: tabular-nums; }
+button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(28, 39, 72, .28); }
+.sheet { justify-content: center; background: rgba(28, 39, 72, .5); pointer-events: auto; }
+.paper { box-sizing: border-box; background: var(--paper); color: var(--ink); border-radius: 16px; padding: 26px 26px 24px; max-width: 26em; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; box-shadow: 0 18px 50px rgba(28, 39, 72, .5); }
+.paper h2 { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 2.1em; line-height: 1.05; margin: 0; text-wrap: balance; }
+.paper p { margin: 0; line-height: 1.5; font-size: 1em; }
+.paper .soft { color: var(--ink-soft); font-size: .88em; }
+.paper .note { border: 1.5px dashed var(--ink-soft); border-radius: 10px; padding: 10px 14px; color: var(--ink-soft); font-family: var(--display); font-style: italic; }
+.paper button { background: var(--ink); color: var(--paper); box-shadow: none; margin-top: 4px; }
+.paper button.alt { background: none; color: var(--ink); text-decoration: underline; text-underline-offset: 4px; font-weight: 500; margin-top: 0; padding: 6px 12px; }
+.paper .keep { color: var(--ok); font-weight: 700; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .gone { opacity: 0 !important; }
 @media (prefers-reduced-motion: reduce) { * { transition-duration: .01s !important; } }
 </style>
@@ -55,6 +70,7 @@ button:focus-visible { outline: 3px solid var(--lamp); outline-offset: 3px; }
   <h1>For Jana</h1>
   <p>The road to the house</p>
   <button id="begin" type="button">Start walking</button>
+  <button id="skip" type="button" class="quiet">Skip to the kitchen</button>
 </div>
 
 <div class="over" id="hud">
@@ -62,11 +78,35 @@ button:focus-visible { outline: 3px solid var(--lamp); outline-offset: 3px; }
   <button id="enter" type="button">Go inside</button>
 </div>
 
-<div class="over" id="card">
-  <h2>The rooms are still being painted</h2>
-  <p>This is the road and the front of the house. The foyer opens next.</p>
-  <button id="again" type="button">Walk the road again</button>
+<div id="kui" hidden>
+  <div class="over" id="khud">
+    <span class="pill" id="kcount">Served 0 of 8</span>
+    <div class="krow">
+      <button class="small" id="ksound" type="button" aria-pressed="true">Sound on</button>
+      <button class="small" id="kleave" type="button">Leave</button>
+    </div>
+  </div>
+  <div class="over sheet" id="kintro">
+    <div class="paper">
+      <h2>Maggi night</h2>
+      <p>Bowls ride the counter toward the bell. Read the ticket, ladle in the right Maggi, then drag on the toppings before the bowl gets there.</p>
+      <p class="soft">Serve 8 bowls to earn the kitchen's keepsake. On a keyboard, keys 1 to 6 add each ingredient.</p>
+      <button id="kstart" type="button">Start cooking</button>
+    </div>
+  </div>
+  <div class="over sheet" id="kwin" hidden>
+    <div class="paper">
+      <h2>Eight perfect bowls</h2>
+      <p class="keep">Keepsake found: the recipe card</p>
+      <p class="note">Your note to Jana about Maggi goes here.</p>
+      <button id="kmore" type="button">Keep cooking</button>
+      <button id="kback" type="button" class="alt">Back to the road</button>
+    </div>
+  </div>
+  <p class="sr" id="klive" aria-live="polite"></p>
 </div>
+
+<div class="over" id="fade"></div>
 
 <script>
 (() => {
@@ -429,6 +469,8 @@ let birds = null, birdTimer = 4;
 /* ------------------------------------------------------------------ state */
 const J = { x: 170, v: 0, dir: 1, phase: 0, max: 170 };
 const moth = { x: 210, y: 240 };
+const road = { init: false };
+let scene = null, sceneName = '', switching = false;
 let camX = 0, zoom = 1, started = false, ended = false, target = null, keyDir = 0, down = false, time = 0, moved = false;
 const SKY = { top: P(['#2f6fc4', '#3d6cb8', '#27407e']), mid: P(['#6aa6e4', '#93b6dc', '#6b7fbf']), hor: P(['#cfe6f3', '#fbd9a0', '#f4b79c']), deep: P(['#3f73a6', '#4a6a98', '#2c3a6e']) };
 
@@ -506,9 +548,19 @@ function drawCat(g, x, y, face) {
   g.restore();
 }
 
-function frame(now) {
-  const dt = Math.min(.05, (now - (frame.t || now)) / 1000); frame.t = now; time += dt;
-  if (!SP) { requestAnimationFrame(frame); return; }
+function loop(now) {
+  const dt = Math.min(.05, (now - (loop.t || now)) / 1000); loop.t = now; time += dt;
+  if (SP && scene) scene.frame(dt);
+  requestAnimationFrame(loop);
+}
+/* the paper finish every scene ends with: mottle, grain and a soft vignette */
+function paper(g, v = .34) {
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  g.fillStyle = SP.mottle; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = SP.grain; g.fillRect(0, 0, cv.width, cv.height);
+  const vg = g.createRadialGradient(cv.width / 2, cv.height * .48, Math.min(cv.width, cv.height) * .45, cv.width / 2, cv.height / 2, Math.hypot(cv.width, cv.height) * .62);
+  vg.addColorStop(0, 'rgba(28,39,72,0)'); vg.addColorStop(1, `rgba(28,39,72,${v})`); g.fillStyle = vg; g.fillRect(0, 0, cv.width, cv.height);
+}
+function roadFrame(dt) {
   /* ---- update */
   let want = 0;
   if (started && !ended) {
@@ -527,7 +579,7 @@ function frame(now) {
   zoom = lerp(1, Math.min(1, Math.max((W / base) / 1080, .64), (H / base) / 1010), endK);
   S = base * zoom; VW = W / S; VH = H / S;
   const camT = clamp(J.x - VW * (.42 - .1 * J.dir * (1 - endK)), 0, WORLD - VW);
-  camX = frame.init ? lerp(camX, camT, 1 - Math.exp(-dt * 3)) : camT; frame.init = true; camX = clamp(camX, 0, WORLD - VW);
+  camX = road.init ? lerp(camX, camT, 1 - Math.exp(-dt * 3)) : camT; road.init = true; camX = clamp(camX, 0, WORLD - VW);
   for (const l of world.lamps) { if (!l.lit && J.max > l.x - 70) { l.lit = true; l.t0 = time; } if (l.lit) l.on = Math.min(1, l.on + dt * 1.4); }
   const nearDoor = Math.abs(J.x - DOOR_X) < 70 && !ended; enter.classList.toggle('on', nearDoor);
   moth.x = lerp(moth.x, J.x + J.dir * 46 + Math.sin(time * 1.1) * 16, 1 - Math.exp(-dt * 2.4));
@@ -635,37 +687,63 @@ function frame(now) {
     const lw = VW + 120, lh = VH + 60, x = wrap(l.x * lw - camX * 1.1 - time * (22 + l.v * .5), lw) - 60, y = wrap(l.y * lh + time * l.v, lh) - 30;
     g.save(); g.translate(x + Math.sin(time * 1.4 + l.ph) * 16, y); g.rotate(l.rot + time * 1.8 + Math.sin(time + l.ph)); g.fillStyle = l.c; g.globalAlpha = .9 - .35 * night; g.beginPath(); g.ellipse(0, 0, l.sz, l.sz * .45, 0, 0, TAU); g.fill(); g.restore();
   }
-  /* paper */
-  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.fillStyle = SP.mottle; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = SP.grain; g.fillRect(0, 0, cv.width, cv.height);
-  const vg = g.createRadialGradient(cv.width / 2, cv.height * .48, Math.min(cv.width, cv.height) * .45, cv.width / 2, cv.height / 2, Math.hypot(cv.width, cv.height) * .62);
-  vg.addColorStop(0, 'rgba(28,39,72,0)'); vg.addColorStop(1, 'rgba(28,39,72,.34)'); g.fillStyle = vg; g.fillRect(0, 0, cv.width, cv.height);
-  requestAnimationFrame(frame);
+  paper(g);
 }
 
 /* ------------------------------------------------------------------ input and UI */
-const titleEl = document.getElementById('title'), hint = document.getElementById('hint'), enter = document.getElementById('enter'), card = document.getElementById('card');
+const titleEl = document.getElementById('title'), hint = document.getElementById('hint'), enter = document.getElementById('enter'), hudEl = document.getElementById('hud'), fade = document.getElementById('fade');
 const aim = e => { const r = cv.getBoundingClientRect(); target = camX + (e.clientX - r.left) / S; };
 function begin() { if (started) return; started = true; titleEl.classList.add('gone'); setTimeout(() => { titleEl.hidden = true; }, 1300); hint.style.opacity = 1; }
+const onRoad = () => scene === scenes.road && !switching;
 document.getElementById('begin').addEventListener('click', begin);
-cv.addEventListener('pointerdown', e => { if (!started) { begin(); return; } down = true; aim(e); });
-cv.addEventListener('pointermove', e => { if (down) aim(e); });
+document.getElementById('skip').addEventListener('click', () => { begin(); go('kitchen'); });
+cv.addEventListener('pointerdown', e => { if (!onRoad()) return; if (!started) { begin(); return; } down = true; aim(e); });
+cv.addEventListener('pointermove', e => { if (down && onRoad()) aim(e); });
 addEventListener('pointerup', () => { down = false; }); addEventListener('pointercancel', () => { down = false; });
 const KEYS = { ArrowRight: 1, d: 1, D: 1, ArrowLeft: -1, a: -1, A: -1 };
-addEventListener('keydown', e => { if (KEYS[e.key]) { if (!started) begin(); keyDir = KEYS[e.key]; e.preventDefault(); } });
+addEventListener('keydown', e => { if (onRoad() && KEYS[e.key]) { if (!started) begin(); keyDir = KEYS[e.key]; e.preventDefault(); } });
 addEventListener('keyup', e => { if (KEYS[e.key] === keyDir) keyDir = 0; });
-enter.addEventListener('click', () => { ended = true; target = null; keyDir = 0; card.classList.add('on'); });
-document.getElementById('again').addEventListener('click', () => { J.x = J.max = 170; J.v = 0; J.dir = 1; target = null; ended = false; frame.init = false; for (const l of world.lamps) { l.on = 0; l.lit = false; } card.classList.remove('on'); });
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); frame.init = false; }, 120); });
+enter.addEventListener('click', () => go('kitchen'));
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); if (scene && scene.resize) scene.resize(); }, 120); });
+
+/* scenes: each room registers itself here; go() fades between them */
+const lightLamps = () => { for (const l of world.lamps) if (J.max > l.x - 70) { l.lit = true; l.on = 1; l.t0 = -9; } };
+const scenes = {
+  road: {
+    frame: roadFrame,
+    enter(o) { hudEl.hidden = false; titleEl.hidden = started; if (o.atDoor) { J.x = DOOR_X; J.max = Math.max(J.max, DOOR_X); J.v = 0; J.dir = -1; lightLamps(); } target = null; road.init = false; },
+    leave() { hudEl.hidden = true; titleEl.hidden = true; enter.classList.remove('on'); target = null; keyDir = 0; down = false; J.v = 0; },
+    resize() { road.init = false; }
+  }
+};
+function show(name, opts) { if (scene) scene.leave(); else { hudEl.hidden = true; titleEl.hidden = true; } scene = scenes[name]; sceneName = name; scene.enter(opts || {}); try { location.hash = name; } catch (e) { /* the hash is a convenience */ } }
+function go(name, opts) {
+  if (switching || !scenes[name] || scene === scenes[name]) return;
+  switching = true; fade.classList.add('on');
+  setTimeout(() => { show(name, opts); fade.classList.remove('on'); switching = false; }, 640);
+}
 
 function start(data) {
   layout(); Q = clamp(base * DPR, 1.25, 2);
-  if (data && data.x) { J.x = data.x; J.max = data.max || data.x; for (const l of world.lamps) if (J.max > l.x - 70) { l.lit = true; l.on = 1; l.t0 = -9; } begin(); moved = true; hint.classList.add('gone'); }
   SP = buildSprites();
-  requestAnimationFrame(frame);
+  let first = 'road';
+  if (data && data.x) { J.x = data.x; J.max = data.max || data.x; lightLamps(); begin(); moved = true; hint.classList.add('gone'); if (scenes[data.scene]) first = data.scene; }
+  else if (scenes[location.hash.slice(1)]) { first = location.hash.slice(1); if (first !== 'road') begin(); }
+  show(first, {});
+  requestAnimationFrame(loop);
 }
-window.__gallery = { jump(x) { J.x = x; J.max = Math.max(J.max, x); frame.init = false; begin(); }, state: J };
-const hot = window.claude && window.claude.hot;
-if (hot && hot.snapshot) hot.snapshot(() => ({ x: J.x, max: J.max }));
-if (hot && hot.ready) hot.ready(start); else start((hot && hot.data) || {});
+const G = window.G = {
+  cv, cx, lerp, clamp, sm, hex, mix, rgb, wrap, TAU, R, RM, dab, foliage, PAL, glow, spr, paper, scenes, go,
+  get W() { return W; }, get H() { return H; }, get DPR() { return DPR; }, get time() { return time; },
+  /* called once every room's script has loaded */
+  boot() {
+    const hot = window.claude && window.claude.hot;
+    if (hot && hot.snapshot) hot.snapshot(() => ({ x: J.x, max: J.max, scene: sceneName }));
+    if (hot && hot.ready) hot.ready(start); else start((hot && hot.data) || {});
+  },
+  jump(x) { J.x = x; J.max = Math.max(J.max, x); road.init = false; begin(); }
+};
 })();
 </script>
+<script src="kitchen.js"></script>
+<script>window.G.boot();</script>
