@@ -52,14 +52,14 @@ function bust(g, x, y, s, k, o = {}) {
   g.save(); g.translate(x, y); g.scale(s, s);
   if (o.top) { g.fillStyle = o.top; g.beginPath(); g.moveTo(-22, 38); g.quadraticCurveTo(-20, 16, -7, 14); g.lineTo(7, 14); g.quadraticCurveTo(20, 16, 22, 38); g.closePath(); g.fill(); g.fillStyle = skin; g.beginPath(); g.moveTo(-6, 14); g.quadraticCurveTo(0, 22, 6, 14); g.fill(); }
   g.fillStyle = skin; g.fillRect(-4, 9, 8, 8);
-  G.headFront(g, who, { r: 14.5, expr: o.joy ? 'joy' : 'smile', up: o.up, helmet: o.helmet, mask: o.mask, hairCol: o.hair, len: o.len ? o.len + 8 : 0, blink: !G.RM && ((G.time + (who === 'f' ? 1.7 : 0)) % 3.6) < .12 });
+  G.headFront(g, who, { x: 0, y: -7, r: 14.5, expr: o.joy ? 'joy' : 'smile', up: o.up, helmet: o.helmet, mask: o.mask, hairCol: o.hair, len: o.len ? o.len + 8 : 0, blink: !G.RM && ((G.time + (who === 'f' ? 1.7 : 0)) % 3.6) < .12 });
   g.restore();
 }
 function rider(g, x, y, k, reach) {
   g.lineCap = 'round'; g.strokeStyle = k.skin; g.lineWidth = 6; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 15, y + 4); g.lineTo(x + 13, y + 22); g.stroke();
   g.fillStyle = '#1c1c22'; rr(g, x - 9, y - 34, 18, 36, 7); g.fill();
   g.strokeStyle = k.skin; g.beginPath(); g.moveTo(x + 2, y - 28); g.lineTo(x + reach, y - 17); g.stroke();
-  G.head(g, k === JK ? 'j' : 'f', { x: x + 2, y: y - 46, r: 12, len: 24, flow: .22, helmet: true, expr: 'joy' });
+  G.head(g, k === JK ? 'j' : 'f', { x: x + 2, y: y - 50, r: 12, len: 24, flow: .22, helmet: true, expr: 'joy' });
 }
 function atv(g, x, y, sc, t, riders) {
   g.save(); g.translate(x, y); g.scale(sc, sc); const spin = riders ? t * 6 : .4;

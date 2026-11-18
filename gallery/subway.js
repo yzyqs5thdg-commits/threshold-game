@@ -78,7 +78,7 @@ function seated(g, x, who, t, mv) {
   g.fillStyle = j ? '#8a7a5c' : '#f4f0e6'; rr(g, x - 28, flr - 12, 25, 13, 6); g.fill(); rr(g, x + 3, flr - 12, 25, 13, 6); g.fill();
   g.fillStyle = top; rr(g, x - 24, seat - 78, 48, 70, 16); g.fill(); g.fillStyle = G.people[who].skin; g.fillRect(x - 6, seat - 88, 12, 14);
   if (!j) { g.fillStyle = '#1c1a1e'; rr(g, x - 20, seat - 44, 40, 32, 9); g.fill(); g.strokeStyle = '#1c1a1e'; g.lineWidth = 3; g.beginPath(); g.arc(x, seat - 44, 13, Math.PI, 0); g.stroke(); } else { g.fillStyle = '#17161a'; rr(g, x - 22, seat - 34, 44, 20, 9); g.fill(); }
-  g.save(); g.translate(x, seat - 108 + Math.sin(t * (j ? 9 : 2) + (j ? 0 : 1)) * (j ? 1.6 : .6) * (G.RM ? 0 : 1)); if (j) g.scale(-1, 1); G.head(g, who, { r: 25, len: 62, expr: j ? 'joy' : 'smile', blink: !G.RM && ((t + (j ? 0 : 1.7)) % 3.6) < .12, flow: 0, t: t + mv }); g.restore();
+  g.save(); g.translate(x, seat - 114 + Math.sin(t * (j ? 9 : 2) + (j ? 0 : 1)) * (j ? 1.6 : .6) * (G.RM ? 0 : 1)); if (j) g.scale(-1, 1); G.head(g, who, { r: 25, len: 62, expr: j ? 'joy' : 'smile', blink: !G.RM && ((t + (j ? 0 : 1.7)) % 3.6) < .12, flow: 0, t: t + mv }); g.restore();
   g.restore();
 }
 function update(dt) {

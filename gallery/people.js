@@ -39,6 +39,12 @@ function helmet(g, r, cx0) {
   g.fillStyle = 'rgba(255,255,255,.3)'; ell(g, cx0 - r * .4, -r * .8, r * .3, r * .14); g.fill();
 }
 
+/* every head brings its own neck, drawn over the hair that hangs behind it and under the chin */
+function neck(g, k, x, r) {
+  g.fillStyle = k.skin; g.beginPath(); g.roundRect(x - r * .27, r * .66, r * .54, r * .82, [0, 0, r * .2, r * .2]); g.fill();
+  g.fillStyle = k.shade; g.globalAlpha = .55; g.fillRect(x - r * .27, r * .9, r * .54, r * .2); g.globalAlpha = 1;
+}
+
 /* three-quarter head, looking right. o: r, expr (smile | joy | yum), blink, flow, len, up, helmet, t, hairCol */
 function head(g, who, o = {}) {
   const k = WHO[who], r = o.r || 17, t = o.t == null ? G.time : o.t, expr = o.expr || 'smile', hc = o.hairCol || k.hair;
@@ -47,6 +53,7 @@ function head(g, who, o = {}) {
   if (o.up) { g.fillStyle = hc; ell(g, -r * .82, -r * .7, r * .46, r * .44); g.fill(); }
   else G.hair(g, -r * .4, -r * .3, { len: o.len || r * 3.3, w: r * .68, flow: o.flow || 0, hang: o.hang == null ? .04 : o.hang, curl: o.curl == null ? .32 : o.curl, wave: k.wave, col: hc, dark: k.hairD, hi: k.hi, lo: 'rgba(0,0,0,.25)', t: t + (who === 'f' ? 1.3 : 0) });
   g.fillStyle = hc; ell(g, -r * .14, -r * .1, r * 1.07, r * 1.1); g.fill();
+  neck(g, k, r * .16, r);
   g.fillStyle = k.skin; ell(g, r * .1, r * .08, r * .9, r * .93); g.fill();
   /* blush, eyes, brows, nose, mouth */
   const bl = expr === 'yum' ? .62 : .42; g.fillStyle = `rgba(${k.blush},${bl})`; ell(g, r * .15, r * .5, r * (expr === 'yum' ? .26 : .21), r * .12); g.fill(); ell(g, r * .73, r * .46, r * .13, r * .1); g.fill();
@@ -74,9 +81,13 @@ function headFront(g, who, o = {}) {
   const mode = expr === 'smile' ? (o.blink ? 'blink' : 'open') : 'happy';
   g.save(); if (o.x != null) g.translate(o.x, o.y); g.lineCap = 'round'; g.lineJoin = 'round';
   g.fillStyle = hc; g.beginPath(); g.moveTo(-r * 1.03, -r * .2); g.bezierCurveTo(-r * 1.12, -r * 1.32, r * 1.12, -r * 1.32, r * 1.03, -r * .2);
-  if (o.up) { g.bezierCurveTo(r * 1.06, r * .5, r * .9, r * .8, r * .7, r * .9); g.lineTo(-r * .7, r * .9); g.bezierCurveTo(-r * .9, r * .8, -r * 1.06, r * .5, -r * 1.03, -r * .2); g.fill(); ell(g, 0, -r * 1.18, r * .52, r * .44); g.fill(); }
-  else { g.bezierCurveTo(r * (1.16 + .1 * wv), r * .6, r * (.94 - .1 * wv), len * .6, r * 1.06, len); g.quadraticCurveTo(0, len + r * .22, -r * 1.06, len); g.bezierCurveTo(-r * (.94 - .1 * wv), len * .6, -r * (1.16 + .1 * wv), r * .6, -r * 1.03, -r * .2); g.fill();
+  if (o.up) { g.bezierCurveTo(r * 1.06, r * .4, r * .9, r * .62, r * .6, r * .7); g.lineTo(-r * .6, r * .7); g.bezierCurveTo(-r * .9, r * .62, -r * 1.06, r * .4, -r * 1.03, -r * .2); g.fill(); ell(g, 0, -r * 1.18, r * .52, r * .44); g.fill(); }
+  else { g.bezierCurveTo(r * (1.16 + .1 * wv), r * .6, r * (.94 - .1 * wv), len * .6, r * 1.06, len);
+    if (len > r * 1.15) { g.quadraticCurveTo(r * .8, len + r * .14, r * .56, len - r * .06); g.bezierCurveTo(r * .62, len * .7, r * .3, r * 1.5, r * .27, r * .8); g.lineTo(-r * .27, r * .8); g.bezierCurveTo(-r * .3, r * 1.5, -r * .62, len * .7, -r * .56, len - r * .06); g.quadraticCurveTo(-r * .8, len + r * .14, -r * 1.06, len); }
+    else g.quadraticCurveTo(0, len + r * .22, -r * 1.06, len);
+    g.bezierCurveTo(-r * (.94 - .1 * wv), len * .6, -r * (1.16 + .1 * wv), r * .6, -r * 1.03, -r * .2); g.fill();
     g.strokeStyle = k.hi; g.lineWidth = Math.max(1, r * .1); for (const d of [-1, 1]) { g.beginPath(); g.moveTo(d * r * .96, r * .2); g.bezierCurveTo(d * r * (1.04 + .1 * wv), r * .8, d * r * (.82 - .08 * wv), len * .6, d * r * .9, len * .92); g.stroke(); } }
+  neck(g, k, 0, r);
   g.fillStyle = k.skin; ell(g, 0, r * .06, r * .9, r * .94); g.fill();
   if (!o.mask) {
     g.fillStyle = `rgba(${k.blush},.42)`; for (const d of [-1, 1]) { ell(g, d * r * .5, r * .47, r * .2, r * .12); g.fill(); }
@@ -120,7 +131,7 @@ function figure(g, x, y, who, o = {}) {
   };
   const legCol = fit === 'skirt' ? k.skin : c.leg, hem = Math.sin(ph) * 2.6 * walk;
   leg(ph + Math.PI, fit === 'skirt' ? k.shade : c.dark, false); arm(ph + Math.PI, c.dark, -1); leg(ph, legCol, true);
-  g.fillStyle = k.skin; g.fillRect(-3, -79, 7, 9);
+  g.fillStyle = k.skin; g.fillRect(-2, -85, 8, 14);
   if (fit === 'coat') {
     g.fillStyle = c.top; g.beginPath(); g.moveTo(-8, -75); g.quadraticCurveTo(-10, -52, -15 - hem, -26); g.quadraticCurveTo(0, -21, 14 - hem, -26); g.quadraticCurveTo(9, -52, 8, -75); g.closePath(); g.fill();
     g.fillStyle = 'rgba(255,255,255,.1)'; g.beginPath(); g.moveTo(8, -75); g.quadraticCurveTo(9, -52, 14 - hem, -26); g.lineTo(8 - hem, -25); g.quadraticCurveTo(5, -52, 4, -75); g.fill();
@@ -140,7 +151,7 @@ function figure(g, x, y, who, o = {}) {
   if (o.medal) { g.strokeStyle = '#e8641c'; g.lineWidth = 2.4; g.beginPath(); g.moveTo(-4, -76); g.lineTo(3, -62); g.lineTo(8, -76); g.stroke(); g.fillStyle = '#f2cf62'; g.beginPath(); g.moveTo(3, -67); g.lineTo(9, -61); g.lineTo(3, -55); g.lineTo(-3, -61); g.fill(); g.fillStyle = '#e8641c'; g.fillRect(-1, -62, 8, 2.4); }
   const expr = o.expr || (cheer ? 'joy' : 'smile'), blink = !G.RM && ((t + (who === 'f' ? 1.7 : 0)) % 3.6) < .12;
   if (cheer) arm(ph, c.top, 1);
-  head(g, who, { x: 2, y: -91, r: 17, expr, blink, t, flow: cheer ? .04 : run ? (air ? .22 : .28) : .03 + .13 * walk, len: run ? 50 : 0, tilt: cheer ? -.06 : 0 });
+  head(g, who, { x: 2, y: -96, r: 17, expr, blink, t, flow: cheer ? .04 : run ? (air ? .22 : .28) : .03 + .13 * walk, len: run ? 50 : 0, tilt: cheer ? -.06 : 0 });
   if (!cheer) arm(ph, c.top, 1);
   g.restore();
 }

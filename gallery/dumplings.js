@@ -188,7 +188,7 @@ function person(g, who, t) {
   if (who === 'j') { g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 3; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(-18 + i * 12, hy + 60); g.lineTo(-22 + i * 12, seat - 6); g.stroke(); } }
   g.fillStyle = G.people[who].skin; g.fillRect(-4, hy + 22, 15, 22); g.fillStyle = k.collar; ell(g, 3, hy + 41, 15, 6); g.fill();
   if (who === 'j') { g.strokeStyle = '#e9c15a'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-3, hy + 36); g.quadraticCurveTo(8, hy + 46, 14, hy + 38); g.stroke(); }
-  G.head(g, who, { x: 4, y: hy, r: 32, len: 124, hang: .02, curl: .2, expr: f === 'laugh' ? 'joy' : f === 'yum' ? 'yum' : 'smile', blink, t });
+  G.head(g, who, { x: 4, y: hy - 6, r: 32, len: 124, hang: .02, curl: .2, expr: f === 'laugh' ? 'joy' : f === 'yum' ? 'yum' : 'smile', blink, t });
   g.restore();
 }
 /* where each of them is holding her chopsticks, and what is on them */

@@ -67,7 +67,7 @@ function delegate(g, x, who, t) {
   g.fillStyle = k.skin; g.fillRect(x - 7, y - 40, 14, 18);
   g.strokeStyle = '#2f62c0'; g.lineWidth = 3; g.beginPath(); g.moveTo(x - 12, y - 26); g.lineTo(x + d * 4, y + 12); g.lineTo(x + 12, y - 26); g.stroke(); g.fillStyle = '#5f9fd8'; rr(g, x + d * 4 - 8, y + 10, 16, 22, 2); g.fill(); g.fillStyle = '#fdfbf4'; g.fillRect(x + d * 4 - 5, y + 13, 10, 8);
   const expr = U.state === 'tally' ? (j && U.vote === 'against' ? 'smile' : 'joy') : 'smile';
-  g.save(); g.translate(x, y - 62); g.scale(d, 1); G.head(g, who, { r: 30, len: 76, expr, blink: !G.RM && ((t + (j ? 0 : 1.7)) % 3.6) < .12, t }); g.restore();
+  g.save(); g.translate(x, y - 68); g.scale(d, 1); G.head(g, who, { r: 30, len: 76, expr, blink: !G.RM && ((t + (j ? 0 : 1.7)) % 3.6) < .12, t }); g.restore();
 }
 function plate(g, x, name) { g.fillStyle = '#17161a'; rr(g, x - 46, L.desk - 26, 92, 24, 3); g.fill(); g.fillStyle = '#fbf6ea'; g.font = `800 13px ${UI}`; g.textAlign = 'center'; g.textBaseline = 'middle'; let w = 0; for (const ch of name) w += g.measureText(ch).width + 2; let lx = x - w / 2 + 1; g.textAlign = 'left'; for (const ch of name) { g.fillText(ch, lx, L.desk - 13.5); lx += g.measureText(ch).width + 2; } }
 function screen(g, x, title, big, col) {

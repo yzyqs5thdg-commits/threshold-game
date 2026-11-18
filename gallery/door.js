@@ -56,11 +56,11 @@ function camera(g, x, y, w, h, v, t) {
   /* her, close to the lens */
   const cx0 = x + w / 2 + Math.sin(t * .9) * 3 * (G.RM ? 0 : 1), cy0 = y + h * .56 + Math.sin(t * 1.4) * 1.5 * (G.RM ? 0 : 1);
   if (v.bag) { g.fillStyle = '#c9a67a'; g.beginPath(); g.moveTo(x + w - 44, y + h); g.lineTo(x + w - 40, y + h - 30); g.lineTo(x + w - 6, y + h - 34); g.lineTo(x + w, y + h); g.fill(); }
-  g.fillStyle = v.coat || v.top; g.beginPath(); g.moveTo(cx0 - 62, y + h + 4); g.quadraticCurveTo(cx0 - 56, cy0 + 26, cx0 - 20, cy0 + 26); g.lineTo(cx0 + 20, cy0 + 26); g.quadraticCurveTo(cx0 + 56, cy0 + 26, cx0 + 62, y + h + 4); g.fill();
+  g.fillStyle = v.coat || v.top; g.beginPath(); g.moveTo(cx0 - 62, y + h + 4); g.quadraticCurveTo(cx0 - 58, cy0 + 30, cx0 - 22, cy0 + 24); g.lineTo(cx0 - 9, cy0 + 16); g.lineTo(cx0 + 9, cy0 + 16); g.lineTo(cx0 + 22, cy0 + 24); g.quadraticCurveTo(cx0 + 58, cy0 + 30, cx0 + 62, y + h + 4); g.fill();
   g.fillStyle = v.top; g.beginPath(); g.moveTo(cx0 - 20, y + h + 4); g.lineTo(cx0 - 14, cy0 + 26); g.lineTo(cx0 + 14, cy0 + 26); g.lineTo(cx0 + 20, y + h + 4); g.fill();
-  g.fillStyle = G.people.j.skin; g.fillRect(cx0 - 8, cy0 + 16, 16, 14);
-  g.save(); g.translate(cx0, cy0 - 8); g.scale(1.12, 1); G.headFront(g, 'j', { r: 30, len: v.up ? 0 : 62, up: v.up, blink: !G.RM && (t % 3.2) < .14 }); g.restore();
-  g.fillStyle = 'rgba(255,255,255,.22)'; ell(g, cx0 - 2, cy0 - 30, 16, 9); g.fill();
+  g.fillStyle = G.people.j.skin; g.beginPath(); g.moveTo(cx0 - 11, cy0 + 16); g.quadraticCurveTo(cx0, cy0 + 42, cx0 + 11, cy0 + 16); g.fill();
+  g.save(); g.translate(cx0, cy0 - 16); g.scale(1.12, 1); G.headFront(g, 'j', { r: 30, len: v.up ? 0 : 62, up: v.up, blink: !G.RM && (t % 3.2) < .14 }); g.restore();
+  g.fillStyle = 'rgba(255,255,255,.22)'; ell(g, cx0 - 2, cy0 - 38, 16, 9); g.fill();
   const vg = g.createRadialGradient(x + w / 2, y + h / 2, h * .4, x + w / 2, y + h / 2, w * .72); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.6)'); g.fillStyle = vg; g.fillRect(x, y, w, h);
   g.fillStyle = 'rgba(0,0,0,.08)'; for (let yy = y; yy < y + h; yy += 3) g.fillRect(x, yy, w, 1);
   g.font = `700 9.5px ${UI}`; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = Math.sin(t * 5) > 0 ? '#ff5a4a' : 'rgba(255,90,74,.3)'; g.beginPath(); g.arc(x + 12, y + 12, 3.4, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.fillText('FRONT DOOR', x + 20, y + 12.5); g.fillText(v.date.toUpperCase(), x + 8, y + h - 16);

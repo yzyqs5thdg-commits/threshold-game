@@ -87,7 +87,7 @@ function person(g, x, who, t, joy) {
   g.save(); g.translate(x, y); g.scale(z, z); g.translate(-x, -y);
   g.fillStyle = j ? '#b3242e' : '#1c1c22'; g.beginPath(); g.moveTo(x - 56, y); g.quadraticCurveTo(x - 54, y - 62, x - 20, y - 66); g.lineTo(x + 20, y - 66); g.quadraticCurveTo(x + 54, y - 62, x + 56, y); g.closePath(); g.fill();
   g.fillStyle = k.skin; g.beginPath(); g.moveTo(x - 22, y - 66); g.quadraticCurveTo(x, y - 46, x + 22, y - 66); g.fill(); g.fillRect(x - 8, y - 84, 16, 20);
-  G.headFront(g, who, { x, y: y - 104 + Math.sin(t * 1.6 + (j ? 0 : 1)) * 1.2 * (G.RM ? 0 : 1), r: 32, len: 78, expr: joy ? 'joy' : 'smile', blink: !G.RM && ((t + (j ? 0 : 1.7)) % 3.6) < .12 });
+  G.headFront(g, who, { x, y: y - 112 + Math.sin(t * 1.6 + (j ? 0 : 1)) * 1.2 * (G.RM ? 0 : 1), r: 32, len: 78, expr: joy ? 'joy' : 'smile', blink: !G.RM && ((t + (j ? 0 : 1.7)) % 3.6) < .12 });
   g.restore();
 }
 

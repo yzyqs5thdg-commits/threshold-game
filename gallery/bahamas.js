@@ -122,8 +122,8 @@ function marina(g, t) {
   g.fillStyle = '#c9a98a'; g.fillRect(-196, -66, 392, 8); g.fillRect(-196, -20, 392, 8); for (let x = -186; x <= 186; x += 18.6) { g.fillRect(x - 2, -58, 4, 38); ell(g, x, -38, 5.5, 11); g.fill(); }
   /* her friend holds out the fork; Jana closes her eyes */
   g.fillStyle = '#8e1a2a'; rr(g, -92, -54, 34, 42, 12); g.fill(); g.fillStyle = '#fbe6e6'; for (let i = 0; i < 9; i++) { g.beginPath(); g.arc(-86 + (i % 3) * 11 + ((i / 3 | 0) % 2) * 5, -46 + (i / 3 | 0) * 11, 1.6, 0, TAU); g.fill(); }
-  G.head(g, 'f', { x: -74, y: -74, r: 17, len: 44, t });
-  g.save(); g.translate(76, 0); g.scale(-1, 1); g.fillStyle = '#4a342c'; rr(g, -16, -52, 34, 40, 12); g.fill(); G.head(g, 'j', { x: 2, y: -72, r: 17, len: 44, expr: 'yum', t }); g.restore();
+  G.head(g, 'f', { x: -74, y: -79, r: 17, len: 44, t });
+  g.save(); g.translate(76, 0); g.scale(-1, 1); g.fillStyle = '#4a342c'; rr(g, -16, -52, 34, 40, 12); g.fill(); G.head(g, 'j', { x: 2, y: -77, r: 17, len: 44, expr: 'yum', t }); g.restore();
   g.fillStyle = '#8f8676'; g.fillRect(-4, -26, 8, 14); g.fillStyle = '#b9b2a4'; rr(g, -56, -36, 112, 10, 4); g.fill();
   g.fillStyle = '#fbfaf4'; ell(g, 2, -40, 24, 8); g.fill(); const r = R(8); g.lineCap = 'round'; for (let i = 0; i < 14; i++) { g.strokeStyle = i % 3 ? '#f0a03c' : '#e2742c'; g.lineWidth = 2; const x = -14 + r() * 32, y = -43 + r() * 5; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + 5, y - 5, x + 10, y + 1); g.stroke(); }
   g.strokeStyle = '#dcab82'; g.lineWidth = 6; g.beginPath(); g.moveTo(-62, -48); g.quadraticCurveTo(-30, -38, 14, -58); g.stroke(); g.strokeStyle = '#d9dce2'; g.lineWidth = 2; g.beginPath(); g.moveTo(14, -58); g.lineTo(40, -64); g.stroke();
@@ -168,7 +168,7 @@ function layout() {
 }
 function seat(g, x, who, mv, t) {
   g.fillStyle = who === 'j' ? '#6b4a3a' : '#8e1a2a'; rr(g, x - 10, -54, 22, 40, 9); g.fill(); g.strokeStyle = G.people[who].skin; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 8, -46); g.lineTo(x + 20, -36); g.stroke();
-  G.head(g, who, { x: x + 2, y: -68, r: 13, len: 32, flow: .04 + .3 * mv, blink: !G.RM && ((t + (who === 'f' ? 1.7 : 0)) % 3.6) < .12, expr: mv > .5 ? 'joy' : 'smile', t });
+  G.head(g, who, { x: x + 2, y: -72, r: 13, len: 32, flow: .04 + .3 * mv, blink: !G.RM && ((t + (who === 'f' ? 1.7 : 0)) % 3.6) < .12, expr: mv > .5 ? 'joy' : 'smile', t });
 }
 function boat(g, x, y, t) {
   const mv = Math.min(1, Math.abs(B.v) / 120);
