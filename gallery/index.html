@@ -68,8 +68,8 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 #rhud .krow, #chud .krow, #dhud .krow, #mhud .krow { flex: none; align-items: center; }
 #mview { gap: 12px; }
 #mcard { justify-content: flex-end; background: none; padding-block: 12px calc(22px + env(safe-area-inset-bottom, 0px)); }
-#mvid { max-height: 66vh; max-width: min(100%, 24em); border-radius: 10px; border: 6px solid var(--paper); background: var(--night); box-shadow: 0 18px 50px rgba(28, 39, 72, .5); }
-#mvid.wide { max-width: min(100%, 44em); }
+#mvid, #mimg { max-height: 66vh; max-width: min(100%, 24em); border-radius: 10px; border: 6px solid var(--paper); background: var(--night); box-shadow: 0 18px 50px rgba(28, 39, 72, .5); }
+#mvid.wide, #mimg.wide { max-width: min(100%, 44em); }
 #mcap { margin: 0; font-family: var(--display); font-style: italic; font-size: 1.3em; color: var(--title); text-align: center; }
 #cbar, #dbar { justify-content: flex-end; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 .paper ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; text-align: left; line-height: 1.4; }
@@ -211,6 +211,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
   </div>
   <div class="over sheet" id="mview" hidden>
     <video id="mvid" playsinline controls preload="none"></video>
+    <img id="mimg" alt="" hidden>
     <p id="mcap"></p>
     <button id="mclose" type="button">Close</button>
   </div>
@@ -613,6 +614,28 @@ function put(g, s, x, yb, sc = 1, shear = 0) {
 function tile(g, s, yTop, off = 0) { if (!s.pat) s.pat = g.createPattern(s, 'repeat'); const w = s.width / Q; g.save(); g.translate(-wrap(camX + off, w), yTop); g.scale(1 / Q, 1 / Q); g.fillStyle = s.pat; g.fillRect(0, 0, (VW + w) * Q, s.height); g.restore(); }
 function glow(g, x, y, rad, c, a) { const gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, `rgba(${c},${a})`); gr.addColorStop(1, `rgba(${c},0)`); g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
 
+/* Long hair drawn as layered locks: full at the crown, falling off the back of the head, feathered at the ends.
+   It hangs when she is still and lifts behind her as she moves.
+   o: len, w (half-width), flow 0..1, wave 0..1, curl, col, dark, hi, lo, t, hang */
+function hairFlow(g, x0, y0, o) {
+  const n = 9, t = o.t || 0, flow = o.flow || 0, seg = o.len / n, curl = o.curl == null ? .62 : o.curl, wave = o.wave || 0;
+  const base = lerp(Math.PI / 2 + (o.hang == null ? .1 : o.hang), Math.PI - .34, flow), amp = (.04 + .16 * flow) * (RM ? .3 : 1);
+  const smooth = pts => { for (let i = 1; i < pts.length - 1; i++) g.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2); const e = pts[pts.length - 1]; g.lineTo(e[0], e[1]); };
+  const lock = (col, da, lMul, wMul, ph, strands) => {
+    const P = []; let x = x0, y = y0;
+    for (let i = 0; i <= n; i++) {
+      const u = i / n, a = base + da * u + curl * (1 - flow * .7) * (1 - u) * (1 - u) + Math.sin(t * (2 + 4 * flow) - i * .8 + ph) * amp * (.25 + u) + wave * Math.sin(i * 1.25 + ph * 1.7) * .3 * Math.min(1, u * 1.6);
+      const hw = o.w * wMul * (i === 0 ? .78 : Math.min(1, .86 + u) * (1 - .78 * Math.pow(u, 2.2)));
+      P.push([x, y, -Math.sin(a) * hw, Math.cos(a) * hw]); x += Math.cos(a) * seg * lMul; y += Math.sin(a) * seg * lMul;
+    }
+    const side = f => P.map(p => [p[0] + p[2] * f, p[1] + p[3] * f]), A = side(1), B = side(-1).reverse(), e = P[n], d = P[n - 1];
+    g.fillStyle = col; g.beginPath(); g.moveTo(A[0][0], A[0][1]); smooth(A); g.quadraticCurveTo(e[0] + (e[0] - d[0]) * .7, e[1] + (e[1] - d[1]) * .7, B[0][0], B[0][1]); smooth(B); g.closePath(); g.fill();
+    if (strands) { g.lineCap = 'round'; for (const [f, c, w] of strands) { const C = side(f).slice(0, n); g.strokeStyle = c; g.lineWidth = w * o.w / 9; g.beginPath(); g.moveTo(C[0][0], C[0][1]); smooth(C); g.stroke(); } }
+  };
+  const dark = o.dark || o.col;
+  lock(dark, .2, .9, .86, 1.9, null); lock(dark, -.2, .96, .84, .9, [[.2, o.lo, 1.4]]);
+  lock(o.col, .08, .84, .8, 2.6, [[.3, o.hi, 1.6]]); lock(o.col, -.06, 1, .9, 0, [[.45, o.hi, 2], [-.2, o.hi, 1.3], [-.6, o.lo, 1.5]]);
+}
 function drawJana(g, x, y, dir, phase, moving) {
   const walk = Math.min(1, Math.abs(J.v) / 60), bob = moving ? Math.abs(Math.sin(phase)) * 2.4 * walk : Math.sin(time * 1.7) * .7;
   g.save(); g.translate(x, y);
@@ -632,9 +655,6 @@ function drawJana(g, x, y, dir, phase, moving) {
     g.fillStyle = '#f0c7a6'; g.beginPath(); g.arc(hx, hy + 2.5, 3.1, 0, TAU); g.fill();
   };
   leg(phase + Math.PI, '#252b40'); arm(phase, '#191e35');
-  /* long hair, lifting behind her as she walks */
-  const wv = .2 + .8 * walk, hair = (ox, w, col) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.moveTo(-5 + ox, -112); for (let i = 1; i <= 6; i++) g.lineTo(-5 + ox - i * (1.2 + 2.3 * wv) + Math.sin(i * 1.3) * 1.6, -112 + i * (8.6 - 2 * wv) + Math.sin(time * 4.6 - i * .9) * i * .8 * wv); g.stroke(); };
-  hair(0, 12, '#573726'); hair(-2.5, 2.6, 'rgba(196,142,88,.9)'); hair(2.5, 1.6, 'rgba(58,34,22,.6)');
   leg(phase, '#2f3650');
   /* navy coat */
   const hem = Math.sin(phase) * 2.5 * walk;
@@ -648,7 +668,8 @@ function drawJana(g, x, y, dir, phase, moving) {
   g.strokeStyle = '#8f949c'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(-7, -95); g.lineTo(9, -62); g.stroke();
   g.fillStyle = '#cfd3da'; g.beginPath(); g.roundRect(1, -66, 14, 11, 3); g.fill(); g.fillStyle = 'rgba(255,255,255,.7)'; g.fillRect(3, -64.5, 9, 1.8);
   arm(phase + Math.PI, '#232a45');
-  /* head and hair */
+  /* head, and her hair falling full down her back */
+  hairFlow(g, -6, -116, { len: 60, w: 10.5, flow: .02 + .1 * walk, curl: .4, wave: 1, col: '#573726', dark: '#40281b', hi: 'rgba(196,142,88,.9)', lo: 'rgba(58,34,22,.55)', t: time });
   g.fillStyle = '#573726'; g.beginPath(); g.ellipse(-4, -109, 12.5, 14, .1, 0, TAU); g.fill();
   g.fillStyle = '#f0c7a6'; g.beginPath(); g.arc(1.5, -111, 11.5, 0, TAU); g.fill();
   g.fillStyle = '#573726'; g.beginPath(); g.moveTo(10.5, -119); g.quadraticCurveTo(3, -127, -8, -122); g.quadraticCurveTo(-13, -112, -9, -100); g.lineTo(-3, -101); g.quadraticCurveTo(-5, -112, 2, -118); g.quadraticCurveTo(7, -121, 10.5, -119); g.fill();
@@ -872,7 +893,7 @@ function start(data) {
   requestAnimationFrame(loop);
 }
 const G = window.G = {
-  cv, cx, lerp, clamp, sm, hex, mix, rgb, wrap, TAU, R, RM, dab, foliage, PAL, glow, spr, paper, scenes, go, tone,
+  cv, cx, lerp, clamp, sm, hex, mix, rgb, wrap, TAU, R, RM, dab, foliage, PAL, glow, spr, paper, scenes, go, tone, hair: hairFlow,
   get sound() { return soundOn; }, set sound(v) { soundOn = !!v; }, get SP() { return SP; },
   get W() { return W; }, get H() { return H; }, get DPR() { return DPR; }, get time() { return time; },
   /* called once every room's script has loaded */

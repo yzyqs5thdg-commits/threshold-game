@@ -7,19 +7,21 @@ const { cv, cx, lerp, clamp, sm, hex, mix, rgb, wrap, TAU, R, dab, foliage, PAL,
 const $ = id => document.getElementById(id);
 const UI = '"Nunito", "Avenir Next", system-ui, sans-serif';
 const INK = '#2c2a3d', PAPER = '#fbf3df';
-const CLIPS = [
-  { id: 'finish', title: 'Coming up to the finish', tall: true },
-  { id: 'medal', title: 'Medal on', tall: true },
-  { id: 'us', title: 'All of us, medals up', tall: false }
+const ITEMS = [
+  { id: 'finish', kind: 'clip', label: 'The finish', title: 'Coming up to the finish', tall: true },
+  { id: 'medal', kind: 'clip', label: 'Medal on', title: 'Medal on', tall: true },
+  { id: 'us', kind: 'clip', label: 'Medals up', title: 'All of us, medals up', tall: false },
+  { id: 'train1', kind: 'photo', label: 'Training days', title: 'Training days', tall: true },
+  { id: 'train2', kind: 'photo', label: 'The crew', title: 'Training days, the four of us', tall: false }
 ];
 const LOOK = {
   /* Jana ran in plum, bib 1502 */
-  j: { jacket: '#5c2a4a', dark: '#44203a', legs: '#4a2040', skin: '#f0c7a6', hair: '#573726', hi: 'rgba(196,142,88,.9)', bib: '1502' },
-  f: { jacket: '#22222a', dark: '#16161c', legs: '#1c1c22', skin: '#c99a74', hair: '#17141a', hi: 'rgba(96,88,116,.7)', bib: '1504' }
+  j: { jacket: '#5c2a4a', dark: '#44203a', legs: '#4a2040', skin: '#f0c7a6', hair: '#573726', hdark: '#40281b', hi: 'rgba(196,142,88,.9)', lo: 'rgba(58,34,22,.55)', wave: 1, bib: '1502' },
+  f: { jacket: '#22222a', dark: '#16161c', legs: '#1c1c22', skin: '#c99a74', hair: '#17141a', hdark: '#0c0a0f', hi: 'rgba(110,102,132,.75)', lo: 'rgba(0,0,0,.4)', wave: .25, bib: '1504' }
 };
 const TOTAL = 9200, SPEED = 232, FEET = 92;
 let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false;
-const img = {}; for (const c of CLIPS) { const im = new Image(); im.onload = () => { im.ok = true; }; im.src = `media/${c.id}.jpg`; img[c.id] = im; }
+const img = {}; for (const c of ITEMS) { const im = new Image(); im.onload = () => { im.ok = true; }; im.src = `media/${c.id}.jpg`; img[c.id] = im; }
 const M = { phase: 'room', earned: false, dist: 0, v: 0, y: 0, vy: 0, fy: 0, fvy: 0, ph: 0, slow: 0, obs: [], ft: 0, mt: 0, cool: 0 };
 const parts = [], says = [], moth = { x: 60, y: 200 };
 const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
@@ -29,11 +31,11 @@ const Y = y => VH - y;
 /* ------------------------------------------------------------------ layout and sprites */
 function layout() {
   S = Math.min(G.W / 430, G.H / 720); VW = G.W / S; VH = G.H / S;
-  const wide = VW >= 920, cxm = VW / 2, fw = 132, fh = 235, lw = 250, lh = 141;
-  const frames = wide
-    ? [{ x: cxm - 300, y: 150, w: fw, h: fh }, { x: cxm - 132, y: 150, w: fw, h: fh }, { x: cxm + 36, y: 197, w: lw, h: lh }]
-    : [{ x: cxm - 136, y: 294, w: 124, h: 220 }, { x: cxm + 12, y: 294, w: 124, h: 220 }, { x: cxm - 62, y: 104, w: 236, h: 133 }];
-  L = { wide, cxm, frames, hook: wide ? { x: cxm - 384, y: 150 } : { x: 76, y: 104 }, bib: wide ? { x: cxm + 384, y: 250 } : { x: cxm + 118, y: 592 },
+  const wide = VW >= 1180, cxm = VW / 2;
+  let frames;
+  if (wide) { let x = cxm - 445; frames = [[112, 199], [112, 199], [224, 126], [126, 168], [196, 147]].map(([w, h]) => { const f = { x, y: 250 - h / 2, w, h }; x += w + 30; return f; }); }
+  else frames = [{ x: cxm - 172, y: 280, w: 96, h: 171 }, { x: cxm - 54, y: 280, w: 96, h: 171 }, { x: cxm - 62, y: 104, w: 236, h: 133 }, { x: cxm + 64, y: 280, w: 108, h: 144 }, { x: cxm - 180, y: 498, w: 140, h: 105 }];
+  L = { wide, cxm, frames, hook: wide ? { x: cxm - 520, y: 150 } : { x: 76, y: 104 }, bib: wide ? { x: cxm + 530, y: 250 } : { x: cxm + 100, y: 562 },
     bench: { x: wide ? cxm : cxm - 40, y: VH - (wide ? 150 : 190) }, floor: VH - (wide ? 96 : 120) };
   const key = `${Math.round(VW)}x${Math.round(VH)}`, q = clamp(S * G.DPR, 1, 2.5);
   if (!SPR || SPR.key !== key) SPR = { key, room: G.spr(VW, VH, drawRoom, q), litter: G.spr(600, 150, drawLitter, q), line: G.spr(600, 190, drawTreeline, q) };
@@ -117,13 +119,12 @@ function runner(g, x, y, who, ph, air, cheer, sc, medalOn) {
     g.strokeStyle = col; g.lineWidth = 7.6; g.beginPath(); g.moveTo(0, -93); g.lineTo(ex, ey); g.lineTo(hx, hy); g.stroke(); g.fillStyle = k.skin; g.beginPath(); g.arc(hx, hy, 3.6, 0, TAU); g.fill();
   };
   leg(ph + Math.PI, k.dark, false); arm(ph + Math.PI, k.dark, -1);
-  /* hair streaming behind */
-  const wv = cheer ? .25 : 1; for (const [o, w, col] of [[0, 12, k.hair], [-2.5, 2.4, k.hi], [3, 1.6, 'rgba(0,0,0,.25)']]) { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.moveTo(-5 + o, -113); for (let i = 1; i <= 6; i++) g.lineTo(-5 + o - i * (1.6 + 5 * wv), -113 + i * (8 - 6 * wv) + Math.sin(G.time * 9 - i * .9 + (who === 'f' ? 2 : 0)) * i * .9 * wv); g.stroke(); }
   leg(ph, k.legs, true);
   g.fillStyle = k.jacket; g.beginPath(); g.moveTo(-9, -100); g.quadraticCurveTo(-11, -74, -10, -50); g.lineTo(10, -50); g.quadraticCurveTo(11, -74, 9, -100); g.closePath(); g.fill();
   g.fillStyle = '#fdfbf4'; rr(g, -4, -80, 14, 11, 1.5); g.fill(); g.fillStyle = '#17161a'; g.fillRect(-2, -77, 10, 3); g.fillStyle = '#4a3a8c'; g.fillRect(-4, -72, 14, 3);
   if (medalOn) { g.strokeStyle = '#e8641c'; g.lineWidth = 2.6; g.beginPath(); g.moveTo(-5, -100); g.lineTo(2, -86); g.lineTo(8, -100); g.stroke(); g.fillStyle = '#f2cf62'; g.beginPath(); g.moveTo(2, -90); g.lineTo(7, -85); g.lineTo(2, -80); g.lineTo(-3, -85); g.fill(); }
   arm(ph, k.jacket, 1);
+  G.hair(g, -6, -117, { len: 60, w: 10.5, flow: cheer ? .04 : air ? .4 : .5, wave: k.wave, col: k.hair, dark: k.hdark, hi: k.hi, lo: k.lo, t: G.time + (who === 'f' ? 1.3 : 0) });
   g.fillStyle = k.hair; ell(g, -3, -111, 12, 13); g.fill(); g.fillStyle = k.skin; g.beginPath(); g.arc(2, -112, 11.2, 0, TAU); g.fill();
   g.fillStyle = k.hair; g.beginPath(); g.moveTo(11, -120); g.quadraticCurveTo(3, -128, -8, -123); g.quadraticCurveTo(-13, -113, -9, -102); g.lineTo(-3, -103); g.quadraticCurveTo(-5, -113, 2, -119); g.quadraticCurveTo(7, -122, 11, -120); g.fill();
   g.fillStyle = '#2b2024'; if (cheer) { g.strokeStyle = '#2b2024'; g.lineWidth = 1.4; g.beginPath(); g.arc(7.6, -111, 2.2, Math.PI * 1.1, Math.PI * 1.9); g.stroke(); } else { ell(g, 8, -112, 1.3, 1.8); g.fill(); }
@@ -136,7 +137,7 @@ function say(text, x, y) { says.push({ text, x: clamp(x, 90, VW - 90), y, life: 
 function burst(x, y, n) { if (G.RM) return; const cs = ['#d9a53a', '#c66c32', '#e8c860', '#f2cf62', '#e8641c']; for (let i = 0; i < n; i++) { const a = Math.random() * TAU, v = 60 + Math.random() * 220; parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 160, life: 1.4, c: cs[Math.random() * 5 | 0], s: 2.4 + Math.random() * 3, r: Math.random() * 6 }); } }
 function setStep() {
   const p = M.phase;
-  $('mstep').textContent = p === 'room' ? (M.earned ? 'Tap a frame to watch it. Tap the running shoes to run it again.' : 'Tap a frame to watch it. Tap the running shoes to run the 5K and bring the medal home.') : p === 'run' ? 'Tap to jump the cones and the leaf piles. Five kilometres, together.' : 'Finished. Together.';
+  $('mstep').textContent = p === 'room' ? (M.earned ? 'Tap a frame to open it. Tap the running shoes to run it again.' : 'Tap a frame to open it. Tap the running shoes to run the 5K and bring the medal home.') : p === 'run' ? 'Tap to jump the cones and the leaf piles. Five kilometres, together.' : 'Finished. Together.';
   $('mdist').hidden = p === 'room';
 }
 function startRun() {
@@ -175,15 +176,15 @@ function drawRoomScene(g, t) {
   g.drawImage(SPR.room, 0, 0, VW, VH);
   /* the frames */
   L.frames.forEach((f, i) => {
-    const c = CLIPS[i], im = img[c.id];
+    const c = ITEMS[i], im = img[c.id];
     g.fillStyle = 'rgba(70,40,14,.28)'; rr(g, f.x - 7, f.y - 5, f.w + 20, f.h + 20, 5); g.fill();
     g.fillStyle = '#6e4628'; rr(g, f.x - 10, f.y - 10, f.w + 20, f.h + 20, 5); g.fill(); g.fillStyle = '#a8774c'; rr(g, f.x - 7, f.y - 7, f.w + 14, f.h + 14, 4); g.fill(); g.fillStyle = '#f6efdc'; g.fillRect(f.x - 3, f.y - 3, f.w + 6, f.h + 6);
     g.save(); g.beginPath(); g.rect(f.x, f.y, f.w, f.h); g.clip();
     if (im.ok) { const s = Math.max(f.w / im.width, f.h / im.height), dw = im.width * s, dh = im.height * s; g.drawImage(im, f.x + (f.w - dw) / 2, f.y + (f.h - dh) / 2, dw, dh); }
     else { const gr = g.createLinearGradient(0, f.y, 0, f.y + f.h); gr.addColorStop(0, '#cfe0ec'); gr.addColorStop(.6, '#e8c860'); gr.addColorStop(1, '#c66c32'); g.fillStyle = gr; g.fillRect(f.x, f.y, f.w, f.h); }
-    g.fillStyle = 'rgba(28,39,72,.16)'; g.fillRect(f.x, f.y, f.w, f.h); g.restore();
-    const px = f.x + f.w / 2, py = f.y + f.h / 2, pu = 1 + .05 * Math.sin(t * 3 + i); g.fillStyle = 'rgba(251,243,223,.92)'; g.beginPath(); g.arc(px, py, 19 * pu, 0, TAU); g.fill(); g.fillStyle = INK; g.beginPath(); g.moveTo(px - 6, py - 9); g.lineTo(px + 10, py); g.lineTo(px - 6, py + 9); g.fill();
-    g.font = `700 11.5px ${UI}`; g.textAlign = 'center'; g.textBaseline = 'middle'; const tw = g.measureText(c.title).width + 14; g.fillStyle = '#d9b25c'; rr(g, px - tw / 2, f.y + f.h + 14, tw, 18, 3); g.fill(); g.fillStyle = '#3a2a1a'; g.fillText(c.title, px, f.y + f.h + 23.5);
+    if (c.kind === 'clip') { g.fillStyle = 'rgba(28,39,72,.16)'; g.fillRect(f.x, f.y, f.w, f.h); } g.restore();
+    const px = f.x + f.w / 2, py = f.y + f.h / 2, pu = 1 + .05 * Math.sin(t * 3 + i); if (c.kind === 'clip') { g.fillStyle = 'rgba(251,243,223,.92)'; g.beginPath(); g.arc(px, py, 17 * pu, 0, TAU); g.fill(); g.fillStyle = INK; g.beginPath(); g.moveTo(px - 5, py - 8); g.lineTo(px + 9, py); g.lineTo(px - 5, py + 8); g.fill(); }
+    g.font = `700 11.5px ${UI}`; g.textAlign = 'center'; g.textBaseline = 'middle'; const tw = g.measureText(c.label).width + 14; g.fillStyle = '#d9b25c'; rr(g, px - tw / 2, f.y + f.h + 14, tw, 18, 3); g.fill(); g.fillStyle = '#3a2a1a'; g.fillText(c.label, px, f.y + f.h + 23.5);
   });
   /* the hook, with or without its medal */
   const h = L.hook; g.fillStyle = '#8a6a48'; g.beginPath(); g.arc(h.x, h.y, 5, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,255,255,.4)'; g.beginPath(); g.arc(h.x - 1.4, h.y - 1.4, 1.6, 0, TAU); g.fill();
@@ -244,13 +245,16 @@ function frame(dt) {
 }
 
 /* ------------------------------------------------------------------ the clip viewer, input and wiring */
-const vid = $('mvid');
+const vid = $('mvid'), pic = $('mimg');
 function watch(i) {
-  const c = CLIPS[i]; $('mcap').textContent = c.title; $('mview').hidden = false; vid.classList.toggle('wide', !c.tall);
-  vid.muted = !G.sound; vid.loop = true; vid.poster = `media/${c.id}.jpg`; vid.src = `media/${c.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); $('mclose').focus();
+  const c = ITEMS[i], photo = c.kind === 'photo'; $('mcap').textContent = c.title; $('mview').hidden = false; vid.hidden = photo; pic.hidden = !photo;
+  if (photo) { pic.classList.toggle('wide', !c.tall); pic.alt = c.title; pic.src = `media/${c.id}.jpg`; }
+  else { vid.classList.toggle('wide', !c.tall); vid.muted = !G.sound; vid.loop = true; vid.poster = `media/${c.id}.jpg`; vid.src = `media/${c.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); }
+  $('mclose').focus();
 }
-function closeView() { vid.pause(); vid.removeAttribute('src'); vid.load(); $('mview').hidden = true; }
+function closeView() { vid.pause(); vid.removeAttribute('src'); vid.load(); pic.removeAttribute('src'); $('mview').hidden = true; }
 vid.addEventListener('error', () => { if (!$('mview').hidden && vid.getAttribute('src')) $('mcap').textContent = "This clip isn't loaded here."; });
+pic.addEventListener('error', () => { if (!$('mview').hidden && pic.getAttribute('src')) $('mcap').textContent = "This photo isn't loaded here."; });
 const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / S, (e.clientY - r.top) / S]; };
 cv.addEventListener('pointerdown', e => {
   if (!active || !L || !$('mcard').hidden || !$('mview').hidden) return; const [x, y] = pt(e);
@@ -264,7 +268,7 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape' && !$('mview').hidden) { closeView(); return; }
   if (!$('mcard').hidden || !$('mview').hidden || (e.target && e.target.tagName === 'BUTTON')) return;
   if (M.phase === 'run' && (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'Enter')) { e.preventDefault(); if (!e.repeat) jump(); }
-  else if (M.phase === 'room') { const i = '123'.indexOf(e.key); if (i >= 0) watch(i); else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); startRun(); } }
+  else if (M.phase === 'room') { const i = '12345'.indexOf(e.key); if (i >= 0) watch(i); else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); startRun(); } }
 });
 const soundLabel = () => { $('msound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('msound').setAttribute('aria-pressed', G.sound); };
 $('msound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });

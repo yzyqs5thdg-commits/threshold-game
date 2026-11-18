@@ -195,8 +195,7 @@ function person(g, who, t) {
   /* head in profile */
   g.fillStyle = k.skin; g.beginPath(); g.arc(2, hy, 30, 0, TAU); g.fill(); g.beginPath(); g.moveTo(29, hy - 4); g.quadraticCurveTo(39, hy + 6, 30, hy + 10); g.fill();
   g.fillStyle = k.hair; g.beginPath(); g.moveTo(25, hy - 18); g.quadraticCurveTo(8, hy - 41, -14, hy - 31); g.quadraticCurveTo(-37, hy - 12, -30, hy + 24); g.lineTo(-12, hy + 24); g.quadraticCurveTo(-16, hy - 4, 2, hy - 14); g.quadraticCurveTo(14, hy - 20, 25, hy - 18); g.fill();
-  g.strokeStyle = k.hair; g.lineWidth = 11; g.beginPath(); g.moveTo(-8, hy - 6); if (wv) { g.bezierCurveTo(0, hy + 24, -18, hy + 46, -6, hy + 72); g.quadraticCurveTo(2, hy + 90, -8, hy + 106); } else g.bezierCurveTo(-10, hy + 30, -7, hy + 70, -9, hy + 106); g.stroke();
-  g.strokeStyle = k.hi; g.lineWidth = 2; g.beginPath(); g.moveTo(-5, hy - 4); if (wv) { g.bezierCurveTo(3, hy + 24, -15, hy + 46, -3, hy + 72); g.quadraticCurveTo(5, hy + 90, -5, hy + 104); } else g.bezierCurveTo(-7, hy + 30, -4, hy + 70, -6, hy + 104); g.stroke();
+  G.hair(g, -9, hy - 12, { len: 122, w: 10.5, flow: 0, hang: .02, curl: .12, wave: wv * .7, col: k.hair, dark: k.hair, hi: k.hi, lo: 'rgba(0,0,0,.28)', t: t + (who === 'f' ? 1.3 : 0) });
   if (who === 'j') { g.fillStyle = '#e9c15a'; g.beginPath(); g.arc(1, hy + 21, 3.4, 0, TAU); g.fill(); } else { g.strokeStyle = '#e9c15a'; g.lineWidth = 2; g.beginPath(); g.arc(1, hy + 23, 4.6, 0, TAU); g.stroke(); }
   g.strokeStyle = k.brow; g.lineWidth = who === 'j' ? 2.8 : 2.4; g.beginPath(); g.moveTo(10, hy - 12); g.quadraticCurveTo(17, hy - 16, 24, hy - 11); g.stroke();
   if (f !== 'smile' || blink) { g.strokeStyle = '#231a1c'; g.lineWidth = 2.2; g.beginPath(); g.arc(17, hy, 5, Math.PI * 1.15, Math.PI * 1.85); g.stroke(); }
