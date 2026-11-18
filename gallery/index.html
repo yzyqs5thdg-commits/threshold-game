@@ -64,14 +64,19 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .paper .keep { color: var(--ok); font-weight: 700; }
 .paper .toast { font-family: var(--display); font-style: italic; font-size: 1.4em; line-height: 1.3; text-wrap: balance; max-width: 16em; }
 .cork { display: block; }
-#rhud, #chud, #dhud, #mhud, #xhud, #bhud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
-#rhud .krow, #chud .krow, #dhud .krow, #mhud .krow, #xhud .krow, #bhud .krow { flex: none; align-items: center; }
+#rhud, #chud, #dhud, #mhud, #xhud, #bhud, #fhud, #shud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
+#rhud .krow, #chud .krow, #dhud .krow, #mhud .krow, #xhud .krow, #bhud .krow, #fhud .krow, #shud .krow { flex: none; align-items: center; }
+#sbar { flex-direction: row; align-items: flex-end; align-content: flex-end; justify-content: center; flex-wrap: wrap; gap: 8px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
+#sbar button { padding: 11px 15px; font-size: 14.5px; }
+#sbar button:disabled { opacity: .45; cursor: default; }
+#door .paper { max-height: 100%; overflow-y: auto; gap: 8px; padding-block: 20px; }
+#door .paper button { margin-top: 0; padding: 10px 22px; }
 .xnav { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .xnav[hidden] { display: none; }
 .paper .xnav button { margin: 0; padding: .45em 1em; font-size: .85em; background: none; color: var(--ink); border: 1.5px solid var(--ink-soft); }
 .paper .xnav button:disabled { opacity: .35; cursor: default; }
-#xhud .krow, #bhud .krow { flex: 0 1 auto; }
-#xhud .step, #bhud .step { flex: 1 1 9em; min-width: 9em; }
+#xhud .krow, #bhud .krow, #fhud .krow, #shud .krow { flex: 0 1 auto; }
+#xhud .step, #bhud .step, #fhud .step, #shud .step { flex: 1 1 9em; min-width: 9em; }
 #xbar, #bbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 .xcard { max-width: 30em; gap: 8px; padding: 18px 20px 20px; }
 .xcard img, .xcard video { display: block; max-width: 100%; max-height: 50vh; border-radius: 8px; background: var(--night); }
@@ -296,6 +301,73 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
   </div>
 </div>
 
+<div id="fui" hidden>
+  <div class="over" id="fhud">
+    <p class="pill step" id="fstep" aria-live="polite"></p>
+    <div class="krow">
+      <span class="pill" id="fcount">Visits 0 of 4</span>
+      <button class="small" id="fsound" type="button" aria-pressed="true">Sound on</button>
+      <button class="small" id="fleave" type="button">Leave</button>
+    </div>
+  </div>
+  <div class="over sheet" id="fview" hidden>
+    <div class="paper xcard">
+      <img id="fimg" alt="">
+      <p class="xno" id="fno"></p>
+      <h2 id="ftitle"></h2>
+      <p id="ftext"></p>
+      <button id="fclose" type="button">Close the door</button>
+    </div>
+  </div>
+  <div class="over sheet" id="fend" hidden>
+    <div class="paper">
+      <h2>The front door</h2>
+      <p>Every one of these is you, arriving. It is my favourite notification.</p>
+      <p class="keep">Keepsake found: the spare key</p>
+      <p class="note">Your note to Jana about the front door goes here.</p>
+      <button id="fstay" type="button">Stay a while</button>
+      <button id="fagain" type="button" class="alt">Ring again</button>
+      <button id="fback" type="button" class="alt">Back downstairs</button>
+    </div>
+  </div>
+</div>
+
+<div id="sui" hidden>
+  <div class="over" id="shud">
+    <p class="pill step" id="sstep" aria-live="polite"></p>
+    <div class="krow">
+      <span class="pill" id="sstops">Stop 1 of 10</span>
+      <button class="small" id="ssound" type="button" aria-pressed="true">Sound on</button>
+      <button class="small" id="sleave" type="button">Leave</button>
+    </div>
+  </div>
+  <div class="over" id="sbar">
+    <button id="sprev" type="button">Back a stop</button>
+    <button id="slook" type="button">Look closer</button>
+    <button id="snext" type="button">Next stop</button>
+  </div>
+  <div class="over sheet" id="sview" hidden>
+    <div class="paper xcard">
+      <img id="simg" alt="">
+      <p class="xno" id="sno"></p>
+      <h2 id="stitle"></h2>
+      <p id="stext"></p>
+      <div class="xnav" id="snav"><button id="sp" type="button">Previous</button><button id="sn" type="button">Next</button></div>
+      <button id="sclose" type="button">Back on the train</button>
+    </div>
+  </div>
+  <div class="over sheet" id="send" hidden>
+    <div class="paper">
+      <h2>The city</h2>
+      <p>Ten stops, and I would ride every one of them again with you.</p>
+      <p class="keep">Keepsake found: the subway card</p>
+      <p class="note">Your note to Jana about New York goes here.</p>
+      <button id="sstay" type="button">Stay a while</button>
+      <button id="sback" type="button" class="alt">Back downstairs</button>
+    </div>
+  </div>
+</div>
+
 <div class="over sheet" id="door" hidden>
   <div class="paper">
     <h2>Where to?</h2>
@@ -305,6 +377,8 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
     <button id="dchai" type="button">Chai coffee</button>
     <button id="ddump" type="button">Spicy Village</button>
     <button id="dmedal" type="button">The medal room</button>
+    <button id="dcity" type="button">The city</button>
+    <button id="dfront" type="button">The front door</button>
     <button id="dbahamas" type="button">The Bahamas</button>
     <button id="dmexico" type="button">The Mexico wing</button>
     <button id="dstay" type="button" class="alt">Stay outside</button>
@@ -902,7 +976,7 @@ const KEYS = { ArrowRight: 1, d: 1, D: 1, ArrowLeft: -1, a: -1, A: -1 };
 addEventListener('keydown', e => { if (onRoad() && KEYS[e.key]) { if (!started) begin(); keyDir = KEYS[e.key]; e.preventDefault(); } });
 addEventListener('keyup', e => { if (KEYS[e.key] === keyDir) keyDir = 0; });
 enter.addEventListener('click', () => { door.hidden = false; target = null; document.getElementById('dkitchen').focus(); });
-for (const [id, to] of [['dkitchen', 'kitchen'], ['droof', 'rooftop'], ['dchai', 'chai'], ['ddump', 'dumplings'], ['dmedal', 'medal'], ['dbahamas', 'bahamas'], ['dmexico', 'mexico'], ['dstay', null]]) document.getElementById(id).addEventListener('click', () => { door.hidden = true; if (to) go(to); });
+for (const [id, to] of [['dkitchen', 'kitchen'], ['droof', 'rooftop'], ['dchai', 'chai'], ['ddump', 'dumplings'], ['dmedal', 'medal'], ['dcity', 'city'], ['dfront', 'frontdoor'], ['dbahamas', 'bahamas'], ['dmexico', 'mexico'], ['dstay', null]]) document.getElementById(id).addEventListener('click', () => { door.hidden = true; if (to) go(to); });
 
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); if (scene && scene.resize) scene.resize(); }, 120); });
 
@@ -954,4 +1028,6 @@ const G = window.G = {
 <script src="medal.js"></script>
 <script src="museum.js"></script>
 <script src="bahamas.js"></script>
+<script src="door.js"></script>
+<script src="subway.js"></script>
 <script>window.G.boot();</script>

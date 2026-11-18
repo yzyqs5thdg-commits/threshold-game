@@ -24,7 +24,7 @@ const FIND = [
 const SLOTS = [[-52, -3], [-31, -16], [-7, -19], [17, -16], [41, -11], [57, 4], [-40, 9], [-15, 2], [9, 7], [33, 13]];
 const PLATE = [[-34, -4], [-12, -10], [12, -9], [34, -3], [0, 6]];
 let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false;
-const fresh = () => ({ phase: 'look', fi: 0, idle: 0, pop: {}, order: 0, arrive: 0, dump: [], line: null, fly: 0, taps: 0, shots: [], act: { j: null, f: null }, queue: 0, fwait: .8, face: { j: { f: 'smile', t: 0 }, f: { f: 'smile', t: 0 } }, slurp: 0, slurping: false, wait: 0, cool: 0 });
+const fresh = () => ({ phase: 'look', fi: 0, idle: 0, pop: {}, order: 0, arrive: 0, dump: [], line: null, fly: 0, taps: 0, shots: [], act: { j: null, f: null }, queue: 0, fwait: .8, face: { j: { f: 'smile', t: 0 }, f: { f: 'smile', t: 0 } }, slurp: 0, ns: 0, slurping: false, wait: 0, cool: 0 });
 let D = fresh();
 const parts = [], says = [], moth = { x: 60, y: 200 };
 const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
@@ -194,7 +194,7 @@ function person(g, who, t) {
 /* where each of them is holding her chopsticks, and what is on them */
 function tip(who, t) {
   const d = who === 'j' ? 1 : -1, x = who === 'j' ? L.jx : L.fx, pl = who === 'j' ? L.pj : L.pf, rest = [pl.x - d * 8, pl.y - 36], mouth = [x + d * 30, L.hy + 20], a = D.act[who];
-  if (D.phase === 'noodles' && D.slurping) { const u = G.RM ? .5 : .5 + .5 * Math.sin(t * 4.2 + (who === 'f' ? 1.6 : 0)), from = [L.noodle.x - d * 22, L.noodle.y - 12]; return { p: [lerp(from[0], mouth[0], u), lerp(from[1], mouth[1], u)], carry: 'noodles', up: u, d, x }; }
+  if (D.phase === 'noodles' && D.slurping && D.ns >= 1) { const u = G.RM ? .5 : .5 + .5 * Math.sin(t * 4.2 + (who === 'f' ? 1.6 : 0)), from = [pl.x - d * 6, pl.y - 10]; return { p: [lerp(from[0], mouth[0], u), lerp(from[1], mouth[1], u)], carry: 'noodles', up: u, d, x }; }
   if (!a) return { p: rest, carry: null, up: 0, d, x };
   const dd = D.dump[a.i], from = [pl.x + dd.px, pl.y + dd.py - 6]; let p, carry = null, up = 0;
   if (a.t < .22) { const k = sm(a.t, 0, .22); p = [lerp(rest[0], from[0], k), lerp(rest[1], from[1], k)]; }
@@ -205,11 +205,18 @@ function tip(who, t) {
 function sticks(g, x, y, fx, fy) { g.lineCap = 'round'; for (const o of [-3.2, 3.2]) { g.strokeStyle = '#b89a62'; g.lineWidth = 4.6; g.beginPath(); g.moveTo(fx + o * 2, fy); g.lineTo(x + o * .5, y); g.stroke(); g.strokeStyle = '#ecd8a8'; g.lineWidth = 3; g.stroke(); } }
 function arm(g, who, t) {
   const k = WHO[who], T = tip(who, t), d = T.d, up = T.up, hx = T.p[0] + lerp(-d * 22, d * 8, up), hyy = T.p[1] + lerp(-26, 22, up), sx = T.x + d * 6, sy = L.hy + 62;
-  if (T.carry === 'noodles') { g.lineCap = 'round'; for (let i = 0; i < 5; i++) { const o = (i - 2) * 4; for (const pass of [0, 1]) { g.strokeStyle = pass ? '#f3dea0' : '#b9944a'; g.lineWidth = pass ? 2.4 : 4; g.beginPath(); g.moveTo(L.noodle.x - d * 16 + o * 2, L.noodle.y + 2); g.bezierCurveTo(L.noodle.x - d * 16 + o * 2 + Math.sin(t * 11 + i) * 6, L.noodle.y - 40, T.p[0] + o + Math.sin(t * 9 + i * 2) * 5, T.p[1] + 50, T.p[0] + o * .4, T.p[1]); g.stroke(); } } }
+  if (T.carry === 'noodles') { g.lineCap = 'round'; const len = 30 * (1 - up * .8) + 4; for (let i = 0; i < 5; i++) { const o = (i - 2) * 2.6; for (const pass of [0, 1]) { g.strokeStyle = pass ? '#f3dea0' : '#b9944a'; g.lineWidth = pass ? 2.4 : 4; g.beginPath(); g.moveTo(T.p[0] + o * .4, T.p[1]); g.quadraticCurveTo(T.p[0] + o + Math.sin(t * 9 + i) * 3, T.p[1] + len * .6, T.p[0] + o * 1.4 + Math.sin(t * 7 + i * 2) * 2, T.p[1] + len); g.stroke(); } } }
   g.lineCap = 'round'; g.strokeStyle = k.top[0]; g.lineWidth = 20; g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo((sx + hx) / 2 - d * 6, Math.max(sy, hyy) + 34, hx, hyy); g.stroke();
   sticks(g, T.p[0], T.p[1], hx + (hx - T.p[0]) * .5, hyy + (hyy - T.p[1]) * .5);
   if (typeof T.carry === 'number') { const dd = D.dump[T.carry]; dumpling(g, T.p[0], T.p[1] + 3, dd.rot, dd.vin, dd.chi, true, L.ds + .08); }
   g.fillStyle = G.people[who].skin; g.beginPath(); g.arc(hx, hyy, 10, 0, TAU); g.fill();
+}
+
+/* a small heap of noodles: each of them gets her own half on her plate */
+function pile(g, x, y, k) {
+  if (k <= .03) return; const r = R(51); g.lineCap = 'round';
+  for (let i = 0; i < 16; i++) { const a = r() * TAU, d = Math.sqrt(r()), x0 = x + Math.cos(a) * d * 26 * k, y0 = y + Math.sin(a) * d * 9 * k, a2 = r() * TAU, l = 14 * k + 4; for (const pass of [0, 1]) { g.strokeStyle = pass ? '#f3dea0' : '#b9944a'; g.lineWidth = pass ? 2.4 : 4; g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 + Math.cos(a2 + 1) * l * .6, y0 + Math.sin(a2 + 1) * l * .3 - 3, x0 + Math.cos(a2) * l, y0 + Math.sin(a2) * l * .4); g.stroke(); } }
+  for (let i = 0; i < 5; i++) { const a = r() * TAU, d = Math.sqrt(r()) * k; g.fillStyle = '#dcf0b4'; ell(g, x + Math.cos(a) * d * 22, y - 2 + Math.sin(a) * d * 7, 3, 2); g.fill(); g.strokeStyle = '#4f8f38'; g.lineWidth = 1.5; g.stroke(); }
 }
 
 /* ------------------------------------------------------------------ play */
@@ -222,7 +229,7 @@ function setStep() {
   $('dstep').textContent = p === 'look' ? FIND[D.fi].clue : p === 'order' ? 'The usual: scallion dumplings and scallion noodles.'
     : p === 'split' ? 'Ten dumplings, half and half. Draw one line across the bowl with five on each side.' : p === 'fly' ? 'Five each, in one go.'
     : p === 'sauce' ? 'Sauce goes straight on. Tap the black vinegar and the chili oil.' : p === 'eat' ? `Tap your dumplings to eat them. ${mine('j').length + (D.act.j ? 1 : 0)} left.`
-    : p === 'noodles' ? 'Now the scallion noodles. Hold the bowl and you both slurp.' : 'All gone.';
+    : p === 'noodles' ? 'Now the scallion noodles, half each. Hold your plate to eat.' : 'All gone.';
   $('dnext').hidden = !(p === 'sauce' && D.taps >= 2);
 }
 function spot(id) {
@@ -271,7 +278,8 @@ function update(dt) {
       if (a.t >= 1) D.act[w] = null; }
     if (!D.act.j && !D.act.f && D.dump.every(d => d.state === 'eaten')) { D.phase = 'noodles'; setStep(); }
   }
-  if (p === 'noodles' && D.slurping) { D.slurp = Math.min(1, D.slurp + dt / 3.6); if (!G.RM && Math.random() < dt * 9) tone(300 + D.slurp * 300 + Math.random() * 80, .12, 'sine', .03, 0, 1.6); if (D.slurp >= 1) { D.slurping = false; D.phase = 'done'; D.wait = 1.6; setStep(); face('j', 'yum', 3); face('f', 'laugh', 3); } }
+  if (p === 'noodles' && D.ns < 1) D.ns = Math.min(1, D.ns + dt / 1.2);
+  if (p === 'noodles' && D.slurping && D.ns >= 1) { D.slurp = Math.min(1, D.slurp + dt / 3.6); if (!G.RM && Math.random() < dt * 9) tone(300 + D.slurp * 300 + Math.random() * 80, .12, 'sine', .03, 0, 1.6); if (D.slurp >= 1) { D.slurping = false; D.phase = 'done'; D.wait = 1.6; setStep(); face('j', 'yum', 3); face('f', 'laugh', 3); } }
   if (p === 'done' && D.wait > 0) { D.wait -= dt; if (D.wait <= 0) finish(); }
   for (let i = parts.length - 1; i >= 0; i--) { const q = parts[i]; q.life -= dt; q.vy += 300 * dt; q.x += q.vx * dt; q.y += q.vy * dt; if (q.life <= 0) parts.splice(i, 1); }
   for (let i = says.length - 1; i >= 0; i--) { const q = says[i]; q.life -= dt; q.y -= 12 * dt; if (q.life <= 0) says.splice(i, 1); }
@@ -310,7 +318,7 @@ function frame(dt) {
     g.globalAlpha = D.arrive; const dy = (1 - sm(D.arrive, 0, 1)) * -30, n = L.noodle, b = L.bowl;
     g.save(); g.translate(n.x, n.y + dy); g.scale(L.nr / 64, L.nr / 64); g.translate(-n.x, -n.y - dy);
     bowl(g, n.x, n.y + dy, 64);
-    { g.save(); ell(g, n.x, n.y + 2 + dy, 56, 24); g.clip(); g.fillStyle = '#3a2416'; g.fillRect(n.x - 70, n.y - 30 + dy, 140, 70); const r = R(44), cnt = 3 + 30 * (1 - D.slurp); g.lineCap = 'round';
+    { g.save(); ell(g, n.x, n.y + 2 + dy, 56, 24); g.clip(); g.fillStyle = '#3a2416'; g.fillRect(n.x - 70, n.y - 30 + dy, 140, 70); const r = R(44), cnt = 2 + 31 * (1 - sm(D.ns, 0, .8)); g.lineCap = 'round';
       for (let i = 0; i < cnt; i++) { const a = r() * TAU, d = Math.sqrt(r()) * .82, x0 = n.x + Math.cos(a) * d * 52, y0 = n.y + 2 + dy + Math.sin(a) * d * 21, a2 = r() * TAU, l = 16 + r() * 16; for (const pass of [0, 1]) { g.strokeStyle = pass ? '#f3dea0' : '#b9944a'; g.lineWidth = pass ? 2.6 : 4.4; g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 + Math.cos(a2 + 1) * l * .6, y0 + Math.sin(a2 + 1) * l * .3, x0 + Math.cos(a2) * l, y0 + Math.sin(a2) * l * .45); g.stroke(); } }
       for (let i = 0; i < cnt * .8; i++) { const a = r() * TAU, d = Math.sqrt(r()) * .8, x0 = n.x + Math.cos(a) * d * 50, y0 = n.y + dy + Math.sin(a) * d * 20; g.fillStyle = '#dcf0b4'; ell(g, x0, y0, 3.6, 2.4); g.fill(); g.strokeStyle = '#4f8f38'; g.lineWidth = 1.8; g.stroke(); }
       g.restore(); }
@@ -325,6 +333,7 @@ function frame(dt) {
     else if (d.state === 'fly') { const k = sm(D.fly, d.owner === 'j' ? 0 : .3, d.owner === 'j' ? .7 : 1); dumpling(g, lerp(L.bowl.x + d.sx, pl.x + d.px, k), lerp(L.bowl.y + d.sy, pl.y + d.py, k) - Math.sin(k * Math.PI) * 70, d.rot + Math.sin(k * Math.PI) * .5, 0, 0, true, lerp(1, L.ds, k)); }
   }
   for (const s of D.shots) if (s.t > 0) { const pl = s.to === 'j' ? L.pj : L.pf, k = s.t, x = lerp(s.x0, pl.x, k), y = lerp(s.y0, pl.y - 6, k) - Math.sin(k * Math.PI) * 110; g.fillStyle = s.k === 'v' ? '#2a1812' : '#b02a16'; g.beginPath(); g.arc(x, y, 5, 0, TAU); g.fill(); g.beginPath(); g.arc(x + 5, y + 6, 2.6, 0, TAU); g.fill(); g.beginPath(); g.arc(x - 6, y + 9, 2, 0, TAU); g.fill(); }
+  if (p === 'noodles' || p === 'done') for (const pl of [L.pj, L.pf]) { const me = pl === L.pj, u = sm(D.ns, me ? 0 : .25, me ? .75 : 1), x = lerp(L.noodle.x, pl.x, u), y = lerp(L.noodle.y, pl.y - 3, u) - Math.sin(u * Math.PI) * 60; if (D.ns > (me ? 0 : .25)) pile(g, x, y, (u < 1 ? .8 : 1 - D.slurp) * (L.ps + .15)); }
   arm(g, 'j', t); arm(g, 'f', t);
   /* the line she draws across the bowl, laid down like a chopstick */
   if (D.line && p === 'split') { const l = D.line, [a, b] = sides(l), ok = a === 5, len = Math.hypot(l.x1 - l.x0, l.y1 - l.y0) || 1, nx = -(l.y1 - l.y0) / len, ny = (l.x1 - l.x0) / len, mx = (l.x0 + l.x1) / 2, my = (l.y0 + l.y1) / 2;
@@ -337,8 +346,8 @@ function frame(dt) {
   if (p === 'split' && !D.line) { ell(g, L.bowl.x, L.bowl.y, L.br + 8 + pu * 4, L.br * .5 + 5 + pu * 3); g.stroke(); }
   if (p === 'sauce' && D.taps === 0) { for (const id of ['vinegar', 'chili']) { const [x, y, rx, ry] = spot(id); ell(g, x, y, rx + 4 + pu * 3, ry + 4 + pu * 3); g.stroke(); } }
   if (p === 'eat' && mine('j').length === 5 && !D.act.j) { ell(g, L.pj.x, L.pj.y, 82 * L.ps + pu * 4, 32 * L.ps + pu * 3); g.stroke(); }
-  if (p === 'noodles' && !D.slurping && D.slurp < .05) { ell(g, L.noodle.x, L.noodle.y, L.nr + 6 + pu * 4, L.nr * .5 + 4 + pu * 3); g.stroke(); }
-  if (p === 'noodles' && D.slurp > 0) { g.fillStyle = PAPER; rr(g, L.noodle.x - 60, L.noodle.y + 62, 120, 12, 6); g.fill(); g.fillStyle = '#f2b45c'; rr(g, L.noodle.x - 57, L.noodle.y + 65, Math.max(8, 114 * D.slurp), 6, 3); g.fill(); }
+  if (p === 'noodles' && D.ns >= 1 && !D.slurping && D.slurp < .05) { ell(g, L.pj.x, L.pj.y, 82 * L.ps + pu * 4, 32 * L.ps + pu * 3); g.stroke(); }
+  if (p === 'noodles' && D.slurp > 0) { g.fillStyle = PAPER; rr(g, L.pj.x - 60, L.pj.y + 36, 120, 12, 6); g.fill(); g.fillStyle = '#f2b45c'; rr(g, L.pj.x - 57, L.pj.y + 39, Math.max(8, 114 * D.slurp), 6, 3); g.fill(); }
   for (const s of says) tag(g, s.text, s.x, s.y, Math.min(1, s.life * 2), s.col);
   g.globalCompositeOperation = 'lighter'; glow(g, moth.x, moth.y, 46, '255,214,130', .34 + .08 * Math.sin(t * 6)); g.globalCompositeOperation = 'source-over';
   { const f = G.RM ? .6 : Math.abs(Math.sin(t * 17)); g.fillStyle = 'rgba(255,246,214,.94)'; for (const d of [-1, 1]) { g.beginPath(); g.ellipse(moth.x + d * (2 + 4.5 * f), moth.y - 2, 1.6 + 5 * f, 5.4, d * .5, 0, TAU); g.fill(); g.beginPath(); g.ellipse(moth.x + d * (1.5 + 3 * f), moth.y + 4, 1.2 + 3 * f, 3.4, d * -.4, 0, TAU); g.fill(); } g.fillStyle = '#ffd874'; ell(g, moth.x, moth.y, 2.2, 4.6); g.fill(); }
@@ -354,7 +363,7 @@ cv.addEventListener('pointerdown', e => {
   if (p === 'split' && Math.hypot(x - L.bowl.x, y - L.bowl.y) < 210) { D.line = { x0: x, y0: y, x1: x, y1: y }; try { cv.setPointerCapture(e.pointerId); } catch (_) { /* fine without capture */ } e.preventDefault(); return; }
   if (p === 'sauce') { if (hit('vinegar', x, y)) addSauce('v'); else if (hit('chili', x, y)) addSauce('c'); return; }
   if (p === 'eat' && Math.abs(x - L.pj.x) < 96 * L.ps + 14 && Math.abs(y - L.pj.y) < 50) { if (D.queue < mine('j').length) D.queue++; return; }
-  if (p === 'noodles' && Math.hypot(x - L.noodle.x, (y - L.noodle.y) * 1.5) < 100) { D.slurping = true; try { cv.setPointerCapture(e.pointerId); } catch (_) { /* fine without capture */ } e.preventDefault(); }
+  if (p === 'noodles' && (Math.hypot(x - L.pj.x, (y - L.pj.y) * 1.5) < 110 || Math.hypot(x - L.noodle.x, (y - L.noodle.y) * 1.5) < 100)) { D.slurping = true; try { cv.setPointerCapture(e.pointerId); } catch (_) { /* fine without capture */ } e.preventDefault(); }
 });
 cv.addEventListener('pointermove', e => { if (!active || !D.line) return; const [x, y] = pt(e); D.line.x1 = x; D.line.y1 = y; });
 const letGo = () => { if (D.line && D.phase === 'split') { const l = D.line; D.line = null; if (Math.hypot(l.x1 - l.x0, l.y1 - l.y0) > 50) split(l); } D.line = null; D.slurping = false; };
