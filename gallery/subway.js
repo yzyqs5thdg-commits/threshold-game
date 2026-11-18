@@ -9,14 +9,17 @@ const UI = '"Nunito", "Avenir Next", system-ui, sans-serif';
 const INK = '#2c2a3d', PAPER = '#fbf3df', SPAN = 2000;
 const ST = [
   { id: 'train', name: 'Our train', col: '#d8262c', items: [{ id: 'train', title: 'On the train', text: 'Laughing on the way somewhere. The joke is lost; the photo is not.' }] },
-  { id: 'stadium', name: 'The stadium', col: '#27375c', items: [{ id: 'stadium', title: 'The ballgame', text: 'Matching caps, and a cookie dressed as a baseball.' }] },
+  { id: 'stadium', name: 'The stadium', col: '#27375c', items: [{ id: 'stadium', title: 'The ballgame', text: 'Matching caps, and a cookie dressed as a baseball.' }, { id: 'blanket', media: 'clip', title: 'Under the blanket', text: 'Matching caps and one blanket between us.' }] },
   { id: 'gym', name: 'The gym', col: '#6a3058', items: [{ id: 'gym', title: 'Mirror check', text: 'Three of us in the mirror. Proof that we went.' }] },
+  { id: 'home', name: 'Home', col: '#b3242e', items: [{ id: 'cards', media: 'clip', title: 'The card reading', text: 'Cards spread out on the bed, and you mid-reading.' }] },
   { id: 'river', name: 'East River', col: '#2f7fa8', items: [{ id: 'river', title: 'The study spot', text: 'Books open by the water, the bridge behind us. Some studying happened.' }] },
   { id: 'bridge', name: 'Brooklyn Bridge', col: '#8a6a52', items: [{ id: 'bridge', title: 'Walking the bridge', text: 'The whole skyline behind us, and both of us grinning at the camera instead.' }] },
   { id: 'park', name: 'Central Park', col: '#3f8a4a', items: [{ id: 'park', title: 'By the pond', text: 'Green everywhere, and a bouquet with a doll in the middle of it.' }] },
   { id: 'village', name: 'The Village', col: '#c8402c', items: [{ id: 'village', title: 'Ice cream this way', text: 'A hug in the middle of the crosswalk. The sign had a point.' }] },
+  { id: 'downtown', name: 'Downtown', col: '#5a5a66', items: [{ id: 'street', title: 'Waiting to cross', text: 'Grey sky, a yellow bus, and your hair doing the most.' }, { id: 'friend', title: "You've got a friend", text: 'The wall said it first. You laughed. It is true.' }] },
   { id: 'spritz', name: 'The pâtisserie', col: '#8e1a2a', items: [{ id: 'spritz', title: 'Two spritzes', text: 'One orange, one pale yellow, and something very interesting above us.' }] },
   { id: 'pub', name: 'The pub', col: '#2f6a3c', items: [{ id: 'pub', title: 'At the bar', text: 'White turtleneck, black fur, heads together.' }] },
+  { id: 'rooftop', name: 'The rooftop', col: '#33273c', items: [{ id: 'rooftop', title: 'Candle and moon', text: 'One candle, the moon through the clouds, and you looking off at something.' }] },
   { id: 'view', name: 'The view', col: '#1c2748', night: true, items: [{ id: 'view', title: 'The top of the city', text: 'All of it lit up below us.' }, { id: 'selfie', title: 'Cheek to cheek', text: 'Above everything, squeezed into one frame.' }, { id: 'moon', title: 'The moon and the tower', text: 'The moon showed up right next to the spire.' }] }
 ];
 const img = {}; for (const s of ST) { const im = new Image(); im.onload = () => { im.ok = true; }; im.src = `media/ny_${s.items[0].id}.jpg`; img[s.id] = im; }
@@ -35,10 +38,10 @@ function setStep() {
   $('sstops').textContent = `Stop ${C.at + 1} of ${ST.length}`; $('sprev').disabled = !!m || C.at === 0; $('snext').disabled = !!m || C.at === ST.length - 1; $('slook').disabled = !!m;
 }
 function ride(to) { if (C.move || to < 0 || to >= ST.length) return; C.move = { from: C.at, to, u: 0 }; setStep(); tone(523, .18, 'sine', .06); tone(415, .3, 'sine', .06, .18); }
-const vid = null, pic = $('simg');
-function show() { const s = view.st, it = s.items[view.i]; $('sno').textContent = `${s.name}` + (s.items.length > 1 ? `  ·  ${view.i + 1} of ${s.items.length}` : ''); $('stitle').textContent = it.title; $('stext').textContent = it.text; pic.alt = it.title; pic.src = `media/ny_${it.id}.jpg`; $('snav').hidden = s.items.length < 2; $('sp').disabled = view.i === 0; $('sn').disabled = view.i === s.items.length - 1; }
+const vid = $('svid'), pic = $('simg');
+function show() { const s = view.st, it = s.items[view.i], clip = it.media === 'clip'; vid.pause(); vid.hidden = !clip; pic.hidden = clip; if (clip) { pic.removeAttribute('src'); vid.muted = !G.sound; vid.loop = true; vid.poster = `media/ny_${it.id}.jpg`; vid.src = `media/ny_${it.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); } else { vid.removeAttribute('src'); vid.load(); } $('sno').textContent = `${s.name}` + (s.items.length > 1 ? `  ·  ${view.i + 1} of ${s.items.length}` : ''); $('stitle').textContent = it.title; $('stext').textContent = it.text; if (!clip) { pic.alt = it.title; pic.src = `media/ny_${it.id}.jpg`; } $('snav').hidden = s.items.length < 2; $('sp').disabled = view.i === 0; $('sn').disabled = view.i === s.items.length - 1; }
 function look() { if (C.move) return; view = { st: ST[C.at], i: 0 }; seen.add(ST[C.at].id); $('sview').hidden = false; show(); $('sclose').focus(); tone(660, .1, 'sine', .05); }
-function closeView() { const s = view && view.st; $('sview').hidden = true; pic.removeAttribute('src'); view = null; if (s && s.night && !endShown) { endShown = true; setTimeout(() => { if (active) { $('send').hidden = false; $('sstay').focus(); [523, 659, 784, 1047].forEach((f, i) => tone(f, .9, 'sine', .05, i * .22)); } }, 1200); } }
+function closeView() { const s = view && view.st; vid.pause(); vid.removeAttribute('src'); vid.load(); $('sview').hidden = true; pic.removeAttribute('src'); view = null; if (s && s.night && !endShown) { endShown = true; setTimeout(() => { if (active) { $('send').hidden = false; $('sstay').focus(); [523, 659, 784, 1047].forEach((f, i) => tone(f, .9, 'sine', .05, i * .22)); } }, 1200); } }
 
 /* ------------------------------------------------------------------ what passes outside the window */
 function outside(g, t) {
@@ -99,7 +102,7 @@ function frame(dt) {
   /* route map and the sign */
   const m = C.move, cur = ST[C.at], led = m ? `NEXT STOP: ${ST[m.to].name.toUpperCase()}` : `THIS IS: ${cur.name.toUpperCase()}`;
   g.font = `800 12px ${UI}`; const lw = Math.min(VW - 24, g.measureText(led).width + 34); g.fillStyle = '#17161a'; rr(g, VW / 2 - lw / 2, L.ty, lw, 26, 6); g.fill(); g.fillStyle = '#ffb53c'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(led, VW / 2, L.ty + 13.5);
-  const mx0 = L.wide ? VW / 2 - 440 : 30, mx1 = L.wide ? VW / 2 + 440 : VW - 30, my = L.ty + 46; g.strokeStyle = '#fbf6ea'; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(mx0, my); g.lineTo(mx1, my); g.stroke(); g.strokeStyle = '#d8262c'; g.lineWidth = 5; g.beginPath(); g.moveTo(mx0, my); g.lineTo(lerp(mx0, mx1, C.pos / (ST.length - 1)), my); g.stroke();
+  const mw = Math.min(560, VW / 2 - 60), mx0 = L.wide ? VW / 2 - mw : 30, mx1 = L.wide ? VW / 2 + mw : VW - 30, my = L.ty + 46; g.strokeStyle = '#fbf6ea'; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(mx0, my); g.lineTo(mx1, my); g.stroke(); g.strokeStyle = '#d8262c'; g.lineWidth = 5; g.beginPath(); g.moveTo(mx0, my); g.lineTo(lerp(mx0, mx1, C.pos / (ST.length - 1)), my); g.stroke();
   ST.forEach((s, i) => { const x = lerp(mx0, mx1, i / (ST.length - 1)), on = i === C.at && !m; g.fillStyle = seen.has(s.id) ? '#d8262c' : '#fbf6ea'; g.beginPath(); g.arc(x, my, on ? 8 : 5.5, 0, TAU); g.fill(); g.strokeStyle = '#17161a'; g.lineWidth = 1.6; g.stroke(); if (L.wide) { g.fillStyle = '#2c2a3d'; g.font = `${on ? 800 : 600} 9.5px ${UI}`; g.fillText(s.name, x, my + 16); } });
   /* bench, the two of them, the floor */
   const seat = L.seat; g.fillStyle = '#8f949c'; g.fillRect(0, seat + 16, VW, 12); gr = g.createLinearGradient(0, seat - 40, 0, seat + 20); gr.addColorStop(0, '#f08a2c'); gr.addColorStop(1, '#d86a1c'); g.fillStyle = gr; rr(g, -10, seat - 44, VW + 20, 62, 10); g.fill(); g.fillStyle = 'rgba(255,255,255,.2)'; g.fillRect(0, seat - 44, VW, 4); g.fillStyle = '#f2b02c'; for (let x = VW / 2 % 150 - 150; x < VW; x += 150) g.fillRect(x, seat - 44, 3, 62);

@@ -1,4 +1,4 @@
-/* The blossom garden. A cherry tree in full bloom by the lake; thirteen blossoms each hold a memory.
+/* The blossom garden. A cherry tree in full bloom by the lake; five blossoms each hold a memory from the park.
    When every one has been opened, evening falls, the lanterns light, and the garden wall says what it has to say. */
 (() => {
 'use strict';
@@ -11,19 +11,11 @@ const BLOOMS = [
   { id: 'pink', media: 'photo', title: 'Under the pink tree', text: 'Eyes closed, hair flying, nose in a blossom.' },
   { id: 'white', media: 'photo', title: 'White blossom', text: 'Sitting on the rock under a whole tree of white.' },
   { id: 'park', media: 'clip', title: 'The park in bloom', text: 'The whole park had the same idea we did.' },
-  { id: 'lake', media: 'clip', title: 'The lake', text: 'Still water, a tower behind the trees, and the birds on their branch.' },
-  { id: 'street', media: 'photo', title: 'Waiting to cross', text: 'Grey sky, a yellow bus, and your hair doing the most.' },
-  { id: 'rooftop', media: 'photo', title: 'Candle and moon', text: 'One candle, the moon through the clouds, and you looking off at something.' },
-  { id: 'glasses', media: 'photo', title: 'Two glasses', text: 'Red and white, both balanced on you, and you laughing through it.' },
-  { id: 'fries', media: 'photo', title: 'The pour', text: 'Full concentration, for fries.' },
-  { id: 'breakfast', media: 'photo', title: 'Breakfast, with tea', text: 'The whole table full, and you pouring the tea.' },
-  { id: 'edamame', media: 'photo', title: 'Edamame', text: 'Held up proudly, drink in the other hand.' },
-  { id: 'cards', media: 'clip', title: 'The card reading', text: 'Cards spread out on the bed, and you mid-reading.' },
-  { id: 'stadium', media: 'clip', title: 'Under the blanket', text: 'Matching caps and one blanket between us.' }
+  { id: 'lake', media: 'clip', title: 'The lake', text: 'Still water, a tower behind the trees, and the birds on their branch.' }
 ];
-const FRIEND = { id: 'friend', media: 'photo', title: "You've got a friend", text: 'The wall said it first. You laughed. It is true.' };
-const SPOTS = [[-.7, -.05], [-.45, -.5], [-.15, -.72], [.2, -.6], [.5, -.35], [.75, 0], [.45, .3], [.1, .1], [-.25, -.15], [-.55, .35], [-.1, .5], [.25, .62], [-.82, .4]];
-let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false, view = null, endShown = false;
+const SPOTS = [[-.55, -.3], [0, -.62], [.55, -.28], [-.3, .34], [.42, .38]];
+const BRANCH = [[-.7, -.05], [-.45, -.5], [-.15, -.72], [.2, -.6], [.5, -.35], [.75, 0], [.45, .3], [.1, .1], [-.25, -.15], [-.55, .35], [-.1, .5], [.25, .62], [-.82, .4]];
+let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false, view = null, endShown = false, finT = 0;
 const open = new Set(), parts = [], moth = { x: 0, y: 0 }; let fin = 0;
 const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
 const ell = (g, x, y, rx, ry, a0 = 0, a1 = TAU) => { g.beginPath(); g.ellipse(x, y, rx, ry, 0, a0, a1); };
@@ -33,7 +25,7 @@ function layout() {
   S = Math.min(G.W / 430, G.H / 720); VW = G.W / S; VH = G.H / S; const wide = VW >= 760, cxm = VW / 2, gy = VH - (wide ? 110 : 120);
   const c = wide ? { x: cxm - 170, y: 250, rx: 340, ry: 180 } : { x: VW * .45, y: 300, rx: 185, ry: 170 };
   const wall = wide ? { x: cxm + 210, y: gy - 300, w: 360, h: 300 } : { x: VW - 205, y: gy - 300, w: 197, h: 300 };
-  L = { wide, cxm, gy, c, wall, tx: wide ? c.x : VW * .3, spots: SPOTS.map(([u, v]) => [c.x + u * c.rx, c.y + v * c.ry]) };
+  L = { wide, cxm, gy, c, wall, tx: wide ? c.x : VW * .3, spots: SPOTS.map(([u, v]) => [c.x + u * c.rx, c.y + v * c.ry]), branches: BRANCH.map(([u, v]) => [c.x + u * c.rx, c.y + v * c.ry]) };
   const key = `${Math.round(VW)}x${Math.round(VH)}`; if (!SPR || SPR.key !== key) SPR = { key, bg: G.spr(VW, VH, drawScene, clamp(S * G.DPR, 1, 2.5)) };
   $('gui').style.fontSize = clamp(16 * S, 13, 18) + 'px';
 }
@@ -57,7 +49,7 @@ function drawScene(g, w, h) {
   /* trunk, branches, and a cloud of blossom */
   const tx = L.tx; g.lineCap = 'round'; g.strokeStyle = '#5a3c30'; g.lineWidth = 34; g.beginPath(); g.moveTo(tx, gy + 6); g.quadraticCurveTo(tx - 8, gy - 110, tx + (c.x - tx) * .5, c.y + c.ry * .5); g.stroke();
   g.strokeStyle = 'rgba(255,220,200,.18)'; g.lineWidth = 6; g.beginPath(); g.moveTo(tx - 9, gy); g.quadraticCurveTo(tx - 16, gy - 110, tx + (c.x - tx) * .5 - 8, c.y + c.ry * .5); g.stroke();
-  const bx = tx + (c.x - tx) * .5, by = c.y + c.ry * .5; for (const [x, y] of L.spots) { g.strokeStyle = '#5a3c30'; g.lineWidth = 5 + r() * 5; g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo(lerp(bx, x, .5) + (r() - .5) * 60, lerp(by, y, .5) - 30, x, y); g.stroke(); }
+  const bx = tx + (c.x - tx) * .5, by = c.y + c.ry * .5; for (const [x, y] of L.branches) { g.strokeStyle = '#5a3c30'; g.lineWidth = 5 + r() * 5; g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo(lerp(bx, x, .5) + (r() - .5) * 60, lerp(by, y, .5) - 30, x, y); g.stroke(); }
   for (let i = 0; i < c.rx * c.ry / 34; i++) { const a = r() * TAU, d = Math.sqrt(r()); dab(g, c.x + Math.cos(a) * d * c.rx * 1.04, c.y + Math.sin(a) * d * c.ry * 1.04, 9 + r() * 12, 7 + r() * 9, r() * 3, PINK[r() * 5 | 0], .78); } g.globalAlpha = 1;
 }
 function flower(g, x, y, s, t, on, i) {
@@ -69,7 +61,7 @@ function flower(g, x, y, s, t, on, i) {
   g.restore();
 }
 function setStep() {
-  const left = BLOOMS.length - open.size; $('gstep').textContent = left > 0 ? `Tap a glowing blossom to open a memory. ${left} left.` : fin < 1 ? 'Evening in the garden.' : 'Read the wall, then tap it.';
+  const left = BLOOMS.length - open.size; $('gstep').textContent = left > 0 ? `Tap a glowing blossom to open a memory. ${left} left.` : 'Evening in the garden.';
   $('gcount').textContent = `Blossoms ${open.size} of ${BLOOMS.length}`;
 }
 const vid = $('gvid'), pic = $('gimg');
@@ -83,18 +75,18 @@ function pick(i) {
   open.add(i); tone(784 + i * 30, .16, 'sine', .06); tone(1175 + i * 30, .3, 'sine', .04, .08); show(BLOOMS[i], `Blossom ${open.size} of ${BLOOMS.length}`); setStep();
 }
 function closeView() {
-  const was = view; vid.pause(); vid.removeAttribute('src'); vid.load(); pic.removeAttribute('src'); $('gview').hidden = true; view = null;
-  if (was === FRIEND && !endShown) { endShown = true; $('gend').hidden = false; $('gstay').focus(); [523, 659, 784, 1047].forEach((f, i) => tone(f, .9, 'sine', .05, i * .22)); }
+  vid.pause(); vid.removeAttribute('src'); vid.load(); pic.removeAttribute('src'); $('gview').hidden = true; view = null;
 }
 function frame(dt) {
   if (!L || !SPR) return; const t = G.time, g = cx, c = L.c, W = L.wall, gy = L.gy, all = open.size === BLOOMS.length;
-  if (all && fin < 1) { fin = Math.min(1, fin + dt / 3.4); if (fin >= 1) { setStep(); tone(523, .6, 'sine', .05); tone(784, .8, 'sine', .04, .2); } }
+  if (all && $('gview').hidden && fin < 1) { fin = Math.min(1, fin + dt / 3.4); if (fin >= 1) { setStep(); tone(523, .6, 'sine', .05); tone(784, .8, 'sine', .04, .2); } }
+  if (fin >= 1 && !endShown && active) { finT += dt; if (finT > 3) { endShown = true; $('gend').hidden = false; $('gstay').focus(); [523, 659, 784, 1047].forEach((f, i) => tone(f, .9, 'sine', .05, i * .22)); } }
   g.setTransform(S * G.DPR, 0, 0, S * G.DPR, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.drawImage(SPR.bg, 0, 0, VW, VH);
   /* the two of them, by the wall */
   const wc = W.x + W.w / 2, sc = L.wide ? 1.35 : 1.1, sp = L.wide ? 52 : 40;
   G.figure(g, wc - sp, gy + 12, 'j', { dir: 1, outfit: 'coat', sc, expr: fin >= 1 ? 'joy' : 'smile' }); G.figure(g, wc + sp, gy + 12, 'f', { dir: -1, outfit: 'coat', sc, expr: fin > .5 ? 'joy' : 'smile' });
   /* blossoms, falling petals */
-  L.spots.forEach(([x, y], i) => flower(g, x, y, L.wide ? 1.15 : 1, t, open.has(i), i));
+  L.spots.forEach(([x, y], i) => flower(g, x, y, L.wide ? 1.5 : 1.3, t, open.has(i), i));
   if (!G.RM) { const pr = R(8); for (let i = 0; i < 34; i++) { const x = wrap(pr() * (VW + 100) + Math.sin(t * .7 + i) * 30 + t * 8, VW + 100) - 50, y = wrap(pr() * VH + t * (22 + pr() * 26), VH + 40) - 20; g.save(); g.translate(x, y); g.rotate(t * (1 + pr()) + i); g.fillStyle = PINK[i % 5]; g.globalAlpha = .9; g.beginPath(); g.ellipse(0, 0, 4.4, 2.4, 0, 0, TAU); g.fill(); g.restore(); } }
   for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.life -= dt; p.vy += 120 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += dt * 5; if (p.life <= 0) { parts.splice(i, 1); continue; } g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.globalAlpha = Math.min(1, p.life * 1.6); g.fillStyle = p.c; g.beginPath(); g.ellipse(0, 0, 5, 2.6, 0, 0, TAU); g.fill(); g.restore(); }
   g.globalAlpha = 1;
@@ -107,7 +99,6 @@ function frame(dt) {
     const lines = L.wide ? ["YOU'VE GOT", 'A FRIEND'] : ["YOU'VE", 'GOT A', 'FRIEND'], fs = L.wide ? 38 : 28, total = lines.join('').length; let shown = Math.floor(sm(fin, .15, 1) * (total + 1));
     g.font = `800 ${fs}px ${UI}`; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = '#1c1a1e';
     lines.forEach((ln, k) => { let w = 0; for (const ch of ln) w += g.measureText(ch).width + 2; let lx = wc - w / 2; for (const ch of ln) { if (shown-- > 0) g.fillText(ch, lx, W.y + 44 + k * (fs + 8)); lx += g.measureText(ch).width + 2; } });
-    if (fin >= 1 && !endShown) { const pu = .5 + .5 * Math.sin(t * 5); g.strokeStyle = `rgba(255,240,190,${.5 + .4 * pu})`; g.lineWidth = 3.5; rr(g, W.x - 6 - pu * 3, W.y - 12 - pu * 3, W.w + 12 + pu * 6, W.h + 18 + pu * 6, 8); g.stroke(); }
   }
   moth.x = lerp(moth.x, c.x + c.rx * .9 + Math.sin(t * .8) * 14, 1 - Math.exp(-dt * 2)); moth.y = lerp(moth.y, c.y + c.ry + 20 + Math.sin(t * 2.1) * 10, 1 - Math.exp(-dt * 2));
   g.globalCompositeOperation = 'lighter'; glow(g, moth.x, moth.y, 46, '255,214,130', .3 + .2 * fin + .08 * Math.sin(t * 6)); g.globalCompositeOperation = 'source-over';
@@ -117,14 +108,13 @@ function frame(dt) {
 const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / S, (e.clientY - r.top) / S]; };
 const busy = () => !active || !$('gview').hidden || !$('gend').hidden;
 cv.addEventListener('pointerdown', e => {
-  if (busy()) return; const [x, y] = pt(e), W = L.wall; let best = -1, bd = 34; L.spots.forEach(([sx, sy], i) => { const d = Math.hypot(x - sx, y - sy); if (d < bd) { bd = d; best = i; } });
-  if (best >= 0) { if (open.has(best)) show(BLOOMS[best], 'Blossom, again'); else pick(best); return; }
-  if (fin >= 1 && x > W.x - 10 && x < W.x + W.w + 10 && y > W.y - 14 && y < W.y + W.h) { tone(660, .1, 'sine', .05); show(FRIEND, 'The wall'); }
+  if (busy()) return; const [x, y] = pt(e); let best = -1, bd = 34; L.spots.forEach(([sx, sy], i) => { const d = Math.hypot(x - sx, y - sy); if (d < bd) { bd = d; best = i; } });
+  if (best >= 0) { if (open.has(best)) show(BLOOMS[best], 'Blossom, again'); else pick(best); }
 });
 addEventListener('keydown', e => {
   if (!active || e.metaKey || e.ctrlKey) return; if (!$('gview').hidden) { if (e.key === 'Escape') closeView(); return; }
   if (busy() || (e.target && e.target.tagName === 'BUTTON') || (e.key !== ' ' && e.key !== 'Enter')) return; e.preventDefault();
-  const i = BLOOMS.findIndex((_, k) => !open.has(k)); if (i >= 0) pick(i); else if (fin >= 1) show(FRIEND, 'The wall');
+  const i = BLOOMS.findIndex((_, k) => !open.has(k)); if (i >= 0) pick(i);
 });
 const soundLabel = () => { $('gsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('gsound').setAttribute('aria-pressed', G.sound); };
 $('gsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
