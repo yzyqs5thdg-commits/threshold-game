@@ -21,17 +21,7 @@ const K = { state: 'intro', served: 0, streak: 0, n: 0, order: null, bowl: null,
 const moth = { x: 300, y: 120 };
 
 /* ------------------------------------------------------------------ sound */
-let AC = null, soundOn = true;
-function tone(f, d = .12, type = 'sine', v = .08, when = 0, slide = 0) {
-  if (!soundOn) return;
-  try {
-    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
-    const t0 = AC.currentTime + when, o = AC.createOscillator(), a = AC.createGain();
-    o.type = type; o.frequency.setValueAtTime(f, t0); if (slide) o.frequency.exponentialRampToValueAtTime(f * slide, t0 + d);
-    a.gain.setValueAtTime(.0001, t0); a.gain.exponentialRampToValueAtTime(v, t0 + .012); a.gain.exponentialRampToValueAtTime(.0001, t0 + d);
-    o.connect(a); a.connect(AC.destination); o.start(t0); o.stop(t0 + d + .05);
-  } catch (e) { /* no sound is fine */ }
-}
+const tone = G.tone;
 const sfx = {
   pick() { tone(520, .05, 'triangle', .04); },
   plop() { tone(380, .14, 'sine', .1, 0, .55); tone(240, .12, 'sine', .06, .05, .7); },
@@ -442,14 +432,15 @@ $('kstart').addEventListener('click', () => { K.state = 'play'; $('kintro').hidd
 $('kleave').addEventListener('click', () => G.go('road', { atDoor: true }));
 $('kback').addEventListener('click', () => { $('kwin').hidden = true; K.endless = true; K.state = 'play'; hud(); G.go('road', { atDoor: true }); });
 $('kmore').addEventListener('click', () => { $('kwin').hidden = true; K.endless = true; K.state = 'play'; hud(); });
-$('ksound').addEventListener('click', () => { soundOn = !soundOn; $('ksound').textContent = soundOn ? 'Sound on' : 'Sound off'; $('ksound').setAttribute('aria-pressed', soundOn); });
+const soundLabel = () => { $('ksound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('ksound').setAttribute('aria-pressed', G.sound); };
+$('ksound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
 
 G.scenes.kitchen = {
   frame, resize: layout,
   enter() {
     active = true; $('kui').hidden = false; layout();
     if (!K.order) { K.order = makeOrder(0); K.bowl = newBowl(); }
-    $('kintro').hidden = K.state !== 'intro'; $('kwin').hidden = K.state !== 'won'; hud(); announce();
+    $('kintro').hidden = K.state !== 'intro'; $('kwin').hidden = K.state !== 'won'; hud(); announce(); soundLabel();
     if (document.fonts && document.fonts.load) { document.fonts.load(`700 14px Nunito`); document.fonts.load(`italic 600 21px Fraunces`); }
   },
   leave() { active = false; K.held = null; $('kui').hidden = true; },

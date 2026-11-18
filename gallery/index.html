@@ -59,6 +59,10 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .paper button { background: var(--ink); color: var(--paper); box-shadow: none; margin-top: 4px; }
 .paper button.alt { background: none; color: var(--ink); text-decoration: underline; text-underline-offset: 4px; font-weight: 500; margin-top: 0; padding: 6px 12px; }
 .paper .keep { color: var(--ok); font-weight: 700; }
+#rhud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
+#rhud .krow { flex: none; }
+.step { margin: 0; border-radius: 16px; line-height: 1.35; max-width: 22em; }
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 6px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .gone { opacity: 0 !important; }
 @media (prefers-reduced-motion: reduce) { * { transition-duration: .01s !important; } }
@@ -70,7 +74,10 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
   <h1>For Jana</h1>
   <p>The road to the house</p>
   <button id="begin" type="button">Start walking</button>
-  <button id="skip" type="button" class="quiet">Skip to the kitchen</button>
+  <div class="links">
+    <button id="skip" type="button" class="quiet">Skip to the kitchen</button>
+    <button id="skiproof" type="button" class="quiet">Skip to the rooftop</button>
+  </div>
 </div>
 
 <div class="over" id="hud">
@@ -104,6 +111,35 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
     </div>
   </div>
   <p class="sr" id="klive" aria-live="polite"></p>
+</div>
+
+<div id="rui" hidden>
+  <div class="over" id="rhud">
+    <p class="pill step" id="rstep" aria-live="polite"></p>
+    <div class="krow">
+      <button class="small" id="rsound" type="button" aria-pressed="true">Sound on</button>
+      <button class="small" id="rleave" type="button">Leave</button>
+    </div>
+  </div>
+  <div class="over sheet" id="rwin" hidden>
+    <div class="paper">
+      <h2>The tower winks back</h2>
+      <p class="keep">Keepsake found: the cork</p>
+      <p class="note">Your note to Jana about the rooftop goes here.</p>
+      <button id="rstay" type="button">Stay a while</button>
+      <button id="rback" type="button" class="alt">Back downstairs</button>
+    </div>
+  </div>
+</div>
+
+<div class="over sheet" id="door" hidden>
+  <div class="paper">
+    <h2>Where to?</h2>
+    <p class="soft">The hall and the other rooms are still being painted.</p>
+    <button id="dkitchen" type="button">The kitchen</button>
+    <button id="droof" type="button">The rooftop</button>
+    <button id="dstay" type="button" class="alt">Stay outside</button>
+  </div>
 </div>
 
 <div class="over" id="fade"></div>
@@ -500,39 +536,40 @@ function drawJana(g, x, y, dir, phase, moving) {
     const th = .52 * Math.sin(p) * walk, sh = th - .8 * Math.max(0, Math.cos(p)) * walk;
     const kx = Math.sin(th) * 25, ky = -50 + Math.cos(th) * 25, fx = kx + Math.sin(sh) * 25, fy = ky + Math.cos(sh) * 25;
     g.strokeStyle = col; g.lineWidth = 7.5; g.beginPath(); g.moveTo(0, -50); g.lineTo(kx, ky); g.lineTo(fx, fy); g.stroke();
-    g.fillStyle = '#5a3a2c'; g.beginPath(); g.ellipse(fx + 3, fy + 1, 7, 4, sh * -.6, 0, TAU); g.fill();
+    g.fillStyle = '#f1ede4'; g.beginPath(); g.ellipse(fx + 3, fy + 1, 7, 4, sh * -.6, 0, TAU); g.fill();
   };
   const arm = (p, col) => {
     const a = .55 * Math.sin(p) * walk + .05, ex = Math.sin(a) * 17, ey = -90 + Math.cos(a) * 17, hx = ex + Math.sin(a + .35 * walk) * 15, hy = ey + Math.cos(a + .35 * walk) * 15;
-    g.strokeStyle = col; g.lineWidth = 7; g.beginPath(); g.moveTo(0, -91); g.lineTo(ex, ey); g.lineTo(hx, hy); g.stroke();
-    g.fillStyle = '#eec7a2'; g.beginPath(); g.arc(hx, hy + 1.5, 3.1, 0, TAU); g.fill();
+    g.strokeStyle = col; g.lineWidth = 7.4; g.beginPath(); g.moveTo(0, -91); g.lineTo(ex, ey); g.lineTo(hx, hy); g.stroke();
+    g.strokeStyle = '#f1e6d0'; g.lineWidth = 8; g.beginPath(); g.moveTo(lerp(ex, hx, .62), lerp(ey, hy, .62)); g.lineTo(hx, hy); g.stroke();
+    g.fillStyle = '#f0c7a6'; g.beginPath(); g.arc(hx, hy + 2.5, 3.1, 0, TAU); g.fill();
   };
-  leg(phase + Math.PI, '#2f2a3a'); arm(phase, '#a8392f');
-  /* scarf tail, behind the coat */
-  const wv = .25 + .75 * walk; g.strokeStyle = '#f4e9cf'; g.lineWidth = 6; g.beginPath(); g.moveTo(-5, -99);
-  for (let i = 1; i <= 5; i++) g.lineTo(-5 - i * (1.6 + 6.4 * wv), -99 + Math.sin(time * 5 - i * .9) * i * 1.4 * wv + i * (5.2 - 3.9 * wv));
-  g.stroke();
-  leg(phase, '#3a3446');
-  /* coat */
+  leg(phase + Math.PI, '#252b40'); arm(phase, '#191e35');
+  /* long hair, lifting behind her as she walks */
+  const wv = .2 + .8 * walk, hair = (ox, w, col) => { g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.moveTo(-5 + ox, -112); for (let i = 1; i <= 6; i++) g.lineTo(-5 + ox - i * (1.2 + 2.3 * wv) + Math.sin(i * 1.3) * 1.6, -112 + i * (8.6 - 2 * wv) + Math.sin(time * 4.6 - i * .9) * i * .8 * wv); g.stroke(); };
+  hair(0, 12, '#573726'); hair(-2.5, 2.6, 'rgba(196,142,88,.9)'); hair(2.5, 1.6, 'rgba(58,34,22,.6)');
+  leg(phase, '#2f3650');
+  /* navy coat */
   const hem = Math.sin(phase) * 2.5 * walk;
-  g.fillStyle = '#c9463b'; g.beginPath(); g.moveTo(-9, -98); g.quadraticCurveTo(-11, -72, -16 - hem, -36); g.quadraticCurveTo(0, -31, 15 - hem, -36); g.quadraticCurveTo(10, -72, 9, -98); g.closePath(); g.fill();
-  g.fillStyle = 'rgba(255,200,150,.28)'; g.beginPath(); g.moveTo(-9, -98); g.quadraticCurveTo(-11, -72, -16 - hem, -36); g.lineTo(-9 - hem, -35); g.quadraticCurveTo(-5, -72, -4, -98); g.fill();
-  g.fillStyle = 'rgba(70,20,50,.22)'; g.beginPath(); g.moveTo(9, -98); g.quadraticCurveTo(10, -72, 15 - hem, -36); g.lineTo(8 - hem, -34); g.quadraticCurveTo(5, -72, 4, -98); g.fill();
-  /* satchel for keepsakes */
-  g.strokeStyle = '#6e4628'; g.lineWidth = 2; g.beginPath(); g.moveTo(-7, -95); g.lineTo(9, -62); g.stroke();
-  g.fillStyle = '#8f5e36'; g.beginPath(); g.roundRect(1, -66, 14, 12, 3); g.fill(); g.fillStyle = '#f2b45c'; g.fillRect(7, -62, 2.4, 2.4);
-  arm(phase + Math.PI, '#c9463b');
-  /* scarf, head, hair, hat */
-  g.fillStyle = '#f4e9cf'; g.beginPath(); g.ellipse(0, -99, 9.5, 5, 0, 0, TAU); g.fill();
-  g.fillStyle = '#3b2a26'; g.beginPath(); g.ellipse(-4, -108, 11.5, 13, .1, 0, TAU); g.fill();
-  g.fillStyle = '#f2ccaa'; g.beginPath(); g.arc(1.5, -111, 11.5, 0, TAU); g.fill();
-  g.fillStyle = '#3b2a26'; g.beginPath(); g.arc(1.5, -111, 11.8, Math.PI * .9, Math.PI * 1.75); g.lineTo(-2, -108); g.fill();
-  g.fillStyle = '#2b2024'; g.beginPath(); g.ellipse(7.5, -111, 1.3, 1.7, 0, 0, TAU); g.fill();
+  g.fillStyle = '#232a45'; g.beginPath(); g.moveTo(-9, -98); g.quadraticCurveTo(-11, -72, -16 - hem, -36); g.quadraticCurveTo(0, -31, 15 - hem, -36); g.quadraticCurveTo(10, -72, 9, -98); g.closePath(); g.fill();
+  g.fillStyle = 'rgba(150,170,240,.2)'; g.beginPath(); g.moveTo(-9, -98); g.quadraticCurveTo(-11, -72, -16 - hem, -36); g.lineTo(-9 - hem, -35); g.quadraticCurveTo(-5, -72, -4, -98); g.fill();
+  g.fillStyle = 'rgba(0,0,20,.28)'; g.beginPath(); g.moveTo(9, -98); g.quadraticCurveTo(10, -72, 15 - hem, -36); g.lineTo(8 - hem, -34); g.quadraticCurveTo(5, -72, 4, -98); g.fill();
+  /* cream collar and lapel */
+  g.fillStyle = '#f1e6d0'; g.beginPath(); g.moveTo(1, -100); g.lineTo(10, -96); g.lineTo(8, -78); g.lineTo(2, -86); g.closePath(); g.fill();
+  g.beginPath(); g.ellipse(0, -98, 10.5, 5.6, 0, 0, TAU); g.fill();
+  /* her silver bag */
+  g.strokeStyle = '#8f949c'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(-7, -95); g.lineTo(9, -62); g.stroke();
+  g.fillStyle = '#cfd3da'; g.beginPath(); g.roundRect(1, -66, 14, 11, 3); g.fill(); g.fillStyle = 'rgba(255,255,255,.7)'; g.fillRect(3, -64.5, 9, 1.8);
+  arm(phase + Math.PI, '#232a45');
+  /* head and hair */
+  g.fillStyle = '#573726'; g.beginPath(); g.ellipse(-4, -109, 12.5, 14, .1, 0, TAU); g.fill();
+  g.fillStyle = '#f0c7a6'; g.beginPath(); g.arc(1.5, -111, 11.5, 0, TAU); g.fill();
+  g.fillStyle = '#573726'; g.beginPath(); g.moveTo(10.5, -119); g.quadraticCurveTo(3, -127, -8, -122); g.quadraticCurveTo(-13, -112, -9, -100); g.lineTo(-3, -101); g.quadraticCurveTo(-5, -112, 2, -118); g.quadraticCurveTo(7, -121, 10.5, -119); g.fill();
+  g.strokeStyle = 'rgba(196,142,88,.9)'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(5, -122); g.quadraticCurveTo(-5, -121, -7, -106); g.stroke();
+  g.fillStyle = '#2b2024'; g.beginPath(); g.ellipse(7.5, -111, 1.3, 1.8, 0, 0, TAU); g.fill();
+  g.strokeStyle = '#3b2a26'; g.lineWidth = 1.1; g.beginPath(); g.moveTo(5.4, -115); g.lineTo(9.6, -115.6); g.stroke();
   g.fillStyle = 'rgba(232,120,110,.4)'; g.beginPath(); g.ellipse(5.5, -106, 3, 2, 0, 0, TAU); g.fill();
-  g.fillStyle = '#e9d08c'; g.beginPath(); g.ellipse(1, -119, 20, 4.6, -.06, 0, TAU); g.fill();
-  g.beginPath(); g.ellipse(0, -120, 11.5, 9.5, 0, Math.PI, 0); g.fill();
-  g.fillStyle = '#b5533c'; g.fillRect(-11.5, -122.4, 23, 3);
-  g.fillStyle = 'rgba(120,90,40,.25)'; g.beginPath(); g.ellipse(1, -117.6, 19, 2.2, -.06, 0, Math.PI); g.fill();
+  g.fillStyle = '#e9c15a'; g.beginPath(); g.arc(-2.2, -105.4, 1.9, 0, TAU); g.fill();
   g.restore();
 }
 
@@ -559,6 +596,18 @@ function paper(g, v = .34) {
   g.fillStyle = SP.mottle; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = SP.grain; g.fillRect(0, 0, cv.width, cv.height);
   const vg = g.createRadialGradient(cv.width / 2, cv.height * .48, Math.min(cv.width, cv.height) * .45, cv.width / 2, cv.height / 2, Math.hypot(cv.width, cv.height) * .62);
   vg.addColorStop(0, 'rgba(28,39,72,0)'); vg.addColorStop(1, `rgba(28,39,72,${v})`); g.fillStyle = vg; g.fillRect(0, 0, cv.width, cv.height);
+}
+/* one small synth for every room, so the sound switch is shared */
+let AC = null, soundOn = true;
+function tone(f, d = .12, type = 'sine', v = .08, when = 0, slide = 0) {
+  if (!soundOn) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = AC.currentTime + when, o = AC.createOscillator(), a = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t0); if (slide) o.frequency.exponentialRampToValueAtTime(f * slide, t0 + d);
+    a.gain.setValueAtTime(.0001, t0); a.gain.exponentialRampToValueAtTime(v, t0 + .012); a.gain.exponentialRampToValueAtTime(.0001, t0 + d);
+    o.connect(a); a.connect(AC.destination); o.start(t0); o.stop(t0 + d + .05);
+  } catch (e) { /* no sound is fine */ }
 }
 function roadFrame(dt) {
   /* ---- update */
@@ -694,7 +743,7 @@ function roadFrame(dt) {
 const titleEl = document.getElementById('title'), hint = document.getElementById('hint'), enter = document.getElementById('enter'), hudEl = document.getElementById('hud'), fade = document.getElementById('fade');
 const aim = e => { const r = cv.getBoundingClientRect(); target = camX + (e.clientX - r.left) / S; };
 function begin() { if (started) return; started = true; titleEl.classList.add('gone'); setTimeout(() => { titleEl.hidden = true; }, 1300); hint.style.opacity = 1; }
-const onRoad = () => scene === scenes.road && !switching;
+const onRoad = () => scene === scenes.road && !switching && door.hidden;
 document.getElementById('begin').addEventListener('click', begin);
 document.getElementById('skip').addEventListener('click', () => { begin(); go('kitchen'); });
 cv.addEventListener('pointerdown', e => { if (!onRoad()) return; if (!started) { begin(); return; } down = true; aim(e); });
@@ -703,7 +752,10 @@ addEventListener('pointerup', () => { down = false; }); addEventListener('pointe
 const KEYS = { ArrowRight: 1, d: 1, D: 1, ArrowLeft: -1, a: -1, A: -1 };
 addEventListener('keydown', e => { if (onRoad() && KEYS[e.key]) { if (!started) begin(); keyDir = KEYS[e.key]; e.preventDefault(); } });
 addEventListener('keyup', e => { if (KEYS[e.key] === keyDir) keyDir = 0; });
-enter.addEventListener('click', () => go('kitchen'));
+const door = document.getElementById('door');
+enter.addEventListener('click', () => { door.hidden = false; target = null; document.getElementById('dkitchen').focus(); });
+for (const [id, to] of [['dkitchen', 'kitchen'], ['droof', 'rooftop'], ['dstay', null]]) document.getElementById(id).addEventListener('click', () => { door.hidden = true; if (to) go(to); });
+document.getElementById('skiproof').addEventListener('click', () => { begin(); go('rooftop'); });
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); if (scene && scene.resize) scene.resize(); }, 120); });
 
 /* scenes: each room registers itself here; go() fades between them */
@@ -712,7 +764,7 @@ const scenes = {
   road: {
     frame: roadFrame,
     enter(o) { hudEl.hidden = false; titleEl.hidden = started; if (o.atDoor) { J.x = DOOR_X; J.max = Math.max(J.max, DOOR_X); J.v = 0; J.dir = -1; lightLamps(); } target = null; road.init = false; },
-    leave() { hudEl.hidden = true; titleEl.hidden = true; enter.classList.remove('on'); target = null; keyDir = 0; down = false; J.v = 0; },
+    leave() { hudEl.hidden = true; titleEl.hidden = true; door.hidden = true; enter.classList.remove('on'); target = null; keyDir = 0; down = false; J.v = 0; },
     resize() { road.init = false; }
   }
 };
@@ -733,7 +785,8 @@ function start(data) {
   requestAnimationFrame(loop);
 }
 const G = window.G = {
-  cv, cx, lerp, clamp, sm, hex, mix, rgb, wrap, TAU, R, RM, dab, foliage, PAL, glow, spr, paper, scenes, go,
+  cv, cx, lerp, clamp, sm, hex, mix, rgb, wrap, TAU, R, RM, dab, foliage, PAL, glow, spr, paper, scenes, go, tone,
+  get sound() { return soundOn; }, set sound(v) { soundOn = !!v; }, get SP() { return SP; },
   get W() { return W; }, get H() { return H; }, get DPR() { return DPR; }, get time() { return time; },
   /* called once every room's script has loaded */
   boot() {
@@ -746,4 +799,5 @@ const G = window.G = {
 })();
 </script>
 <script src="kitchen.js"></script>
+<script src="rooftop.js"></script>
 <script>window.G.boot();</script>
