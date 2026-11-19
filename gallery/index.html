@@ -64,7 +64,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .paper .keep { color: var(--ok); font-weight: 700; }
 .paper .toast { font-family: var(--display); font-style: italic; font-size: 1.4em; line-height: 1.3; text-wrap: balance; max-width: 16em; }
 .cork { display: block; }
-#rhud, #chud, #dhud, #mhud, #xhud, #bhud, #fhud, #shud, #uhud, #tbhud, #ghud, #maphud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
+#rhud, #chud, #dhud, #mhud, #xhud, #bhud, #fhud, #shud, #uhud, #tbhud, #ghud, #maphud, #phud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
 #rhud .krow, #chud .krow, #dhud .krow, #mhud .krow, #xhud .krow, #bhud .krow, #fhud .krow, #shud .krow { flex: none; align-items: center; }
 #sbar, #ubar { flex-direction: row; align-items: flex-end; align-content: flex-end; justify-content: center; flex-wrap: wrap; gap: 8px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 #sbar button, #ubar button { padding: 11px 15px; font-size: 14.5px; }
@@ -74,23 +74,34 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .xnav[hidden] { display: none; }
 .paper .xnav button { margin: 0; padding: .45em 1em; font-size: .85em; background: none; color: var(--ink); border: 1.5px solid var(--ink-soft); }
 .paper .xnav button:disabled { opacity: .35; cursor: default; }
-#xhud .krow, #bhud .krow, #fhud .krow, #shud .krow, #uhud .krow, #tbhud .krow, #ghud .krow, #maphud .krow { flex: 0 1 auto; align-items: center; }
-#xhud .step, #bhud .step, #fhud .step, #shud .step, #uhud .step, #tbhud .step, #ghud .step { flex: 1 1 9em; min-width: 9em; }
+#xhud .krow, #bhud .krow, #fhud .krow, #shud .krow, #uhud .krow, #tbhud .krow, #ghud .krow, #maphud .krow, #phud .krow { flex: 0 1 auto; align-items: center; }
+#xhud .step, #bhud .step, #fhud .step, #shud .step, #uhud .step, #tbhud .step, #ghud .step, #phud .step { flex: 1 1 9em; min-width: 9em; }
 #maphud .step { flex: 0 1 auto; }
 #tomap { align-self: flex-end; }
 #whud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
-#wpanel { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(64px + env(safe-area-inset-top, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(24em, 42vw); background: var(--paper); color: var(--ink); border-radius: 16px; box-shadow: 0 18px 50px rgba(28, 39, 72, .4); display: flex; flex-direction: column; min-height: 0; }
-@media (max-aspect-ratio: 1/1) { #wpanel { left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); top: auto; width: auto; height: 46%; } }
-#wtabs { display: flex; gap: 6px; padding: 12px 12px 0; }
-#wtabs button { flex: 1; background: none; box-shadow: none; color: var(--ink); border: 1.5px solid var(--ink-soft); padding: .55em .4em; font-size: .9em; }
-#wtabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-#wbody { overflow-y: auto; padding: 4px 14px 16px; min-height: 0; }
-#wbody h3 { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 1.15em; margin: 14px 0 8px; }
+#wpanel, #ppanel { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(64px + env(safe-area-inset-top, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(24em, 42vw); background: var(--paper); color: var(--ink); border-radius: 16px; box-shadow: 0 18px 50px rgba(28, 39, 72, .4); display: flex; flex-direction: column; min-height: 0; }
+@media (max-aspect-ratio: 1/1) { #wpanel, #ppanel { left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); top: auto; width: auto; height: 46%; } }
+#wtabs, #ptabs { display: flex; gap: 6px; padding: 12px 12px 0; }
+#wtabs button, #ptabs button { flex: 1; background: none; box-shadow: none; color: var(--ink); border: 1.5px solid var(--ink-soft); padding: .55em .4em; font-size: .9em; }
+#wtabs button[aria-pressed="true"], #ptabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+#wbody, #pbody { overflow-y: auto; padding: 4px 14px 16px; min-height: 0; }
+#wbody h3, #pbody h3 { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 1.15em; margin: 14px 0 8px; }
 .chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .chip { display: inline-flex; align-items: center; gap: 8px; background: none; box-shadow: none; color: var(--ink); border: 1.5px solid var(--ink-soft); padding: .5em .9em; font-size: .86em; text-align: left; }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .chip .sw { flex: none; width: 1.05em; height: 1.05em; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .7); box-shadow: 0 0 0 1px rgba(44, 42, 61, .35); }
-#xbar, #bbar, #gbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
+#ppanel[hidden], #pbar[hidden] { display: none; }
+#pbody { flex: 1; }
+#pbody .soft { color: var(--ink-soft); font-size: .84em; margin: 14px 0 0; }
+#pfoot { display: flex; align-items: center; gap: 6px; padding: 10px 12px 12px; border-top: 1.5px solid rgba(44, 42, 61, .14); }
+#psnap { flex: 1; background: var(--wine); color: var(--paper); box-shadow: none; padding: .8em 1em; font-size: 1em; }
+#psnap:disabled { opacity: .6; cursor: default; }
+#pagain { background: none; box-shadow: none; color: var(--ink); text-decoration: underline; text-underline-offset: 4px; font-weight: 500; font-size: .85em; padding: .6em .7em; }
+#pagain[hidden] { display: none; }
+#pview .xcard, #pout .xcard { max-width: 34em; }
+#pview .xcard img { max-height: min(68vh, 60em); background: none; }
+#poutslot img, #poutslot canvas { display: block; max-width: 100%; max-height: 56vh; width: auto; height: auto; border-radius: 4px; box-shadow: 0 6px 22px rgba(28, 39, 72, .35); background: none; -webkit-touch-callout: default; user-select: auto; }
+#xbar, #bbar, #gbar, #pbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 .xcard { max-width: 30em; gap: 8px; padding: 18px 20px 20px; }
 .xcard img, .xcard video { display: block; max-width: 100%; max-height: 50vh; border-radius: 8px; background: var(--night); }
 .xcard h2 { font-size: 1.55em; }
@@ -485,6 +496,40 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
   <div class="over" id="maphud">
     <p class="pill step" id="mapstep" aria-live="polite">Tap a place on the map to go there.</p>
     <div class="krow"><button class="small" id="mapward" type="button">Wardrobe</button><button class="small" id="mapsound" type="button" aria-pressed="true">Sound on</button></div>
+  </div>
+</div>
+
+<div id="pui" hidden>
+  <div class="over" id="phud">
+    <p class="pill step" id="pstep" aria-live="polite"></p>
+    <div class="krow">
+      <button class="small" id="pskip" type="button" hidden>Skip to the photo</button>
+      <button class="small" id="pwall" type="button" hidden>Out of the booth</button>
+      <button class="small" id="psound" type="button" aria-pressed="true">Sound on</button>
+      <button class="small" id="pleave" type="button">Back to the map</button>
+    </div>
+  </div>
+  <div class="over" id="pbar"><button id="pgo" type="button">Step into the booth</button></div>
+  <div id="ppanel" hidden>
+    <div id="ptabs"><button type="button" data-tab="pose">Poses</button><button type="button" data-tab="look">Outfits</button><button type="button" data-tab="film">Film</button></div>
+    <div id="pbody"></div>
+    <div id="pfoot"><button id="psnap" type="button">Take photo 1 of 4</button><button id="pagain" type="button" hidden>Start over</button></div>
+  </div>
+  <div class="over sheet" id="pview" hidden>
+    <div class="paper xcard">
+      <img id="pimg" alt="">
+      <button id="pclose" type="button">Back to the wall</button>
+      <button class="alt" id="pwatch" type="button">Watch it again</button>
+    </div>
+  </div>
+  <div class="over sheet" id="pout" hidden>
+    <div class="paper xcard">
+      <h2>Fresh out of the booth</h2>
+      <div id="poutslot"><img id="poutimg" alt="Your photo strip: four photos of the two of us"></div>
+      <p class="soft">Press and hold the strip to save it, or take a screenshot. The newest one stays in the window on the booth.</p>
+      <button id="pmore" type="button">Take another strip</button>
+      <button class="alt" id="pback" type="button">Back to the wall</button>
+    </div>
   </div>
 </div>
 
@@ -1147,5 +1192,6 @@ const G = window.G = {
 <script src="table.js"></script>
 <script src="garden.js"></script>
 <script src="wardrobe.js"></script>
+<script src="booth.js"></script>
 <script src="map.js"></script>
 <script>window.G.boot();</script>
