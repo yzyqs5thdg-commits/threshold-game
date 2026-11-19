@@ -155,6 +155,7 @@ addEventListener('keydown', e => {
 });
 const soundLabel = () => { $('mapsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('mapsound').setAttribute('aria-pressed', G.sound); };
 $('mapsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
+$('mapward').addEventListener('click', () => { if (!G.started) G.begin(); if (!trip) G.go('wardrobe'); });
 
 G.scenes.map = {
   frame, resize() { layout(); },

@@ -183,7 +183,7 @@ function person(g, who, t) {
   g.fillStyle = k.pants; rr(g, 44, seat - 14, 22, fl - seat + 6, 9); g.fill(); g.fillStyle = k.shoe; rr(g, 42, fl - 10, 38, 12, 6); g.fill();
   g.fillStyle = k.pants; rr(g, -22, seat - 26, 90, 28, 14); g.fill();
   /* sweater */
-  const sw = g.createLinearGradient(-30, 0, 28, 0); sw.addColorStop(0, k.top[1]); sw.addColorStop(1, k.top[0]); g.fillStyle = sw;
+  const sw = g.createLinearGradient(-30, 0, 28, 0); const jt = who === 'j' && G.janaTop(); sw.addColorStop(0, jt ? jt.dark : k.top[1]); sw.addColorStop(1, jt ? jt.top : k.top[0]); g.fillStyle = sw;
   g.beginPath(); g.moveTo(-26, seat + 2); g.quadraticCurveTo(-34, hy + 90, -24, hy + 52); g.quadraticCurveTo(-14, hy + 36, 4, hy + 38); g.quadraticCurveTo(24, hy + 44, 26, hy + 74); g.quadraticCurveTo(28, seat - 30, 22, seat + 2); g.closePath(); g.fill();
   if (who === 'j') { g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 3; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(-18 + i * 12, hy + 60); g.lineTo(-22 + i * 12, seat - 6); g.stroke(); } }
   g.fillStyle = G.people[who].skin; g.fillRect(-4, hy + 22, 15, 22); g.fillStyle = k.collar; ell(g, 3, hy + 41, 15, 6); g.fill();

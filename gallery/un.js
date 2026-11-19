@@ -62,7 +62,7 @@ function delegate(g, x, who, t) {
   const j = who === 'j', y = L.desk + 76, d = j ? 1 : -1, k = G.people[who], raise = j ? (U.vote === 'favour' ? U.raise : 0) : U.raise;
   g.fillStyle = '#1c2a44'; rr(g, x - 46, y - 40, 92, 150, 16); g.fill();
   if (raise > 0) { const hx = x - d * 44, hy = y - 30 - 96 * sm(raise) + Math.sin(t * 9) * 2 * raise; g.lineCap = 'round'; g.strokeStyle = j ? '#fdfbf4' : k.skin; g.lineWidth = 15; g.beginPath(); g.moveTo(x - d * 30, y - 14); g.lineTo(hx, hy + 18); g.stroke(); g.fillStyle = k.skin; g.beginPath(); g.arc(hx, hy + 6, 9, 0, TAU); g.fill(); }
-  g.fillStyle = j ? '#fdfbf4' : '#1c1c22'; g.beginPath(); g.moveTo(x - 44, y + 60); g.quadraticCurveTo(x - 42, y - 22, x - 14, y - 26); g.lineTo(x + 14, y - 26); g.quadraticCurveTo(x + 42, y - 22, x + 44, y + 60); g.closePath(); g.fill();
+  g.fillStyle = j ? (G.janaTop() ? G.janaTop().top : '#fdfbf4') : '#1c1c22'; g.beginPath(); g.moveTo(x - 44, y + 60); g.quadraticCurveTo(x - 42, y - 22, x - 14, y - 26); g.lineTo(x + 14, y - 26); g.quadraticCurveTo(x + 42, y - 22, x + 44, y + 60); g.closePath(); g.fill();
   if (!j) { g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 1; for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(x + i * 10, y - 22); g.lineTo(x + i * 11, y + 60); g.stroke(); } }
   g.fillStyle = k.skin; g.fillRect(x - 7, y - 40, 14, 18);
   g.strokeStyle = '#2f62c0'; g.lineWidth = 3; g.beginPath(); g.moveTo(x - 12, y - 26); g.lineTo(x + d * 4, y + 12); g.lineTo(x + 12, y - 26); g.stroke(); g.fillStyle = '#5f9fd8'; rr(g, x + d * 4 - 8, y + 10, 16, 22, 2); g.fill(); g.fillStyle = '#fdfbf4'; g.fillRect(x + d * 4 - 5, y + 13, 10, 8);

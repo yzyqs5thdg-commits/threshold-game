@@ -167,7 +167,7 @@ function layout() {
   layCv.width = cv.width; layCv.height = cv.height; $('bui').style.fontSize = clamp(16 * S, 13, 18) + 'px';
 }
 function seat(g, x, who, mv, t) {
-  g.fillStyle = who === 'j' ? '#6b4a3a' : '#8e1a2a'; rr(g, x - 10, -54, 22, 40, 9); g.fill(); g.strokeStyle = G.people[who].skin; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 8, -46); g.lineTo(x + 20, -36); g.stroke();
+  g.fillStyle = who === 'j' ? (G.janaTop() ? G.janaTop().top : '#6b4a3a') : '#8e1a2a'; rr(g, x - 10, -54, 22, 40, 9); g.fill(); g.strokeStyle = G.people[who].skin; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 8, -46); g.lineTo(x + 20, -36); g.stroke();
   G.head(g, who, { x: x + 2, y: -72, r: 13, len: 32, flow: .04 + .3 * mv, blink: !G.RM && ((t + (who === 'f' ? 1.7 : 0)) % 3.6) < .12, expr: mv > .5 ? 'joy' : 'smile', t });
 }
 function boat(g, x, y, t) {

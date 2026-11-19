@@ -75,7 +75,7 @@ function outside(g, t) {
   }
 }
 function seated(g, x, who, t, mv) {
-  const seat = L.seat, j = who === 'j', top = j ? '#22222a' : '#e9e2d0', jeans = j ? '#27375c' : '#4a6a9c', flr = seat + 92, z = L.wide ? 1.3 : 1.12;
+  const seat = L.seat, j = who === 'j', top = j ? (G.janaTop() ? G.janaTop().top : '#22222a') : '#e9e2d0', jeans = j ? '#27375c' : '#4a6a9c', flr = seat + 92, z = L.wide ? 1.3 : 1.12;
   g.save(); g.translate(x, seat); g.scale(z, z); g.translate(-x, -seat);
   g.fillStyle = jeans; rr(g, x - 26, seat - 18, 52, 26, 12); g.fill(); rr(g, x - 24, seat - 2, 19, flr - seat - 4, 8); g.fill(); rr(g, x + 5, seat - 2, 19, flr - seat - 4, 8); g.fill();
   g.fillStyle = j ? '#8a7a5c' : '#f4f0e6'; rr(g, x - 28, flr - 12, 25, 13, 6); g.fill(); rr(g, x + 3, flr - 12, 25, 13, 6); g.fill();
