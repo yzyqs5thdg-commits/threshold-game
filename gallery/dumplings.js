@@ -378,9 +378,9 @@ addEventListener('keyup', e => { if (active && (e.key === ' ' || e.key === 'Ente
 const soundLabel = () => { $('dsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('dsound').setAttribute('aria-pressed', G.sound); };
 $('dsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
 $('dnext').addEventListener('click', () => { if (D.phase === 'sauce') { D.phase = 'eat'; setStep(); tone(700, .08, 'sine', .05); } });
-$('dleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('dleave').addEventListener('click', () => G.go('map'));
 $('dagain').addEventListener('click', () => { $('ddone').hidden = true; D = fresh(); D.fi = FIND.length - 1; D.phase = 'order'; parts.length = says.length = 0; setStep(); });
-$('dback').addEventListener('click', () => { $('ddone').hidden = true; D = fresh(); G.go('road', { atDoor: true }); });
+$('dback').addEventListener('click', () => { $('ddone').hidden = true; D = fresh(); G.go('map'); });
 
 G.scenes.dumplings = {
   frame, resize: layout,

@@ -127,11 +127,11 @@ addEventListener('keydown', e => {
 });
 const soundLabel = () => { $('ssound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('ssound').setAttribute('aria-pressed', G.sound); };
 $('ssound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('sleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('sleave').addEventListener('click', () => G.go('map'));
 $('sprev').addEventListener('click', () => ride(C.at - 1)); $('snext').addEventListener('click', () => ride(C.at + 1)); $('slook').addEventListener('click', look);
 $('sp').addEventListener('click', () => { if (view && view.i > 0) { view.i--; show(); } }); $('sn').addEventListener('click', () => { if (view && view.i < view.st.items.length - 1) { view.i++; show(); } });
 $('sclose').addEventListener('click', closeView); $('sview').addEventListener('click', e => { if (e.target === $('sview')) closeView(); });
-$('sstay').addEventListener('click', () => { $('send').hidden = true; }); $('sback').addEventListener('click', () => { $('send').hidden = true; G.go('road', { atDoor: true }); });
+$('sstay').addEventListener('click', () => { $('send').hidden = true; }); $('sback').addEventListener('click', () => { $('send').hidden = true; G.go('map'); });
 
 G.scenes.city = {
   frame, resize: layout,

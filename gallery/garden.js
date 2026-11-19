@@ -172,10 +172,10 @@ addEventListener('keydown', e => {
 addEventListener('keyup', e => { if (KEYS[e.key] === keyDir) keyDir = 0; });
 const soundLabel = () => { $('gsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('gsound').setAttribute('aria-pressed', G.sound); };
 $('gsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('gleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('gleave').addEventListener('click', () => G.go('map'));
 $('glook').addEventListener('click', () => { if (near) open(near); });
 $('gclose').addEventListener('click', closeView); $('gview').addEventListener('click', e => { if (e.target === $('gview')) closeView(); });
-$('gstay').addEventListener('click', () => { $('gend').hidden = true; }); $('gback').addEventListener('click', () => { $('gend').hidden = true; G.go('road', { atDoor: true }); });
+$('gstay').addEventListener('click', () => { $('gend').hidden = true; }); $('gback').addEventListener('click', () => { $('gend').hidden = true; G.go('map'); });
 
 G.scenes.garden = {
   frame, resize: layout,

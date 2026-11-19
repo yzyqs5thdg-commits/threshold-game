@@ -296,14 +296,14 @@ addEventListener('keydown', ev => {
 addEventListener('keyup', ev => { if (KEYS[ev.key] === keyDir) keyDir = 0; });
 const soundLabel = () => { $('bsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('bsound').setAttribute('aria-pressed', G.sound); };
 $('bsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('bleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('bleave').addEventListener('click', () => G.go('map'));
 $('banchor').addEventListener('click', anchor);
 $('bprev').addEventListener('click', () => { if (view && view.i > 0) { view.i--; show(); } });
 $('bnext').addEventListener('click', () => { if (view && view.i < view.st.items.length - 1) { view.i++; show(); } });
 $('bclose').addEventListener('click', closeView);
 $('bview').addEventListener('click', ev => { if (ev.target === $('bview')) closeView(); });
 $('bstay').addEventListener('click', () => { $('bend').hidden = true; });
-$('bback').addEventListener('click', () => { $('bend').hidden = true; G.go('road', { atDoor: true }); });
+$('bback').addEventListener('click', () => { $('bend').hidden = true; G.go('map'); });
 vid.addEventListener('error', () => { if (!$('bview').hidden && vid.getAttribute('src')) $('btext').textContent += ' (This clip is not loaded here.)'; });
 
 G.scenes.bahamas = {

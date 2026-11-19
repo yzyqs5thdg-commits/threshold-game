@@ -389,13 +389,13 @@ addEventListener('keydown', ev => {
 addEventListener('keyup', ev => { if (KEYS[ev.key] === keyDir) keyDir = 0; });
 const soundLabel = () => { $('xsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('xsound').setAttribute('aria-pressed', G.sound); };
 $('xsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('xleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('xleave').addEventListener('click', () => G.go('map'));
 $('xlook').addEventListener('click', () => { if (near) open(near); });
 $('xsit').addEventListener('click', sit);
 $('xclose').addEventListener('click', closeView);
 $('xview').addEventListener('click', ev => { if (ev.target === $('xview')) closeView(); });
 $('xstay').addEventListener('click', () => { $('xend').hidden = true; });
-$('xback').addEventListener('click', () => { $('xend').hidden = true; G.go('road', { atDoor: true }); });
+$('xback').addEventListener('click', () => { $('xend').hidden = true; G.go('map'); });
 vid.addEventListener('error', () => { if (!$('xview').hidden && vid.getAttribute('src')) $('xtext').textContent += ' (This clip is not loaded here.)'; });
 
 G.scenes.mexico = {

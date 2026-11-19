@@ -356,9 +356,9 @@ addEventListener('keyup', e => { if (active && (e.key === ' ' || e.key === 'Ente
 const soundLabel = () => { $('csound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('csound').setAttribute('aria-pressed', G.sound); };
 $('csound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
 $('cnext').addEventListener('click', next);
-$('cleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('cleave').addEventListener('click', () => G.go('map'));
 $('cagain').addEventListener('click', () => { $('cdone').hidden = true; C = fresh(); steam.length = parts.length = says.length = 0; setStep('spice'); });
-$('cback').addEventListener('click', () => { $('cdone').hidden = true; C = fresh(); G.go('road', { atDoor: true }); });
+$('cback').addEventListener('click', () => { $('cdone').hidden = true; C = fresh(); G.go('map'); });
 
 G.scenes.chai = {
   frame, resize: layout,

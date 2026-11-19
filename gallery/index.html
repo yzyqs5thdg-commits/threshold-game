@@ -29,7 +29,7 @@ body { background: var(--night); color: var(--title); font-family: var(--ui); ov
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-#title { justify-content: flex-start; gap: 6px; text-align: center; transition: opacity 1.2s ease; padding-top: calc(11vh + env(safe-area-inset-top, 0px)); }
+#title { background: rgba(28, 39, 72, .46); justify-content: flex-start; gap: 6px; text-align: center; transition: opacity 1.2s ease; padding-top: calc(11vh + env(safe-area-inset-top, 0px)); }
 #title h1 { font-family: var(--display); font-style: italic; font-weight: 600; font-size: clamp(44px, 9vw, 92px); line-height: 1; margin: 0; color: var(--title); text-shadow: 0 2px 18px rgba(28, 39, 72, .45); text-wrap: balance; }
 #title p { margin: 0; font-family: var(--display); font-size: clamp(17px, 2.6vw, 24px); color: var(--title); text-shadow: 0 1px 10px rgba(28, 39, 72, .6); }
 button {
@@ -64,20 +64,20 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .paper .keep { color: var(--ok); font-weight: 700; }
 .paper .toast { font-family: var(--display); font-style: italic; font-size: 1.4em; line-height: 1.3; text-wrap: balance; max-width: 16em; }
 .cork { display: block; }
-#rhud, #chud, #dhud, #mhud, #xhud, #bhud, #fhud, #shud, #uhud, #tbhud, #ghud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
+#rhud, #chud, #dhud, #mhud, #xhud, #bhud, #fhud, #shud, #uhud, #tbhud, #ghud, #maphud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
 #rhud .krow, #chud .krow, #dhud .krow, #mhud .krow, #xhud .krow, #bhud .krow, #fhud .krow, #shud .krow { flex: none; align-items: center; }
 #sbar, #ubar { flex-direction: row; align-items: flex-end; align-content: flex-end; justify-content: center; flex-wrap: wrap; gap: 8px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 #sbar button, #ubar button { padding: 11px 15px; font-size: 14.5px; }
 #ubar[hidden] { display: none; }
 #sbar button:disabled { opacity: .45; cursor: default; }
-#door .paper { max-height: 100%; overflow-y: auto; gap: 8px; padding-block: 20px; }
-#door .paper button { margin-top: 0; padding: 10px 22px; }
 .xnav { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .xnav[hidden] { display: none; }
 .paper .xnav button { margin: 0; padding: .45em 1em; font-size: .85em; background: none; color: var(--ink); border: 1.5px solid var(--ink-soft); }
 .paper .xnav button:disabled { opacity: .35; cursor: default; }
-#xhud .krow, #bhud .krow, #fhud .krow, #shud .krow, #uhud .krow, #tbhud .krow, #ghud .krow { flex: 0 1 auto; align-items: center; }
+#xhud .krow, #bhud .krow, #fhud .krow, #shud .krow, #uhud .krow, #tbhud .krow, #ghud .krow, #maphud .krow { flex: 0 1 auto; align-items: center; }
 #xhud .step, #bhud .step, #fhud .step, #shud .step, #uhud .step, #tbhud .step, #ghud .step { flex: 1 1 9em; min-width: 9em; }
+#maphud .step { flex: 0 1 auto; }
+#tomap { align-self: flex-end; }
 #xbar, #bbar, #gbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 .xcard { max-width: 30em; gap: 8px; padding: 18px 20px 20px; }
 .xcard img, .xcard video { display: block; max-width: 100%; max-height: 50vh; border-radius: 8px; background: var(--night); }
@@ -102,14 +102,14 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 
 <div class="over" id="title">
   <h1>For Jana</h1>
-  <p>The road to the house</p>
-  <button id="begin" type="button">Start walking</button>
-  <button id="skip" type="button" class="quiet">Skip to a room</button>
+  <p>A map of us</p>
+  <button id="begin" type="button">Open the map</button>
 </div>
 
 <div class="over" id="hud">
+  <button class="small" id="tomap" type="button">Map</button>
   <div id="hint">Tap or hold ahead of her to walk. On a keyboard, use the arrow keys.</div>
-  <button id="enter" type="button">Go inside</button>
+  <button id="enter" type="button">Back to the map</button>
 </div>
 
 <div id="kui" hidden>
@@ -161,7 +161,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       </svg>
       <p class="toast">To all the glasses of wine had on this rooftop.</p>
       <button id="rstay" type="button">Stay a while</button>
-      <button id="rback" type="button" class="alt">Back downstairs</button>
+      <button id="rback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -182,7 +182,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="keep">Keepsake found: the moka pot</p>
       <p class="note">Wouldn't have learned to make chai (coffee) for anyone else.</p>
       <button id="cagain" type="button">Make another</button>
-      <button id="cback" type="button" class="alt">Back downstairs</button>
+      <button id="cback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -203,7 +203,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="keep">Keepsake found: the lucky cat</p>
       <p class="note">Your note to Jana about Spicy Village goes here.</p>
       <button id="dagain" type="button">Order again</button>
-      <button id="dback" type="button" class="alt">Back downstairs</button>
+      <button id="dback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -264,7 +264,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="keep">Keepsake found: the ticket stub</p>
       <p class="note">Your note to Jana about Mexico goes here.</p>
       <button id="xstay" type="button">Stay a while</button>
-      <button id="xback" type="button" class="alt">Back downstairs</button>
+      <button id="xback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -297,7 +297,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="keep">Keepsake found: the conch shell</p>
       <p class="note">Your note to Jana about the Bahamas goes here.</p>
       <button id="bstay" type="button">Stay a while</button>
-      <button id="bback" type="button" class="alt">Back downstairs</button>
+      <button id="bback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -328,7 +328,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="note">Your note to Jana about the front door goes here.</p>
       <button id="fstay" type="button">Stay a while</button>
       <button id="fagain" type="button" class="alt">Ring again</button>
-      <button id="fback" type="button" class="alt">Back downstairs</button>
+      <button id="fback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -365,7 +365,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="keep">Keepsake found: the subway card</p>
       <p class="note">Your note to Jana about New York goes here.</p>
       <button id="sstay" type="button">Stay a while</button>
-      <button id="sback" type="button" class="alt">Back downstairs</button>
+      <button id="sback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -403,7 +403,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="note">Your note to Jana about the UN goes here.</p>
       <button id="ustay" type="button">Stay a while</button>
       <button id="uagain" type="button" class="alt">Reconvene</button>
-      <button id="uback" type="button" class="alt">Back downstairs</button>
+      <button id="uback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -435,7 +435,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="note">Your note to Jana about all the meals goes here.</p>
       <button id="tbstay" type="button">Stay a while</button>
       <button id="tbagain" type="button" class="alt">Order it all again</button>
-      <button id="tbback" type="button" class="alt">Back downstairs</button>
+      <button id="tbback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
@@ -464,28 +464,15 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <p class="keep">Keepsake found: the pressed blossom</p>
       <p class="note">Your note to Jana about Central Park goes here.</p>
       <button id="gstay" type="button">Stay a while</button>
-      <button id="gback" type="button" class="alt">Back downstairs</button>
+      <button id="gback" type="button" class="alt">Back to the map</button>
     </div>
   </div>
 </div>
 
-<div class="over sheet" id="door" hidden>
-  <div class="paper">
-    <h2>Where to?</h2>
-    <p class="soft">The hall and the other rooms are still being painted.</p>
-    <button id="dkitchen" type="button">The kitchen</button>
-    <button id="droof" type="button">The rooftop</button>
-    <button id="dchai" type="button">Chai coffee</button>
-    <button id="ddump" type="button">Spicy Village</button>
-    <button id="dmedal" type="button">The medal room</button>
-    <button id="dcity" type="button">The city</button>
-    <button id="dun" type="button">The General Assembly</button>
-    <button id="dtable" type="button">Table for two</button>
-    <button id="dgarden" type="button">Central Park</button>
-    <button id="dfront" type="button">The front door</button>
-    <button id="dbahamas" type="button">The Bahamas</button>
-    <button id="dmexico" type="button">The Mexico wing</button>
-    <button id="dstay" type="button" class="alt">Stay outside</button>
+<div id="mapui" hidden>
+  <div class="over" id="maphud">
+    <p class="pill step" id="mapstep" aria-live="polite">Tap a place on the map to go there.</p>
+    <div class="krow"><button class="small" id="mapsound" type="button" aria-pressed="true">Sound on</button></div>
   </div>
 </div>
 
@@ -1069,18 +1056,16 @@ function roadFrame(dt) {
 const titleEl = document.getElementById('title'), hint = document.getElementById('hint'), enter = document.getElementById('enter'), hudEl = document.getElementById('hud'), fade = document.getElementById('fade');
 const aim = e => { const r = cv.getBoundingClientRect(); target = camX + (e.clientX - r.left) / S; };
 function begin() { if (started) return; started = true; titleEl.classList.add('gone'); setTimeout(() => { titleEl.hidden = true; }, 1300); hint.style.opacity = 1; }
-const door = document.getElementById('door');
-const onRoad = () => scene === scenes.road && !switching && door.hidden;
+const onRoad = () => scene === scenes.road && !switching;
 document.getElementById('begin').addEventListener('click', begin);
-document.getElementById('skip').addEventListener('click', () => { begin(); door.hidden = false; document.getElementById('dkitchen').focus(); });
 cv.addEventListener('pointerdown', e => { if (!onRoad()) return; if (!started) { begin(); return; } down = true; aim(e); });
 cv.addEventListener('pointermove', e => { if (down && onRoad()) aim(e); });
 addEventListener('pointerup', () => { down = false; }); addEventListener('pointercancel', () => { down = false; });
 const KEYS = { ArrowRight: 1, d: 1, D: 1, ArrowLeft: -1, a: -1, A: -1 };
 addEventListener('keydown', e => { if (onRoad() && KEYS[e.key]) { if (!started) begin(); keyDir = KEYS[e.key]; e.preventDefault(); } });
 addEventListener('keyup', e => { if (KEYS[e.key] === keyDir) keyDir = 0; });
-enter.addEventListener('click', () => { door.hidden = false; target = null; document.getElementById('dkitchen').focus(); });
-for (const [id, to] of [['dkitchen', 'kitchen'], ['droof', 'rooftop'], ['dchai', 'chai'], ['ddump', 'dumplings'], ['dmedal', 'medal'], ['dcity', 'city'], ['dun', 'un'], ['dtable', 'table'], ['dgarden', 'garden'], ['dfront', 'frontdoor'], ['dbahamas', 'bahamas'], ['dmexico', 'mexico'], ['dstay', null]]) document.getElementById(id).addEventListener('click', () => { door.hidden = true; if (to) go(to); });
+enter.addEventListener('click', () => go('map'));
+document.getElementById('tomap').addEventListener('click', () => go('map'));
 
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { layout(); if (scene && scene.resize) scene.resize(); }, 120); });
 
@@ -1089,8 +1074,8 @@ const lightLamps = () => { for (const l of world.lamps) if (J.max > l.x - 70) { 
 const scenes = {
   road: {
     frame: roadFrame,
-    enter(o) { hudEl.hidden = false; titleEl.hidden = started; if (o.atDoor) { J.x = DOOR_X; J.max = Math.max(J.max, DOOR_X); J.v = 0; J.dir = -1; lightLamps(); } target = null; road.init = false; },
-    leave() { hudEl.hidden = true; titleEl.hidden = true; door.hidden = true; enter.classList.remove('on'); target = null; keyDir = 0; down = false; J.v = 0; },
+    enter(o) { hudEl.hidden = false; titleEl.hidden = started; target = null; road.init = false; },
+    leave() { hudEl.hidden = true; titleEl.hidden = true; enter.classList.remove('on'); target = null; keyDir = 0; down = false; J.v = 0; },
     resize() { road.init = false; }
   }
 };
@@ -1104,14 +1089,15 @@ function go(name, opts) {
 function start(data) {
   layout(); Q = clamp(base * DPR, 1.25, 2);
   SP = buildSprites();
-  let first = 'road';
+  let first = 'map';
   if (data && data.x) { J.x = data.x; J.max = data.max || data.x; lightLamps(); begin(); moved = true; hint.classList.add('gone'); if (scenes[data.scene]) first = data.scene; }
-  else if (scenes[location.hash.slice(1)]) { first = location.hash.slice(1); if (first !== 'road') begin(); }
+  else if (scenes[location.hash.slice(1)]) { first = location.hash.slice(1); if (first !== 'map') begin(); }
   show(first, {});
   requestAnimationFrame(loop);
 }
 const G = window.G = {
-  cv, cx, lerp, clamp, sm, hex, mix, rgb, wrap, TAU, R, RM, dab, foliage, PAL, glow, spr, paper, scenes, go, tone, hair: hairFlow, jana: drawJana,
+  cv, cx, lerp, clamp, sm, hex, mix, rgb, wrap, TAU, R, RM, dab, foliage, PAL, glow, spr, paper, scenes, go, tone, begin, hair: hairFlow, jana: drawJana,
+  get started() { return started; },
   get sound() { return soundOn; }, set sound(v) { soundOn = !!v; }, get SP() { return SP; },
   get W() { return W; }, get H() { return H; }, get DPR() { return DPR; }, get time() { return time; },
   /* called once every room's script has loaded */
@@ -1137,4 +1123,5 @@ const G = window.G = {
 <script src="un.js"></script>
 <script src="table.js"></script>
 <script src="garden.js"></script>
+<script src="map.js"></script>
 <script>window.G.boot();</script>

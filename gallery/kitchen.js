@@ -429,8 +429,8 @@ cv.addEventListener('pointerup', () => {
 cv.addEventListener('pointercancel', () => { K.held = null; });
 addEventListener('keydown', e => { if (!active || K.state !== 'play' || e.metaKey || e.ctrlKey) return; const i = '123456'.indexOf(e.key); if (i >= 0) add(ST[i].id); });
 $('kstart').addEventListener('click', () => { K.state = 'play'; $('kintro').hidden = true; tone(660, .08, 'sine', .05); });
-$('kleave').addEventListener('click', () => G.go('road', { atDoor: true }));
-$('kback').addEventListener('click', () => { $('kwin').hidden = true; K.endless = true; K.state = 'play'; hud(); G.go('road', { atDoor: true }); });
+$('kleave').addEventListener('click', () => G.go('map'));
+$('kback').addEventListener('click', () => { $('kwin').hidden = true; K.endless = true; K.state = 'play'; hud(); G.go('map'); });
 $('kmore').addEventListener('click', () => { $('kwin').hidden = true; K.endless = true; K.state = 'play'; hud(); });
 const soundLabel = () => { $('ksound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('ksound').setAttribute('aria-pressed', G.sound); };
 $('ksound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });

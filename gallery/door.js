@@ -127,11 +127,11 @@ const letGo = () => { D.drag = false; }; cv.addEventListener('pointerup', letGo)
 addEventListener('keydown', e => { if (busy() || e.metaKey || e.ctrlKey || (e.key !== ' ' && e.key !== 'Enter') || (e.target && e.target.tagName === 'BUTTON')) return; e.preventDefault(); if (D.state === 'ring') answer(); else if (D.state === 'live') unlock(); });
 const soundLabel = () => { $('fsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('fsound').setAttribute('aria-pressed', G.sound); };
 $('fsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('fleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('fleave').addEventListener('click', () => G.go('map'));
 $('fclose').addEventListener('click', closeCard);
 $('fstay').addEventListener('click', () => { $('fend').hidden = true; });
 $('fagain').addEventListener('click', () => { $('fend').hidden = true; D.i = 0; D.open = 0; D.walk = 0; D.knob = 0; go('idle'); });
-$('fback').addEventListener('click', () => { $('fend').hidden = true; G.go('road', { atDoor: true }); });
+$('fback').addEventListener('click', () => { $('fend').hidden = true; G.go('map'); });
 
 G.scenes.frontdoor = {
   frame, resize: layout,

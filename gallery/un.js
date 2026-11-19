@@ -131,13 +131,13 @@ addEventListener('keydown', e => {
 });
 const soundLabel = () => { $('usound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('usound').setAttribute('aria-pressed', G.sound); };
 $('usound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('uleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('uleave').addEventListener('click', () => G.go('map'));
 $('uyes').addEventListener('click', () => vote('favour')); $('uno2').addEventListener('click', () => vote('against')); $('uabs').addEventListener('click', () => vote('abstain'));
 $('up').addEventListener('click', () => { if (view && view.i > 0) { view.i--; show(); } }); $('un').addEventListener('click', () => { if (view && view.i < view.a.items.length - 1) { view.i++; show(); } });
 $('uclose').addEventListener('click', closeView);
 $('ustay').addEventListener('click', () => { $('uend').hidden = true; });
 $('uagain').addEventListener('click', () => { $('uend').hidden = true; Object.assign(U, { i: 0, state: 'read', t: 0, vote: null, raise: 0, done: 0, endShown: false }); setStep(); });
-$('uback').addEventListener('click', () => { $('uend').hidden = true; G.go('road', { atDoor: true }); });
+$('uback').addEventListener('click', () => { $('uend').hidden = true; G.go('map'); });
 vid.addEventListener('error', () => { if (!$('uview').hidden && vid.getAttribute('src')) $('utext').textContent += ' (This clip is not loaded here.)'; });
 
 G.scenes.un = {

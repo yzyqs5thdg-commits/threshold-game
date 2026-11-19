@@ -382,9 +382,9 @@ addEventListener('keydown', e => {
 });
 const soundLabel = () => { $('rsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('rsound').setAttribute('aria-pressed', G.sound); };
 $('rsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('rleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('rleave').addEventListener('click', () => G.go('map'));
 $('rstay').addEventListener('click', () => { $('rwin').hidden = true; });
-$('rback').addEventListener('click', () => { $('rwin').hidden = true; G.go('road', { atDoor: true }); });
+$('rback').addEventListener('click', () => { $('rwin').hidden = true; G.go('map'); });
 
 G.scenes.rooftop = {
   frame, resize: layout,

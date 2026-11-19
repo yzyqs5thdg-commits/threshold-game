@@ -248,7 +248,7 @@ addEventListener('keydown', e => {
 });
 const soundLabel = () => { $('msound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('msound').setAttribute('aria-pressed', G.sound); };
 $('msound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('mleave').addEventListener('click', () => { if (M.phase !== 'room') { M.phase = 'room'; setStep(); } else G.go('road', { atDoor: true }); });
+$('mleave').addEventListener('click', () => { if (M.phase !== 'room') { M.phase = 'room'; setStep(); } else G.go('map'); });
 $('mhang').addEventListener('click', () => { $('mcard').hidden = true; M.earned = true; M.phase = 'room'; setStep(); burst(L.hook.x, L.hook.y + 110, 30); });
 $('mclose').addEventListener('click', closeView);
 $('mview').addEventListener('click', e => { if (e.target === $('mview')) closeView(); });

@@ -162,12 +162,12 @@ addEventListener('keydown', e => {
 });
 const soundLabel = () => { $('tbsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('tbsound').setAttribute('aria-pressed', G.sound); };
 $('tbsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
-$('tbleave').addEventListener('click', () => G.go('road', { atDoor: true }));
+$('tbleave').addEventListener('click', () => G.go('map'));
 $('tbp').addEventListener('click', () => { if (view && view.i > 0) { view.i--; show(); } }); $('tbn').addEventListener('click', () => { if (view && view.i < view.src.items.length - 1) { view.i++; show(); } });
 $('tbclose').addEventListener('click', closeView); $('tbview').addEventListener('click', e => { if (e.target === $('tbview')) closeView(); });
 $('tbstay').addEventListener('click', () => { $('tbend').hidden = true; });
 $('tbagain').addEventListener('click', () => { $('tbend').hidden = true; Object.assign(T, { i: 0, state: 'arrive', t: 0, done: 0 }); setStep(); });
-$('tbback').addEventListener('click', () => { $('tbend').hidden = true; G.go('road', { atDoor: true }); });
+$('tbback').addEventListener('click', () => { $('tbend').hidden = true; G.go('map'); });
 
 G.scenes.table = {
   frame, resize: layout,
