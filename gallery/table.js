@@ -8,23 +8,23 @@ const $ = id => document.getElementById(id);
 const UI = '"Nunito", "Avenir Next", system-ui, sans-serif';
 const INK = '#2c2a3d', PAPER = '#fbf3df';
 const COURSES = [
-  { id: 'pretzel', name: 'To start: the pretzel', items: [{ id: 'pretzel', title: 'The pretzel', text: 'Bigger than your face, and you proved it.' }] },
-  { id: 'brunch', name: 'Brunch outside', items: [{ id: 'brunch', title: 'Brunch outside', text: 'Shakshuka in its little pan, and the smile you make at food.' }] },
-  { id: 'breakfast', name: 'Breakfast at home', items: [{ id: 'breakfast', title: 'Breakfast, with tea', text: 'The whole table full, and you pouring the tea.' }] },
-  { id: 'mojito', name: 'The Cuban café', items: [{ id: 'mojito', title: 'The Cuban café', text: 'More mint than glass.' }] },
-  { id: 'sushi', name: 'Sushi', items: [{ id: 'sushi', title: 'Sushi', text: 'One piece held up for the camera before anyone was allowed to eat.' }, { id: 'edamame', title: 'Edamame', text: 'Held up proudly, drink in the other hand.' }] },
-  { id: 'feast', name: 'The feast', items: [{ id: 'feast', title: 'The feast', text: 'We ordered everything. The table can confirm.' }] },
-  { id: 'street', name: 'Street food at night', items: [{ id: 'street', title: 'Street food at night', text: 'Little stools, bright lights, chopsticks.' }] },
-  { id: 'fries', name: 'The fries', items: [{ id: 'fries', title: 'The pour', text: 'Full concentration, for fries.' }] },
-  { id: 'pasta', name: 'Dinner at home', items: [{ id: 'pasta', title: 'Dinner at home', text: 'Rigatoni, a salad, and two spritzes in the fancy glasses.' }] },
-  { id: 'wine', name: 'The wine flight', items: [{ id: 'wine', title: 'The wine flight', text: 'Four reds named in chalk, three whites waiting behind them.' }, { id: 'trick', title: 'The party trick', text: 'A wine glass, balanced where a wine glass should not be.' }, { id: 'glasses', title: 'Two glasses', text: 'Red and white, both balanced on you, and you laughing through it.' }] },
-  { id: 'maggi', name: 'And to finish: Maggi', items: [{ id: 'maggi', title: 'And to finish, Maggi', text: 'Held like something precious, which it is.' }] }
+  { id: 'pretzel', name: 'To start: the pretzel', items: [{ id: 'pretzel', title: 'The pretzel' }] },
+  { id: 'brunch', name: 'Brunch outside', items: [{ id: 'brunch', title: 'Brunch outside' }] },
+  { id: 'breakfast', name: 'Breakfast at home', items: [{ id: 'breakfast', title: 'Breakfast, with tea' }] },
+  { id: 'mojito', name: 'The Cuban café', items: [{ id: 'mojito', title: 'The Cuban café' }] },
+  { id: 'sushi', name: 'Sushi', items: [{ id: 'sushi', title: 'Sushi' }, { id: 'edamame', title: 'Edamame' }] },
+  { id: 'feast', name: 'The feast', items: [{ id: 'feast', title: 'The feast' }] },
+  { id: 'street', name: 'Street food at night', items: [{ id: 'street', title: 'Street food at night' }] },
+  { id: 'fries', name: 'The fries', items: [{ id: 'fries', title: 'The pour' }] },
+  { id: 'pasta', name: 'Dinner at home', items: [{ id: 'pasta', title: 'Dinner at home' }] },
+  { id: 'wine', name: 'The wine flight', items: [{ id: 'wine', title: 'The wine flight' }, { id: 'trick', title: 'The party trick' }, { id: 'glasses', title: 'Two glasses' }] },
+  { id: 'maggi', name: 'And to finish: Maggi', items: [{ id: 'maggi', title: 'And to finish, Maggi' }] }
 ];
 const EXTRA = {
-  window: { name: 'Out the window', items: [{ id: 'bridge', title: 'Under the bridge', text: 'Sunset behind the skyline, and you on the rocks by the water.' }] },
-  flowers: { name: 'The flowers', items: [{ id: 'flowers', title: 'The flowers', text: 'A whole bouquet, and the biggest smile on the street.' }] },
-  vest: { name: 'On the wall', items: [{ id: 'vest', title: 'Outfit check', text: 'Green vest, hands on hips, ready to go.' }] },
-  boat: { name: 'On the wall', items: [{ id: 'boat', title: 'The boat party', text: 'Three of us, mid-song and slightly blurred.' }] }
+  window: { name: 'Out the window', items: [{ id: 'bridge', title: 'Under the bridge' }] },
+  flowers: { name: 'The flowers', items: [{ id: 'flowers', title: 'The flowers' }] },
+  vest: { name: 'On the wall', items: [{ id: 'vest', title: 'Outfit check' }] },
+  boat: { name: 'On the wall', items: [{ id: 'boat', title: 'The boat party' }] }
 };
 const img = {}; for (const k of ['vest', 'boat']) { const im = new Image(); im.onload = () => { im.ok = true; }; im.src = `media/tb_${k}.jpg`; img[k] = im; }
 let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false, view = null;
@@ -101,7 +101,7 @@ function setStep() {
   $('tbcount').textContent = `Courses ${T.done} of ${COURSES.length}`;
 }
 const pic = $('tbimg');
-function show() { const s = view.src, it = s.items[view.i]; $('tbno').textContent = s.name + (s.items.length > 1 ? `  ·  ${view.i + 1} of ${s.items.length}` : ''); $('tbtitle').textContent = it.title; $('tbtext').textContent = it.text; pic.alt = it.title; pic.src = `media/tb_${it.id}.jpg`; $('tbnav').hidden = s.items.length < 2; $('tbp').disabled = view.i === 0; $('tbn').disabled = view.i === s.items.length - 1; }
+function show() { const s = view.src, it = s.items[view.i]; $('tbno').textContent = s.items.length > 1 ? `${view.i + 1} of ${s.items.length}` : ''; pic.alt = it.title; pic.src = `media/tb_${it.id}.jpg`; $('tbnav').hidden = s.items.length < 2; $('tbp').disabled = view.i === 0; $('tbn').disabled = view.i === s.items.length - 1; }
 function open(src, course) { view = { src, i: 0, course }; $('tbview').hidden = false; show(); $('tbclose').focus(); }
 function closeView() {
   const wasCourse = view && view.course; $('tbview').hidden = true; pic.removeAttribute('src'); view = null; if (!wasCourse) return;

@@ -19,21 +19,21 @@ const HALLS = [
 ];
 const HBY = Object.fromEntries(HALLS.map(h => [h.id, h])), TOTAL = 8100, FEET = 96, BENCH = 7690;
 const EX = [
-  { id: 'boat', hall: 'sea', x: 1210, w: 290, h: 210, kind: 'dio', scene: boat, media: 'clip', tall: true, label: 'The boat', title: 'Field recording: the boat', text: 'One specimen, observed on deck between swims. Waves at the camera and appears delighted.' },
-  { id: 'under', hall: 'sea', x: 1610, w: 300, h: 210, kind: 'dio', scene: under, media: 'clip', tall: true, label: 'Below the surface', title: 'Field recording: below the surface', text: 'A snorkeller in clear green water above the sea grass. Stops to wave, then keeps swimming.' },
-  { id: 'mask', hall: 'sea', x: 1970, kind: 'case', obj: maskObj, media: 'clip', tall: true, label: 'Mask and snorkel', title: 'Mask, snorkel and life vest', text: 'Worn in open water. Recorded mid-laugh, holding on to the float.' },
-  { id: 'cave', hall: 'cen', x: 2540, w: 320, h: 230, kind: 'dio', scene: cave, media: 'photo', tall: true, label: 'The cave cenote', title: 'Cenote, under the stalactites', text: 'Two swimmers in water this blue, lit from a gap in the rock overhead, arms around each other.' },
-  { id: 'swim', hall: 'cen', x: 2930, w: 290, h: 200, kind: 'dio', scene: swim, media: 'photo', tall: false, label: 'The open cenote', title: 'Open cenote, with life jackets', text: 'Dark green water and rings of ripples. One swimmer mid hair flip, the other smiling up at the camera.' },
-  { id: 'rain', hall: 'cen', x: 3280, w: 280, h: 200, kind: 'dio', scene: rain, media: 'clip', tall: true, label: 'The downpour', title: 'Field recording: the downpour', text: 'Rain coming down hard on red ground, watched from under the roof. The sign reads KIN-HA.' },
-  { id: 'atv', hall: 'jun', x: 3950, w: 370, h: 240, kind: 'dio', scene: atvScene, media: 'photo', tall: false, label: 'The quad bike', title: 'Jungle transport, heavily muddied', text: 'Driver: Jana, laughing. Passenger: holding on, also laughing. Helmets: orange, both.' },
-  { id: 'negroni', hall: 'food', x: 4690, kind: 'case', obj: negroni, media: 'photo', tall: true, label: 'Two cocktails', title: 'Two cocktails, baby corn garnish', text: 'A matched pair on white coasters, served in a bar lined with records.' },
-  { id: 'paleta', hall: 'food', x: 4990, kind: 'case', obj: paleta, media: 'photo', tall: true, label: 'Paleta', title: 'Paleta, in progress', text: 'Collected at La Michoacana. Photographed mid-bite.' },
-  { id: 'tacos', hall: 'food', x: 5290, kind: 'case', obj: tacos, media: 'photo', tall: true, label: 'Car tacos', title: 'Lunch, back seat of a car', text: 'Tacos, guacamole and lime, on plates balanced on knees.' },
-  { id: 'shots', hall: 'food', x: 5570, kind: 'case', obj: shots, media: 'photo', tall: true, label: 'The toast', title: 'A toast across the table', text: 'One pink with a coconut rim, one green and cream. Raised at the same time.' },
-  { id: 'swing', hall: 'eve', x: 6130, w: 290, h: 240, kind: 'dio', scene: swingScene, media: 'photo', tall: true, label: 'The swing', title: 'Swing under the tree of lights', text: 'A rope swing hung from a tree strung with bulbs, at dusk. The sign above it reads IKÚ.' },
-  { id: 'twirl', hall: 'eve', x: 6520, kind: 'case', big: true, obj: costume, media: 'photo', tall: true, label: 'The skirt', title: 'Evening wear, in motion', text: 'Floral skirt and cream top, caught mid-turn on a street of neon.' },
-  { id: 'show', hall: 'eve', x: 6860, w: 280, h: 200, kind: 'dio', scene: show, media: 'clip', tall: true, label: 'The show', title: 'Field recording: the show', text: 'Fire, aerialists overhead, and a crowd with its arms up.' },
-  { id: 'dawn', hall: 'sky', x: 7620, w: 540, h: 300, kind: 'dome', scene: dawn, media: 'photo', tall: true, label: 'Dawn', title: 'Dawn over the water', text: 'Rays fan out from the horizon, pink and blue, over thatched umbrellas and empty loungers.' }
+  { id: 'boat', hall: 'sea', x: 1210, w: 290, h: 210, kind: 'dio', scene: boat, media: 'clip', tall: true, label: 'The boat', title: 'Field recording: the boat' },
+  { id: 'under', hall: 'sea', x: 1610, w: 300, h: 210, kind: 'dio', scene: under, media: 'clip', tall: true, label: 'Below the surface', title: 'Field recording: below the surface' },
+  { id: 'mask', hall: 'sea', x: 1970, kind: 'case', obj: maskObj, media: 'clip', tall: true, label: 'Mask and snorkel', title: 'Mask, snorkel and life vest' },
+  { id: 'cave', hall: 'cen', x: 2540, w: 320, h: 230, kind: 'dio', scene: cave, media: 'photo', tall: true, label: 'The cave cenote', title: 'Cenote, under the stalactites' },
+  { id: 'swim', hall: 'cen', x: 2930, w: 290, h: 200, kind: 'dio', scene: swim, media: 'photo', tall: false, label: 'The open cenote', title: 'Open cenote, with life jackets' },
+  { id: 'rain', hall: 'cen', x: 3280, w: 280, h: 200, kind: 'dio', scene: rain, media: 'clip', tall: true, label: 'The downpour', title: 'Field recording: the downpour' },
+  { id: 'atv', hall: 'jun', x: 3950, w: 370, h: 240, kind: 'dio', scene: atvScene, media: 'photo', tall: false, label: 'The quad bike', title: 'Jungle transport, heavily muddied' },
+  { id: 'negroni', hall: 'food', x: 4690, kind: 'case', obj: negroni, media: 'photo', tall: true, label: 'Two cocktails', title: 'Two cocktails, baby corn garnish' },
+  { id: 'paleta', hall: 'food', x: 4990, kind: 'case', obj: paleta, media: 'photo', tall: true, label: 'Paleta', title: 'Paleta, in progress' },
+  { id: 'tacos', hall: 'food', x: 5290, kind: 'case', obj: tacos, media: 'photo', tall: true, label: 'Car tacos', title: 'Lunch, back seat of a car' },
+  { id: 'shots', hall: 'food', x: 5570, kind: 'case', obj: shots, media: 'photo', tall: true, label: 'The toast', title: 'A toast across the table' },
+  { id: 'swing', hall: 'eve', x: 6130, w: 290, h: 240, kind: 'dio', scene: swingScene, media: 'photo', tall: true, label: 'The swing', title: 'Swing under the tree of lights' },
+  { id: 'twirl', hall: 'eve', x: 6520, kind: 'case', big: true, obj: costume, media: 'photo', tall: true, label: 'The skirt', title: 'Evening wear, in motion' },
+  { id: 'show', hall: 'eve', x: 6860, w: 280, h: 200, kind: 'dio', scene: show, media: 'clip', tall: true, label: 'The show', title: 'Field recording: the show' },
+  { id: 'dawn', hall: 'sky', x: 7620, w: 540, h: 300, kind: 'dome', scene: dawn, media: 'photo', tall: true, label: 'Dawn', title: 'Dawn over the water' }
 ];
 EX.forEach((e, i) => { e.no = String(i + 1).padStart(2, '0'); });
 const STAMPS = ['sea', 'cen', 'jun', 'food', 'eve', 'sky'];
@@ -231,7 +231,7 @@ function dawn(g, w, h, t) {
 
 /* ------------------------------------------------------------------ the building */
 function plaque(g, e, x, y) {
-  g.font = `700 11.5px ${UI}`; g.textBaseline = 'middle'; const text = `No. ${e.no}  ·  ${e.label}`, w = g.measureText(text).width + (e.media === 'clip' ? 36 : 22);
+  g.font = `700 11.5px ${UI}`; g.textBaseline = 'middle'; const text = `No. ${e.no}`, w = g.measureText(text).width + (e.media === 'clip' ? 36 : 22);
   g.fillStyle = 'rgba(0,0,0,.3)'; rr(g, x - w / 2 + 1.5, y - 9, w, 22, 3); g.fill(); g.fillStyle = seen.has(e.id) ? '#e2cf9a' : BRASS; rr(g, x - w / 2, y - 11, w, 22, 3); g.fill();
   g.fillStyle = '#3a2a1a'; g.textAlign = 'left'; let tx = x - w / 2 + 11; if (e.media === 'clip') { g.beginPath(); g.moveTo(tx, y - 5); g.lineTo(tx + 8, y); g.lineTo(tx, y + 5); g.fill(); tx += 14; } g.fillText(text, tx, y + .5);
 }
@@ -318,7 +318,7 @@ function setStep() {
 const vid = $('xvid'), pic = $('ximg');
 function open(e) {
   const before = stamped(); seen.add(e.id); pending = null; target = null; keyDir = 0; P.v = 0;
-  $('xno').textContent = `Mexico wing  ·  No. ${e.no}`; $('xtitle').textContent = e.title; $('xtext').textContent = e.text; const photo = e.media === 'photo'; vid.hidden = photo; pic.hidden = !photo;
+  $('xno').textContent = ''; const photo = e.media === 'photo'; vid.hidden = photo; pic.hidden = !photo;
   if (photo) { pic.alt = e.title; pic.src = `media/mx_${e.id}.jpg`; } else { vid.muted = !G.sound; vid.loop = true; vid.poster = `media/mx_${e.id}.jpg`; vid.src = `media/mx_${e.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); }
   $('xview').hidden = false; $('xclose').focus(); tone(660, .1, 'sine', .05);
   if (stamped() > before) { opened = HBY[e.hall].name; }
@@ -336,7 +336,7 @@ function update(dt) {
   const camT = clamp((P.seated ? 7620 - VW / 2 : P.x - VW * (VW < 700 ? .5 : .44 - .1 * P.dir)), 0, TOTAL - VW); camX = camInit ? lerp(camX, camT, 1 - Math.exp(-dt * 3)) : camT; camInit = true;
   near = null; let best = 130; for (const e of EX) { const d = Math.abs(e.x - P.x); if (d < best) { best = d; near = e; } }
   const atBench = Math.abs(P.x - (BENCH - 40)) < 110;
-  $('xlook').hidden = !near || P.seated; if (near) $('xlook').textContent = `Look closer: ${near.label}`; $('xsit').hidden = !(atBench || P.seated);
+  $('xlook').hidden = !near || P.seated; if (near) $('xlook').textContent = 'Look closer'; $('xsit').hidden = !(atBench || P.seated);
   const H = hallAt(P.x).id + (P.seated ? 's' : ''); if (H !== hallNow) { hallNow = H; setStep(); }
   for (let i = says.length - 1; i >= 0; i--) { const q = says[i]; q.life -= dt; q.y -= 12 * dt; if (q.life <= 0) says.splice(i, 1); }
   const mx = P.seated ? BENCH + 4 : P.x + P.dir * 46 + Math.sin(t * 1.1) * 14, my = P.seated ? VH - FEET - 150 + Math.sin(t * 2) * 4 : VH - FEET - 186 + Math.sin(t * 2.3) * 12;
@@ -396,7 +396,7 @@ $('xclose').addEventListener('click', closeView);
 $('xview').addEventListener('click', ev => { if (ev.target === $('xview')) closeView(); });
 $('xstay').addEventListener('click', () => { $('xend').hidden = true; });
 $('xback').addEventListener('click', () => { $('xend').hidden = true; G.go('map'); });
-vid.addEventListener('error', () => { if (!$('xview').hidden && vid.getAttribute('src')) $('xtext').textContent += ' (This clip is not loaded here.)'; });
+vid.addEventListener('error', () => { if (!$('xview').hidden && vid.getAttribute('src')) $('xno').textContent = 'This clip is not loaded here.'; });
 
 G.scenes.mexico = {
   frame, resize: layout,

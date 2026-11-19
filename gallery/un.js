@@ -8,13 +8,13 @@ const $ = id => document.getElementById(id);
 const UI = '"Nunito", "Avenir Next", system-ui, sans-serif';
 const INK = '#2c2a3d', PAPER = '#fbf3df';
 const AGENDA = [
-  { text: 'That the badge be worn at all times, including at dinner.', items: [{ id: 'badge', media: 'photo', title: 'The badge', text: 'Shown off across the table, with the look that goes with it.' }] },
-  { text: 'That the commute counts as part of the working day.', items: [{ id: 'commute', media: 'clip', title: 'The commute', text: 'Lanyards on, iced coffees in hand, waiting for the train.' }, { id: 'band', media: 'clip', title: 'The morning band', text: 'Two guitars in the subway car, playing us to work.' }] },
-  { text: 'That iced coffee is essential equipment for diplomacy.', items: [{ id: 'plaza', media: 'photo', title: 'Outside the building', text: 'Flags behind you, sun in your eyes, coffee secured.' }] },
-  { text: 'That we were really in this room.', items: [{ id: 'hall', media: 'photo', title: 'The hall', text: 'Empty, gold, and much bigger than it looks on the news.' }] },
-  { text: 'That the rainbow bagel is a legitimate lunch.', items: [{ id: 'bagel', media: 'photo', title: 'Lunch on the terrace', text: 'A bagel in every colour, by the river, in a pinstripe top.' }] },
-  { text: 'That the view deserves a recess.', items: [{ id: 'window', media: 'photo', title: 'From the window', text: 'The flags in a row, and the silver spire between the buildings.' }, { id: 'roses', media: 'photo', title: 'The rose garden', text: 'Roses in front, the skyline across the water.' }] },
-  { text: 'That the working day ends when we say so.', items: [{ id: 'night', media: 'photo', title: 'After hours', text: 'Blurry, laughing, lanyard still on.' }] },
+  { text: 'That the badge be worn at all times, including at dinner.', items: [{ id: 'badge', media: 'photo', title: 'The badge' }] },
+  { text: 'That the commute counts as part of the working day.', items: [{ id: 'commute', media: 'clip', title: 'The commute' }, { id: 'band', media: 'clip', title: 'The morning band' }] },
+  { text: 'That iced coffee is essential equipment for diplomacy.', items: [{ id: 'plaza', media: 'photo', title: 'Outside the building' }] },
+  { text: 'That we were really in this room.', items: [{ id: 'hall', media: 'photo', title: 'The hall' }] },
+  { text: 'That the rainbow bagel is a legitimate lunch.', items: [{ id: 'bagel', media: 'photo', title: 'Lunch on the terrace' }] },
+  { text: 'That the view deserves a recess.', items: [{ id: 'window', media: 'photo', title: 'From the window' }, { id: 'roses', media: 'photo', title: 'The rose garden' }] },
+  { text: 'That the working day ends when we say so.', items: [{ id: 'night', media: 'photo', title: 'After hours' }] },
   { text: 'That one week together was not enough.', items: [] }
 ];
 const LINES = { favour: 'Adopted.', against: 'Objection noted. Adopted anyway.', abstain: 'Adopted. One delegate pretended not to care.' };
@@ -83,7 +83,7 @@ function setStep() {
 function vote(v) { if (U.state !== 'read' || !active) return; U.vote = v; U.state = 'tally'; U.t = 0; U.raise = 0; U.banged = false; setStep(); tone(v === 'against' ? 330 : 523, .14, 'sine', .06); }
 const vid = $('uvid'), pic = $('uimg');
 function show() {
-  const a = view.a, it = a.items[view.i], photo = it.media === 'photo'; $('uno').textContent = `Annex to resolution ${U.i + 1}` + (a.items.length > 1 ? `  ·  ${view.i + 1} of ${a.items.length}` : ''); $('utitle').textContent = it.title; $('utext').textContent = it.text;
+  const a = view.a, it = a.items[view.i], photo = it.media === 'photo'; $('uno').textContent = a.items.length > 1 ? `${view.i + 1} of ${a.items.length}` : '';
   vid.pause(); vid.hidden = photo; pic.hidden = !photo; $('unav').hidden = a.items.length < 2; $('up').disabled = view.i === 0; $('un').disabled = view.i === a.items.length - 1;
   if (photo) { vid.removeAttribute('src'); vid.load(); pic.alt = it.title; pic.src = `media/un_${it.id}.jpg`; } else { pic.removeAttribute('src'); vid.muted = !G.sound; vid.loop = true; vid.poster = `media/un_${it.id}.jpg`; vid.src = `media/un_${it.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); }
 }
@@ -138,7 +138,7 @@ $('uclose').addEventListener('click', closeView);
 $('ustay').addEventListener('click', () => { $('uend').hidden = true; });
 $('uagain').addEventListener('click', () => { $('uend').hidden = true; Object.assign(U, { i: 0, state: 'read', t: 0, vote: null, raise: 0, done: 0, endShown: false }); setStep(); });
 $('uback').addEventListener('click', () => { $('uend').hidden = true; G.go('map'); });
-vid.addEventListener('error', () => { if (!$('uview').hidden && vid.getAttribute('src')) $('utext').textContent += ' (This clip is not loaded here.)'; });
+vid.addEventListener('error', () => { if (!$('uview').hidden && vid.getAttribute('src')) $('uno').textContent = 'This clip is not loaded here.'; });
 
 G.scenes.un = {
   frame, resize: layout,

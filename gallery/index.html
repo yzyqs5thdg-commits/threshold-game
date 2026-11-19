@@ -105,6 +105,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .xcard { max-width: 30em; gap: 8px; padding: 18px 20px 20px; }
 .xcard img, .xcard video { display: block; max-width: 100%; max-height: 50vh; border-radius: 8px; background: var(--night); }
 .xcard h2 { font-size: 1.55em; }
+.xcard .xno:empty, #mcap:empty { display: none; }
 .xcard .xno { font-size: .74em; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
 #mview { gap: 12px; }
 #mcard { justify-content: flex-end; background: none; padding-block: 12px calc(22px + env(safe-area-inset-bottom, 0px)); }
@@ -155,7 +156,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
     <div class="paper">
       <h2>Eight perfect bowls</h2>
       <p class="keep">Keepsake found: the recipe card</p>
-      <p class="note">Your note to Jana about Maggi goes here.</p>
       <button id="kmore" type="button">Keep cooking</button>
       <button id="kback" type="button" class="alt">Back to the road</button>
     </div>
@@ -224,7 +224,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>The usual at Spicy Village</h2>
       <p>Five dumplings each, the noodles shared, and nothing left.</p>
       <p class="keep">Keepsake found: the lucky cat</p>
-      <p class="note">Your note to Jana about Spicy Village goes here.</p>
       <button id="dagain" type="button">Order again</button>
       <button id="dback" type="button" class="alt">Back to the map</button>
     </div>
@@ -245,7 +244,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>Our first 5K</h2>
       <p>Five kilometres, start to finish, together.</p>
       <p class="keep">Keepsake found: the medal</p>
-      <p class="note">Your note to Jana about the 5K goes here.</p>
       <button id="mhang" type="button">Hang it on the wall</button>
     </div>
   </div>
@@ -275,8 +273,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <img id="ximg" alt="" hidden>
       <video id="xvid" playsinline controls preload="none" hidden></video>
       <p class="xno" id="xno"></p>
-      <h2 id="xtitle"></h2>
-      <p id="xtext"></p>
       <button id="xclose" type="button">Back to the gallery</button>
     </div>
   </div>
@@ -285,7 +281,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>The Mexico wing</h2>
       <p>Every hall in here is a day we had. This bench is the best seat in the building.</p>
       <p class="keep">Keepsake found: the ticket stub</p>
-      <p class="note">Your note to Jana about Mexico goes here.</p>
       <button id="xstay" type="button">Stay a while</button>
       <button id="xback" type="button" class="alt">Back to the map</button>
     </div>
@@ -307,8 +302,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <img id="bimg" alt="" hidden>
       <video id="bvid" playsinline controls preload="none" hidden></video>
       <p class="xno" id="bno"></p>
-      <h2 id="btitle"></h2>
-      <p id="btext"></p>
       <div class="xnav" id="bnav"><button id="bprev" type="button">Previous</button><button id="bnext" type="button">Next</button></div>
       <button id="bclose" type="button">Back to the boat</button>
     </div>
@@ -318,7 +311,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>The Bahamas</h2>
       <p>We left in the morning, came home under a pink sky, and then there was pasta.</p>
       <p class="keep">Keepsake found: the conch shell</p>
-      <p class="note">Your note to Jana about the Bahamas goes here.</p>
       <button id="bstay" type="button">Stay a while</button>
       <button id="bback" type="button" class="alt">Back to the map</button>
     </div>
@@ -338,8 +330,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
     <div class="paper xcard">
       <img id="fimg" alt="">
       <p class="xno" id="fno"></p>
-      <h2 id="ftitle"></h2>
-      <p id="ftext"></p>
       <button id="fclose" type="button">Close the door</button>
     </div>
   </div>
@@ -348,7 +338,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>The front door</h2>
       <p>Every one of these is you, arriving. It is my favourite notification.</p>
       <p class="keep">Keepsake found: the spare key</p>
-      <p class="note">Your note to Jana about the front door goes here.</p>
       <button id="fstay" type="button">Stay a while</button>
       <button id="fagain" type="button" class="alt">Ring again</button>
       <button id="fback" type="button" class="alt">Back to the map</button>
@@ -375,8 +364,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <img id="simg" alt="">
       <video id="svid" playsinline controls preload="none" hidden></video>
       <p class="xno" id="sno"></p>
-      <h2 id="stitle"></h2>
-      <p id="stext"></p>
       <div class="xnav" id="snav"><button id="sp" type="button">Previous</button><button id="sn" type="button">Next</button></div>
       <button id="sclose" type="button">Back on the train</button>
     </div>
@@ -386,7 +373,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>The city</h2>
       <p>Thirteen stops, and I would ride every one of them again with you.</p>
       <p class="keep">Keepsake found: the subway card</p>
-      <p class="note">Your note to Jana about New York goes here.</p>
       <button id="sstay" type="button">Stay a while</button>
       <button id="sback" type="button" class="alt">Back to the map</button>
     </div>
@@ -412,8 +398,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <img id="uimg" alt="" hidden>
       <video id="uvid" playsinline controls preload="none" hidden></video>
       <p class="xno" id="uno"></p>
-      <h2 id="utitle"></h2>
-      <p id="utext"></p>
       <div class="xnav" id="unav"><button id="up" type="button">Previous</button><button id="un" type="button">Next</button></div>
       <button id="uclose" type="button">Back to the session</button>
     </div>
@@ -423,7 +407,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>Adopted unanimously</h2>
       <p>Resolution 8: that one week together was not enough. Two in favour, none against.</p>
       <p class="keep">Keepsake found: the blue lanyard</p>
-      <p class="note">Your note to Jana about the UN goes here.</p>
       <button id="ustay" type="button">Stay a while</button>
       <button id="uagain" type="button" class="alt">Reconvene</button>
       <button id="uback" type="button" class="alt">Back to the map</button>
@@ -444,8 +427,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
     <div class="paper xcard">
       <img id="tbimg" alt="">
       <p class="xno" id="tbno"></p>
-      <h2 id="tbtitle"></h2>
-      <p id="tbtext"></p>
       <div class="xnav" id="tbnav"><button id="tbp" type="button">Previous</button><button id="tbn" type="button">Next</button></div>
       <button id="tbclose" type="button">Back to the table</button>
     </div>
@@ -455,7 +436,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>Table for two</h2>
       <p>Eleven courses, and the best part of every one was who I was eating with.</p>
       <p class="keep">Keepsake found: the menu</p>
-      <p class="note">Your note to Jana about all the meals goes here.</p>
       <button id="tbstay" type="button">Stay a while</button>
       <button id="tbagain" type="button" class="alt">Order it all again</button>
       <button id="tbback" type="button" class="alt">Back to the map</button>
@@ -485,7 +465,6 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <h2>A year in Central Park</h2>
       <p>Every season of it, with you.</p>
       <p class="keep">Keepsake found: the pressed blossom</p>
-      <p class="note">Your note to Jana about Central Park goes here.</p>
       <button id="gstay" type="button">Stay a while</button>
       <button id="gback" type="button" class="alt">Back to the map</button>
     </div>

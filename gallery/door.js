@@ -8,10 +8,10 @@ const $ = id => document.getElementById(id);
 const UI = '"Nunito", "Avenir Next", system-ui, sans-serif';
 const INK = '#2c2a3d', PAPER = '#fbf3df';
 const VISITS = [
-  { id: 1, date: 'September 24, 8:28 PM', top: '#c8262c', coat: '#1c1a1e', says: "It's me!", title: 'Swipe to open', text: 'Leather jacket, already mid-sentence before the door opened.' },
-  { id: 2, date: 'October 3, 1:27 PM', top: '#5c3a2c', up: true, says: 'Finally.', title: 'Visitor pass', text: 'The look of someone who has been waiting four whole seconds.' },
-  { id: 3, date: 'October 17, 3:11 PM', top: '#2a2c2e', coat: '#f1ece0', up: true, bag: true, says: 'I brought things.', title: 'Visitor pass', text: 'A braid, a big collar and a paper bag. The best kind of visitor.' },
-  { id: 4, date: 'Front door', top: '#b9c86a', says: 'Hi.', title: 'Front door', text: 'No smile for the camera. Saving it for upstairs.' }
+  { id: 1, date: 'September 24, 8:28 PM', top: '#c8262c', coat: '#1c1a1e', says: "It's me!" },
+  { id: 2, date: 'October 3, 1:27 PM', top: '#5c3a2c', up: true, says: 'Finally.' },
+  { id: 3, date: 'October 17, 3:11 PM', top: '#2a2c2e', coat: '#f1ece0', up: true, bag: true, says: 'I brought things.' },
+  { id: 4, date: 'Front door', top: '#b9c86a', says: 'Hi.' }
 ];
 let S = 1, VW = 0, VH = 0, L = null, active = false;
 const D = { i: 0, state: 'idle', t: 0, knob: 0, drag: false, open: 0, walk: 0, seen: 0, endShown: false };
@@ -35,7 +35,7 @@ function answer() { if (D.state !== 'ring') return; go('live'); D.knob = 0; tone
 function unlock() { if (D.state !== 'live') return; go('open'); D.knob = 1; D.open = 0; D.walk = 0; tone(180, .5, 'sawtooth', .03); tone(220, .5, 'square', .02); tone(880, .12, 'sine', .05, .5); }
 function showCard() {
   const v = VISITS[D.i]; D.seen = Math.max(D.seen, D.i + 1); $('fimg').src = `media/fd_${v.id}.jpg`; $('fimg').alt = 'Jana at the front door camera';
-  $('fno').textContent = `Front door  ·  ${v.date}`; $('ftitle').textContent = v.title; $('ftext').textContent = v.text;
+  $('fno').textContent = '';
   $('fclose').textContent = D.i < VISITS.length - 1 ? 'Close the door' : 'Close'; $('fview').hidden = false; $('fclose').focus(); setStep();
 }
 function closeCard() {

@@ -8,19 +8,19 @@ const $ = id => document.getElementById(id);
 const UI = '"Nunito", "Avenir Next", system-ui, sans-serif';
 const INK = '#2c2a3d', PAPER = '#fbf3df', SPAN = 2000;
 const ST = [
-  { id: 'train', name: 'Our train', col: '#d8262c', items: [{ id: 'train', title: 'On the train', text: 'Laughing on the way somewhere. The joke is lost; the photo is not.' }] },
-  { id: 'stadium', name: 'The stadium', col: '#27375c', items: [{ id: 'stadium', title: 'The ballgame', text: 'Matching caps, and a cookie dressed as a baseball.' }, { id: 'blanket', media: 'clip', title: 'Under the blanket', text: 'Matching caps and one blanket between us.' }] },
-  { id: 'gym', name: 'The gym', col: '#6a3058', items: [{ id: 'gym', title: 'Mirror check', text: 'Three of us in the mirror. Proof that we went.' }] },
-  { id: 'home', name: 'Home', col: '#b3242e', items: [{ id: 'cards', media: 'clip', title: 'The card reading', text: 'Cards spread out on the bed, and you mid-reading.' }] },
-  { id: 'river', name: 'East River', col: '#2f7fa8', items: [{ id: 'river', title: 'The study spot', text: 'Books open by the water, the bridge behind us. Some studying happened.' }] },
-  { id: 'bridge', name: 'Brooklyn Bridge', col: '#8a6a52', items: [{ id: 'bridge', title: 'Walking the bridge', text: 'The whole skyline behind us, and both of us grinning at the camera instead.' }] },
-  { id: 'park', name: 'Central Park', col: '#3f8a4a', items: [{ id: 'park', title: 'By the pond', text: 'Green everywhere, and a bouquet with a doll in the middle of it.' }] },
-  { id: 'village', name: 'The Village', col: '#c8402c', items: [{ id: 'village', title: 'Ice cream this way', text: 'A hug in the middle of the crosswalk. The sign had a point.' }] },
-  { id: 'downtown', name: 'Downtown', col: '#5a5a66', items: [{ id: 'street', title: 'Waiting to cross', text: 'Grey sky, a yellow bus, and your hair doing the most.' }, { id: 'friend', title: "You've got a friend", text: 'The wall said it first. You laughed. It is true.' }] },
-  { id: 'spritz', name: 'The pâtisserie', col: '#8e1a2a', items: [{ id: 'spritz', title: 'Two spritzes', text: 'One orange, one pale yellow, and something very interesting above us.' }] },
-  { id: 'pub', name: 'The pub', col: '#2f6a3c', items: [{ id: 'pub', title: 'At the bar', text: 'White turtleneck, black fur, heads together.' }] },
-  { id: 'rooftop', name: 'The rooftop', col: '#33273c', items: [{ id: 'rooftop', title: 'Candle and moon', text: 'One candle, the moon through the clouds, and you looking off at something.' }] },
-  { id: 'view', name: 'The view', col: '#1c2748', night: true, items: [{ id: 'view', title: 'The top of the city', text: 'All of it lit up below us.' }, { id: 'selfie', title: 'Cheek to cheek', text: 'Above everything, squeezed into one frame.' }, { id: 'moon', title: 'The moon and the tower', text: 'The moon showed up right next to the spire.' }] }
+  { id: 'train', name: 'Our train', col: '#d8262c', items: [{ id: 'train', title: 'On the train' }] },
+  { id: 'stadium', name: 'The stadium', col: '#27375c', items: [{ id: 'stadium', title: 'The ballgame' }, { id: 'blanket', media: 'clip', title: 'Under the blanket' }] },
+  { id: 'gym', name: 'The gym', col: '#6a3058', items: [{ id: 'gym', title: 'Mirror check' }] },
+  { id: 'home', name: 'Home', col: '#b3242e', items: [{ id: 'cards', media: 'clip', title: 'The card reading' }] },
+  { id: 'river', name: 'East River', col: '#2f7fa8', items: [{ id: 'river', title: 'The study spot' }] },
+  { id: 'bridge', name: 'Brooklyn Bridge', col: '#8a6a52', items: [{ id: 'bridge', title: 'Walking the bridge' }] },
+  { id: 'park', name: 'Central Park', col: '#3f8a4a', items: [{ id: 'park', title: 'By the pond' }] },
+  { id: 'village', name: 'The Village', col: '#c8402c', items: [{ id: 'village', title: 'Ice cream this way' }] },
+  { id: 'downtown', name: 'Downtown', col: '#5a5a66', items: [{ id: 'street', title: 'Waiting to cross' }, { id: 'friend', title: "You've got a friend" }] },
+  { id: 'spritz', name: 'The pâtisserie', col: '#8e1a2a', items: [{ id: 'spritz', title: 'Two spritzes' }] },
+  { id: 'pub', name: 'The pub', col: '#2f6a3c', items: [{ id: 'pub', title: 'At the bar' }] },
+  { id: 'rooftop', name: 'The rooftop', col: '#33273c', items: [{ id: 'rooftop', title: 'Candle and moon' }] },
+  { id: 'view', name: 'The view', col: '#1c2748', night: true, items: [{ id: 'view', title: 'The top of the city' }, { id: 'selfie', title: 'Cheek to cheek' }, { id: 'moon', title: 'The moon and the tower' }] }
 ];
 const img = {}; for (const s of ST) { const im = new Image(); im.onload = () => { im.ok = true; }; im.src = `media/ny_${s.items[0].id}.jpg`; img[s.id] = im; }
 let S = 1, VW = 0, VH = 0, L = null, active = false, view = null, endShown = false, poster = null;
@@ -39,7 +39,7 @@ function setStep() {
 }
 function ride(to) { if (C.move || to < 0 || to >= ST.length) return; C.move = { from: C.at, to, u: 0 }; setStep(); tone(523, .18, 'sine', .06); tone(415, .3, 'sine', .06, .18); }
 const vid = $('svid'), pic = $('simg');
-function show() { const s = view.st, it = s.items[view.i], clip = it.media === 'clip'; vid.pause(); vid.hidden = !clip; pic.hidden = clip; if (clip) { pic.removeAttribute('src'); vid.muted = !G.sound; vid.loop = true; vid.poster = `media/ny_${it.id}.jpg`; vid.src = `media/ny_${it.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); } else { vid.removeAttribute('src'); vid.load(); } $('sno').textContent = `${s.name}` + (s.items.length > 1 ? `  ·  ${view.i + 1} of ${s.items.length}` : ''); $('stitle').textContent = it.title; $('stext').textContent = it.text; if (!clip) { pic.alt = it.title; pic.src = `media/ny_${it.id}.jpg`; } $('snav').hidden = s.items.length < 2; $('sp').disabled = view.i === 0; $('sn').disabled = view.i === s.items.length - 1; }
+function show() { const s = view.st, it = s.items[view.i], clip = it.media === 'clip'; vid.pause(); vid.hidden = !clip; pic.hidden = clip; if (clip) { pic.removeAttribute('src'); vid.muted = !G.sound; vid.loop = true; vid.poster = `media/ny_${it.id}.jpg`; vid.src = `media/ny_${it.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); } else { vid.removeAttribute('src'); vid.load(); } $('sno').textContent = s.items.length > 1 ? `${view.i + 1} of ${s.items.length}` : ''; if (!clip) { pic.alt = it.title; pic.src = `media/ny_${it.id}.jpg`; } $('snav').hidden = s.items.length < 2; $('sp').disabled = view.i === 0; $('sn').disabled = view.i === s.items.length - 1; }
 function look() { if (C.move) return; view = { st: ST[C.at], i: 0 }; seen.add(ST[C.at].id); $('sview').hidden = false; show(); $('sclose').focus(); tone(660, .1, 'sine', .05); }
 function closeView() { const s = view && view.st; vid.pause(); vid.removeAttribute('src'); vid.load(); $('sview').hidden = true; pic.removeAttribute('src'); view = null; if (s && s.night && !endShown) { endShown = true; setTimeout(() => { if (active) { $('send').hidden = false; $('sstay').focus(); [523, 659, 784, 1047].forEach((f, i) => tone(f, .9, 'sine', .05, i * .22)); } }, 1200); } }
 

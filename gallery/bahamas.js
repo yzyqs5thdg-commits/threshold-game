@@ -139,27 +139,27 @@ function marinaL(g, t, n) {
 /* ------------------------------------------------------------------ the stops and their postcards */
 const STOPS = [
   { id: 'home', x: 420, name: 'The villa', w: 600, sign: -276, draw: (g, t) => villa(g, t, false), items: [
-    { id: 'selfie', media: 'photo', title: 'Morning at the villa', text: 'Three of us, one palm tree, and the wind doing whatever it wanted with our hair.' }] },
+    { id: 'selfie', media: 'photo', title: 'Morning at the villa' }] },
   { id: 'cafe', x: 1450, name: 'The yellow café', w: 340, sign: -136, draw: cafe, lights: cafeL, items: [
-    { id: 'coffee', media: 'photo', title: 'The yellow café', text: 'Iced coffee against the yellowest wall on the island.' }] },
+    { id: 'coffee', media: 'photo', title: 'The yellow café' }] },
   { id: 'water', x: 2500, name: 'The clearest water', sign: -160, pier: false, draw: sandbar, items: [
-    { id: 'helm', media: 'clip', title: 'At the helm', text: 'Under the blue canopy, heading out.' },
-    { id: 'feet', media: 'photo', title: 'Feet up', text: 'Wet hair, red cup, nowhere to be.' },
-    { id: 'swim', media: 'clip', title: 'The clearest water', text: 'Water this clear, and the two of us in the middle of it.' }] },
+    { id: 'helm', media: 'clip', title: 'At the helm' },
+    { id: 'feet', media: 'photo', title: 'Feet up' },
+    { id: 'swim', media: 'clip', title: 'The clearest water' }] },
   { id: 'nap', x: 3520, name: 'Nap Cay', w: 400, sign: -170, draw: nap, items: [
-    { id: 'nap', media: 'photo', title: 'Nap Cay', text: 'Sunglasses on, towel up to the chin, fully asleep.' }] },
+    { id: 'nap', media: 'photo', title: 'Nap Cay' }] },
   { id: 'frog', x: 4560, name: "Frog's Landing", w: 520, sign: 176, draw: frog, lights: frogL, items: [
-    { id: 'tall', media: 'photo', title: 'The height check', text: 'You must be this tall to drink. You checked.' },
-    { id: 'trophy', media: 'photo', title: 'Trophy wife', text: 'You found your sign.' },
-    { id: 'dance', media: 'clip', title: 'The dance floor', text: 'Three of us, and every colour of light they had.' }] },
+    { id: 'tall', media: 'photo', title: 'The height check' },
+    { id: 'trophy', media: 'photo', title: 'Trophy wife' },
+    { id: 'dance', media: 'clip', title: 'The dance floor' }] },
   { id: 'sunset', x: 5700, name: 'The villa at sunset', w: 600, sign: -276, draw: (g, t) => villa(g, t, true), lights: villaL, items: [
-    { id: 'bag', media: 'photo', title: 'Golden hour on the deck', text: 'You, me, and the bag getting its own photo.' },
-    { id: 'hamclip', media: 'clip', title: 'The hammock', text: 'Two people, one hammock, no chance.' },
-    { id: 'hammock', media: 'photo', title: 'Still laughing', text: 'We could not stop.' },
-    { id: 'sunset', media: 'photo', title: 'The pink sky', text: 'The sky did this, and we stood under it.' }] },
+    { id: 'bag', media: 'photo', title: 'Golden hour on the deck' },
+    { id: 'hamclip', media: 'clip', title: 'The hammock' },
+    { id: 'hammock', media: 'photo', title: 'Still laughing' },
+    { id: 'sunset', media: 'photo', title: 'The pink sky' }] },
   { id: 'marina', x: 6850, name: 'The marina', sign: -222, draw: marina, lights: marinaL, items: [
-    { id: 'pasta', media: 'photo', title: 'Dinner at the marina', text: 'One fork, held by me. Eyes closed, by you.' },
-    { id: 'pastaclip', media: 'clip', title: 'Spaghetti, continued', text: 'A yacht behind us and the pasta in front.' }] }
+    { id: 'pasta', media: 'photo', title: 'Dinner at the marina' },
+    { id: 'pastaclip', media: 'clip', title: 'Spaghetti, continued' }] }
 ];
 
 function layout() {
@@ -200,7 +200,7 @@ function setStep() {
 const vid = $('bvid'), pic = $('bimg');
 function show() {
   const st = view.st, it = st.items[view.i], photo = it.media === 'photo';
-  $('bno').textContent = `Postcard from ${st.name}` + (st.items.length > 1 ? `  ·  ${view.i + 1} of ${st.items.length}` : ''); $('btitle').textContent = it.title; $('btext').textContent = it.text;
+  $('bno').textContent = st.items.length > 1 ? `${view.i + 1} of ${st.items.length}` : '';
   vid.pause(); vid.hidden = photo; pic.hidden = !photo; $('bnav').hidden = st.items.length < 2; $('bprev').disabled = view.i === 0; $('bnext').disabled = view.i === st.items.length - 1;
   if (photo) { vid.removeAttribute('src'); vid.load(); pic.alt = it.title; pic.src = `media/bh_${it.id}.jpg`; }
   else { pic.removeAttribute('src'); vid.muted = !G.sound; vid.loop = true; vid.poster = `media/bh_${it.id}.jpg`; vid.src = `media/bh_${it.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); }
@@ -304,7 +304,7 @@ $('bclose').addEventListener('click', closeView);
 $('bview').addEventListener('click', ev => { if (ev.target === $('bview')) closeView(); });
 $('bstay').addEventListener('click', () => { $('bend').hidden = true; });
 $('bback').addEventListener('click', () => { $('bend').hidden = true; G.go('map'); });
-vid.addEventListener('error', () => { if (!$('bview').hidden && vid.getAttribute('src')) $('btext').textContent += ' (This clip is not loaded here.)'; });
+vid.addEventListener('error', () => { if (!$('bview').hidden && vid.getAttribute('src')) $('bno').textContent = 'This clip is not loaded here.'; });
 
 G.scenes.bahamas = {
   frame, resize: layout,

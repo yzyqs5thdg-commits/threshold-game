@@ -161,7 +161,6 @@ function drawRoomScene(g, t) {
     else { const gr = g.createLinearGradient(0, f.y, 0, f.y + f.h); gr.addColorStop(0, '#cfe0ec'); gr.addColorStop(.6, '#e8c860'); gr.addColorStop(1, '#c66c32'); g.fillStyle = gr; g.fillRect(f.x, f.y, f.w, f.h); }
     if (c.kind === 'clip') { g.fillStyle = 'rgba(28,39,72,.16)'; g.fillRect(f.x, f.y, f.w, f.h); } g.restore();
     const px = f.x + f.w / 2, py = f.y + f.h / 2, pu = 1 + .05 * Math.sin(t * 3 + i); if (c.kind === 'clip') { g.fillStyle = 'rgba(251,243,223,.92)'; g.beginPath(); g.arc(px, py, 17 * pu, 0, TAU); g.fill(); g.fillStyle = INK; g.beginPath(); g.moveTo(px - 5, py - 8); g.lineTo(px + 9, py); g.lineTo(px - 5, py + 8); g.fill(); }
-    g.font = `700 11.5px ${UI}`; g.textAlign = 'center'; g.textBaseline = 'middle'; const tw = g.measureText(c.label).width + 14; g.fillStyle = '#d9b25c'; rr(g, px - tw / 2, f.y + f.h + 14, tw, 18, 3); g.fill(); g.fillStyle = '#3a2a1a'; g.fillText(c.label, px, f.y + f.h + 23.5);
   });
   /* the hook, with or without its medal */
   const h = L.hook; g.fillStyle = '#8a6a48'; g.beginPath(); g.arc(h.x, h.y, 5, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,255,255,.4)'; g.beginPath(); g.arc(h.x - 1.4, h.y - 1.4, 1.6, 0, TAU); g.fill();
@@ -223,7 +222,7 @@ function frame(dt) {
 /* ------------------------------------------------------------------ the clip viewer, input and wiring */
 const vid = $('mvid'), pic = $('mimg');
 function watch(i) {
-  const c = ITEMS[i], photo = c.kind === 'photo'; $('mcap').textContent = c.title; $('mview').hidden = false; vid.hidden = photo; pic.hidden = !photo;
+  const c = ITEMS[i], photo = c.kind === 'photo'; $('mcap').textContent = ''; $('mview').hidden = false; vid.hidden = photo; pic.hidden = !photo;
   if (photo) { pic.classList.toggle('wide', !c.tall); pic.alt = c.title; pic.src = `media/${c.id}.jpg`; }
   else { vid.classList.toggle('wide', !c.tall); vid.muted = !G.sound; vid.loop = true; vid.poster = `media/${c.id}.jpg`; vid.src = `media/${c.id}.mp4`; const p = vid.play(); if (p && p.catch) p.catch(() => { /* she can press play herself */ }); }
   $('mclose').focus();
