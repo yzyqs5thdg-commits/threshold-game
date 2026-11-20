@@ -64,7 +64,7 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .paper .keep { color: var(--ok); font-weight: 700; }
 .paper .toast { font-family: var(--display); font-style: italic; font-size: 1.4em; line-height: 1.3; text-wrap: balance; max-width: 16em; }
 .cork { display: block; }
-#rhud, #chud, #dhud, #mhud, #xhud, #bhud, #fhud, #shud, #uhud, #tbhud, #ghud, #maphud, #phud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
+#rhud, #chud, #dhud, #mhud, #xhud, #bhud, #fhud, #shud, #uhud, #tbhud, #ghud, #maphud, #phud, #qhud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
 #rhud .krow, #chud .krow, #dhud .krow, #mhud .krow, #xhud .krow, #bhud .krow, #fhud .krow, #shud .krow { flex: none; align-items: center; }
 #sbar, #ubar { flex-direction: row; align-items: flex-end; align-content: flex-end; justify-content: center; flex-wrap: wrap; gap: 8px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 #sbar button, #ubar button { padding: 11px 15px; font-size: 14.5px; }
@@ -74,8 +74,8 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 .xnav[hidden] { display: none; }
 .paper .xnav button { margin: 0; padding: .45em 1em; font-size: .85em; background: none; color: var(--ink); border: 1.5px solid var(--ink-soft); }
 .paper .xnav button:disabled { opacity: .35; cursor: default; }
-#xhud .krow, #bhud .krow, #fhud .krow, #shud .krow, #uhud .krow, #tbhud .krow, #ghud .krow, #maphud .krow, #phud .krow { flex: 0 1 auto; align-items: center; }
-#xhud .step, #bhud .step, #fhud .step, #shud .step, #uhud .step, #tbhud .step, #ghud .step, #phud .step { flex: 1 1 9em; min-width: 9em; }
+#xhud .krow, #bhud .krow, #fhud .krow, #shud .krow, #uhud .krow, #tbhud .krow, #ghud .krow, #maphud .krow, #phud .krow, #qhud .krow { flex: 0 1 auto; align-items: center; }
+#xhud .step, #bhud .step, #fhud .step, #shud .step, #uhud .step, #tbhud .step, #ghud .step, #phud .step, #qhud .step { flex: 1 1 9em; min-width: 9em; }
 #maphud .step { flex: 0 1 auto; }
 #tomap { align-self: flex-end; }
 #whud { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 10px; padding-block: calc(12px + env(safe-area-inset-top, 0px)) 12px; }
@@ -101,7 +101,8 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 #pview .xcard, #pout .xcard { max-width: 34em; }
 #pview .xcard img { max-height: min(68vh, 60em); background: none; }
 #poutslot img, #poutslot canvas { display: block; max-width: 100%; max-height: 56vh; width: auto; height: auto; border-radius: 4px; box-shadow: 0 6px 22px rgba(28, 39, 72, .35); background: none; -webkit-touch-callout: default; user-select: auto; }
-#xbar, #bbar, #gbar, #pbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
+#qbar[hidden] { display: none; }
+#xbar, #bbar, #gbar, #pbar, #qbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 .xcard { max-width: 30em; gap: 8px; padding: 18px 20px 20px; }
 .xcard img, .xcard video { display: block; max-width: 100%; max-height: 50vh; border-radius: 8px; background: var(--night); }
 .xcard h2 { font-size: 1.55em; }
@@ -475,6 +476,26 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
   <div class="over" id="maphud">
     <p class="pill step" id="mapstep" aria-live="polite">Tap a place on the map to go there.</p>
     <div class="krow"><button class="small" id="mapward" type="button">Wardrobe</button><button class="small" id="mapsound" type="button" aria-pressed="true">Sound on</button></div>
+  </div>
+</div>
+
+<div id="qui" hidden>
+  <div class="over" id="qhud">
+    <p class="pill step" id="qstep" aria-live="polite"></p>
+    <div class="krow">
+      <button class="small" id="qsound" type="button" aria-pressed="true">Sound on</button>
+      <button class="small" id="qleave" type="button">Back to the map</button>
+    </div>
+  </div>
+  <div class="over" id="qbar"><button id="qdo" type="button">Shuffle the cards</button></div>
+  <div class="over sheet" id="qend" hidden>
+    <div class="paper">
+      <h2>The Sun, the Star, the Magician</h2>
+      <p class="keep">Keepsake found: the three cards</p>
+      <button id="qstay" type="button">Stay a while</button>
+      <button id="qagain" type="button" class="alt">Read again</button>
+      <button id="qback" type="button" class="alt">Back to the map</button>
+    </div>
   </div>
 </div>
 
@@ -1172,5 +1193,6 @@ const G = window.G = {
 <script src="garden.js"></script>
 <script src="wardrobe.js"></script>
 <script src="booth.js"></script>
+<script src="tarot.js"></script>
 <script src="map.js"></script>
 <script>window.G.boot();</script>

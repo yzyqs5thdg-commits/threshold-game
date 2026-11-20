@@ -9,15 +9,15 @@ const UI = '"Nunito", "Avenir Next", system-ui, sans-serif', DISPLAY = '"Fraunce
 const INK = '#2c2a3d', PAPER = '#fbf3df';
 /* w: position on a wide screen, t: on a tall one, as fractions of the map area */
 const PLACES = [
-  { id: 'frontdoor', name: 'The front door', w: [.15, .21], t: [.21, .11] }, { id: 'kitchen', name: 'Maggi kitchen', w: [.29, .16], t: [.5, .09] }, { id: 'chai', name: 'Chai coffee', w: [.43, .16], t: [.79, .11] }, { id: 'booth', name: 'The photo booth', w: [.56, .23], t: [.5, .575] },
-  { id: 'road', name: 'The river road', w: [.08, .47], t: [.17, .26] }, { id: 'rooftop', name: 'The rooftop', w: [.22, .5], t: [.2, .42] }, { id: 'garden', name: 'Central Park', w: [.39, .47], t: [.5, .255] }, { id: 'un', name: 'The UN', w: [.58, .5], t: [.83, .26] },
-  { id: 'medal', name: 'The 5K', w: [.13, .79], t: [.2, .585] }, { id: 'city', name: 'The subway', w: [.29, .8], t: [.5, .42] }, { id: 'table', name: 'Table for two', w: [.44, .78], t: [.8, .42] }, { id: 'dumplings', name: 'Spicy Village', w: [.57, .8], t: [.8, .585] },
+  { id: 'frontdoor', name: 'The front door', w: [.15, .21], t: [.21, .095] }, { id: 'kitchen', name: 'Maggi kitchen', w: [.29, .16], t: [.5, .085] }, { id: 'chai', name: 'Chai coffee', w: [.43, .15], t: [.79, .095] }, { id: 'booth', name: 'The photo booth', w: [.575, .21], t: [.5, .605] }, { id: 'tarot', name: 'The Columbia steps', w: [.485, .345], t: [.5, .475] },
+  { id: 'road', name: 'The river road', w: [.08, .47], t: [.17, .225] }, { id: 'rooftop', name: 'The rooftop', w: [.22, .5], t: [.2, .355] }, { id: 'garden', name: 'Central Park', w: [.37, .5], t: [.5, .215] }, { id: 'un', name: 'The UN', w: [.59, .52], t: [.83, .225] },
+  { id: 'medal', name: 'The 5K', w: [.13, .79], t: [.2, .485] }, { id: 'city', name: 'The subway', w: [.29, .8], t: [.5, .345] }, { id: 'table', name: 'Table for two', w: [.44, .78], t: [.8, .355] }, { id: 'dumplings', name: 'Spicy Village', w: [.57, .8], t: [.8, .485] },
   { id: 'bahamas', name: 'The Bahamas', w: [.85, .27], t: [.26, .86], isle: 1 }, { id: 'mexico', name: 'Mexico', w: [.84, .74], t: [.74, .86], isle: 2 }
 ];
 const BY = Object.fromEntries(PLACES.map(p => [p.id, p]));
 const EDGES = {
-  w: 'frontdoor-kitchen kitchen-chai road-rooftop rooftop-garden garden-un medal-city city-table table-dumplings frontdoor-rooftop kitchen-garden chai-un rooftop-city garden-table un-dumplings road-medal frontdoor-road chai-booth booth-un',
-  t: 'frontdoor-kitchen kitchen-chai road-garden garden-un rooftop-city city-table medal-dumplings frontdoor-road kitchen-garden chai-un road-rooftop garden-city un-table rooftop-medal table-dumplings city-booth medal-booth booth-dumplings'
+  w: 'frontdoor-kitchen kitchen-chai road-rooftop rooftop-garden garden-un medal-city city-table table-dumplings frontdoor-rooftop kitchen-garden rooftop-city garden-table un-dumplings road-medal frontdoor-road chai-booth booth-un chai-tarot tarot-garden tarot-un',
+  t: 'frontdoor-kitchen kitchen-chai road-garden garden-un rooftop-city city-table medal-tarot tarot-dumplings frontdoor-road kitchen-garden chai-un road-rooftop garden-city un-table rooftop-medal table-dumplings city-tarot tarot-booth'
 };
 let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false, hover = null, focus = -1, cur = 'frontdoor', trip = null;
 const visited = new Set(), moth = { x: 0, y: 0 }, av = { x: 0, y: 0, dir: 1, phase: 0 };
@@ -40,7 +40,7 @@ function layout() {
   const lands = wide ? [mk(at(.335, .5), mw * .335, mh * .485, 7), mk(at(.85, .25), mw * .115, mh * .2, 21), mk(at(.84, .73), mw * .125, mh * .2, 33)]
     : [mk(at(.5, .335), mw * .5 - 2, mh * .345, 7), mk(at(.26, .855), mw * .235, mh * .105, 21), mk(at(.74, .855), mw * .235, mh * .105, 33)];
   const dock = wide ? at(.665, .5) : at(.5, .68);
-  L = { wide, key, pos, lands, dock, z: wide ? 1 : .8, rose: wide ? at(.97, .5) : at(.9, .715), edges: EDGES[key].split(' ').map(e => e.split('-')) };
+  L = { wide, key, pos, lands, dock, z: wide ? 1 : .74, rose: wide ? at(.97, .5) : at(.9, .715), edges: EDGES[key].split(' ').map(e => e.split('-')) };
   SPR = { back: G.spr(VW, VH, drawBack, clamp(S * G.DPR, 1, 2.5)) };
   const c = pos[cur]; av.x = c[0] + 40 * L.z; av.y = c[1] + 12 * L.z; $('mapui').style.fontSize = clamp(16 * S, 13, 18) + 'px';
 }
@@ -96,6 +96,8 @@ const ICON = {
   booth(g, t) { shade(g, 26); wall(g, -18, 36, 50, '#f3e6cc'); g.fillStyle = '#e0604a'; g.fillRect(-18, -12, 36, 4); g.fillStyle = '#b8262c'; rr(g, -21, -60, 42, 13, 4); g.fill(); for (let i = 0; i < 5; i++) { g.fillStyle = `rgba(255,232,150,${.65 + .35 * Math.sin(t * 4 + i * 1.4) * still()})`; g.beginPath(); g.arc(-14 + i * 7, -53.5, 2, 0, TAU); g.fill(); }
     g.fillStyle = '#241820'; g.fillRect(-13, -42, 17, 42); g.fillStyle = '#b83246'; g.fillRect(-13, -42, 17, 25); g.fillStyle = '#84202f'; for (let i = 0; i < 3; i++) g.fillRect(-9 + i * 5.5, -42, 1.6, 25); g.fillStyle = '#fbfaf5'; g.fillRect(8, -40, 7, 21); g.fillStyle = '#5a5560'; for (let i = 0; i < 4; i++) g.fillRect(9, -39 + i * 5, 5, 3.8);
     const k = G.RM ? 1 : (t * .45) % 1; if (k < .12) { g.globalCompositeOperation = 'lighter'; glow(g, -4, -22, 34, '255,250,230', .9 * (1 - k / .12)); g.globalCompositeOperation = 'source-over'; } },
+  tarot(g, t) { shade(g, 34); g.fillStyle = '#9fa8a0'; g.beginPath(); g.ellipse(0, -44, 17, 13, 0, Math.PI, 0); g.fill(); wall(g, -27, 54, 30, '#e9dfca'); g.fillStyle = '#efe6d2'; g.fillRect(-29, -46, 58, 5); g.fillStyle = '#4a4458'; g.fillRect(-19, -38, 38, 24); for (let i = 0; i < 6; i++) { g.fillStyle = '#f4ecd8'; g.fillRect(-18 + i * 6.6, -38, 3.4, 24); }
+    for (let i = 0; i < 4; i++) { g.fillStyle = i % 2 ? '#c6baa2' : '#ebe2cf'; g.fillRect(-30 - i * 2, -14 + i * 4, 60 + i * 4, 4); } const bob = Math.sin(t * 2) * 1.5 * still(); g.save(); g.translate(22, -26 + bob); g.rotate(.2); g.fillStyle = '#fbf3df'; rr(g, -6, -9, 12, 18, 2); g.fill(); g.fillStyle = '#1c2748'; rr(g, -4.6, -7.6, 9.2, 15.2, 1.4); g.fill(); g.fillStyle = '#e9b44c'; g.beginPath(); g.arc(0, 0, 2.6, 0, TAU); g.fill(); g.restore(); },
   road(g) { shade(g, 30); g.strokeStyle = '#a49e9c'; g.lineWidth = 11; g.lineCap = 'round'; g.beginPath(); g.moveTo(-28, 2); g.quadraticCurveTo(-4, -14, 26, -6); g.stroke(); g.strokeStyle = '#fbf6ea'; g.lineWidth = 1.4; g.setLineDash([4, 4]); g.stroke(); g.setLineDash([]); tree(g, -16, -14, 11, '#e2a53a'); tree(g, 6, -18, 9, '#c66c32'); g.fillStyle = '#26302c'; g.fillRect(22, -40, 2.4, 34); g.fillStyle = '#f4ecd2'; g.fillRect(19.6, -47, 7, 8); g.fillStyle = '#26302c'; g.beginPath(); g.moveTo(17.6, -47); g.lineTo(23.2, -53); g.lineTo(28.6, -47); g.fill(); },
   bahamas(g, t) { shade(g, 32); g.fillStyle = '#fbfaf4'; g.fillRect(-12, -28, 32, 28); g.fillStyle = '#e6e2d6'; g.fillRect(-14, -31, 36, 4); g.fillStyle = '#9fc4cc'; g.fillRect(-8, -22, 9, 9); g.fillRect(6, -22, 9, 9); g.fillRect(6, -10, 9, 10); palm(g, -26, 0, 34); g.fillStyle = '#4fd0d8'; rr(g, -8, 6, 26, 6, 3); g.fill();
     for (let i = 0; i < 4; i++) { g.fillStyle = i % 2 ? '#fbfaf4' : '#f2c21c'; g.beginPath(); g.moveTo(30, -22); g.arc(30, -22, 12, Math.PI + i * Math.PI / 4, Math.PI + (i + 1) * Math.PI / 4); g.fill(); } g.fillStyle = '#8f949c'; g.fillRect(29.4, -22, 1.4, 22); },
