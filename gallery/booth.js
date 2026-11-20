@@ -209,9 +209,10 @@ function shot(g, w, h, s, P, t, live) {
   if (typeof P === 'string') P = POSE[P] || POSES[0];
   const r = h * .19, u = r * .5, bg = s.bg && s.bg[0] === '#' ? s.bg : (BGS.find(q => q.id === s.bg) || BGS[0]).sw, left = s.left || 'j';
   g.save(); g.beginPath(); g.rect(0, 0, w, h); g.clip(); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-  g.fillStyle = bg; g.fillRect(0, 0, w, h);
-  let gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,.3)'); gr.addColorStop(.6, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(40,40,70,.14)'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-  g.strokeStyle = 'rgba(60,60,90,.035)'; g.lineWidth = w * .012; for (let i = 1; i < 7; i++) { g.beginPath(); g.moveTo(w * i / 7, 0); g.lineTo(w * i / 7 + w * .01, h); g.stroke(); }
+  let gr;
+  if (!s.bare) { g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,.3)'); gr.addColorStop(.6, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(40,40,70,.14)'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(60,60,90,.035)'; g.lineWidth = w * .012; for (let i = 1; i < 7; i++) { g.beginPath(); g.moveTo(w * i / 7, 0); g.lineTo(w * i / 7 + w * .01, h); g.stroke(); } }
   const mk = (who, sg, bx) => { const p = P[who] || {}, bob = live && !G.RM ? Math.sin(t * 1.5 + (who === 'f' ? 1.4 : 0)) * r * .018 : 0, hx = bx + sg * (p.dx || 0) * r, hy = h * .4 + (p.dy || 0) * r + bob;
     return { who, sg, p, hx, hy, bx: bx + sg * (p.dx || 0) * r * .55, by: h * .4 + (p.dy || 0) * r * .6, o: who === 'j' ? (s.jo || jOut()) : (s.fo || fOut(s)), k: G.people[who], drop: (1 - (p.ha == null ? 1 : p.ha)) * r * 3.6 }; };
   const pR = mk(left === 'j' ? 'f' : 'j', -1, w * .71), pL = mk(left, 1, w * .29), ppl = P.front === pR.who ? [pL, pR] : [pR, pL];
@@ -246,6 +247,7 @@ function shot(g, w, h, s, P, t, live) {
   if (s.film === 'bw') { g.globalCompositeOperation = 'soft-light'; g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(0, 0, w, h); g.globalCompositeOperation = 'source-over'; }
   if (s.film === 'violet') { g.globalCompositeOperation = 'multiply'; g.fillStyle = '#ddd2f6'; g.fillRect(0, 0, w, h); g.globalCompositeOperation = 'screen'; g.fillStyle = '#141032'; g.fillRect(0, 0, w, h); g.globalCompositeOperation = 'source-over'; }
   if (s.film === 'flash') { g.globalCompositeOperation = 'multiply'; g.fillStyle = '#ffeeda'; g.fillRect(0, 0, w, h); g.globalCompositeOperation = 'source-over'; gr = g.createRadialGradient(w / 2, h * .4, 0, w / 2, h * .4, w * .5); gr.addColorStop(0, 'rgba(255,250,236,.26)'); gr.addColorStop(1, 'rgba(255,250,236,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }
+  if (s.bare) { g.restore(); return; }
   gr = g.createRadialGradient(w / 2, h * .45, w * .34, w / 2, h / 2, w * .78); gr.addColorStop(0, 'rgba(20,16,30,0)'); gr.addColorStop(1, `rgba(20,16,30,${s.film === 'flash' ? .42 : .24})`); g.fillStyle = gr; g.fillRect(0, 0, w, h);
   g.restore();
 }
@@ -469,6 +471,8 @@ $('pleave').addEventListener('click', () => G.go('map'));
 const soundLabel = () => { $('psound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('psound').setAttribute('aria-pressed', G.sound); };
 $('psound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
 
+/* other places can seat the same two, from the chest up, in whatever she chose for the booth */
+G.duo = { draw: (g, w, h, P, t, o) => shot(g, w, h, Object.assign({}, st, { film: 'none', bare: true }, o), P, t, true), mix: mixPose };
 G.scenes.booth = {
   frame, resize: layout,
   enter() { active = true; $('pui').hidden = false; soundLabel(); toWall(); if (document.fonts && document.fonts.load) { document.fonts.load(`italic 600 20px Fraunces`).then(() => { if (active) layout(); }).catch(() => { /* the fallback serif is fine */ }); document.fonts.load('700 14px Nunito'); } },

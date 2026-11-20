@@ -1,0 +1,165 @@
+/* The bar. The two of them sit at the counter and Jana works the menu: mezcal with lemon juice,
+   the spritz bar, and the wines. She makes one for each of them, and then they clink. */
+(() => {
+'use strict';
+const G = window.G; if (!G || !G.duo) return;
+const { cv, cx, lerp, clamp, sm, TAU, R, dab, glow, tone } = G;
+const $ = id => document.getElementById(id);
+const UI = '"Nunito", "Avenir Next", system-ui, sans-serif', DISPLAY = '"Fraunces", "Iowan Old Style", Georgia, serif';
+const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+const ell = (g, x, y, rx, ry, a0 = 0, a1 = TAU) => { g.beginPath(); g.ellipse(x, y, rx, ry, 0, a0, a1); };
+const ING = {
+  mezcal: { name: 'Mezcal', col: [236, 230, 204], a: .5, bottle: '#d9cfa8', label: '#2f6a4a' },
+  lemon: { name: 'Lemon juice', col: [248, 226, 104], a: .9, squeeze: true },
+  aperol: { name: 'Aperol', col: [246, 126, 38], a: .92, bottle: '#f08a2c', label: '#fbf3df' },
+  campari: { name: 'Campari', col: [204, 34, 46], a: .94, bottle: '#c8262c', label: '#fbf3df' },
+  limoncello: { name: 'Limoncello', col: [250, 222, 82], a: .9, bottle: '#f2d24a', label: '#fbf3df' },
+  elder: { name: 'Elderflower', col: [216, 230, 150], a: .8, bottle: '#cfe0a0', label: '#4f8a3c' },
+  prosecco: { name: 'Prosecco', col: [246, 230, 162], a: .78, fizz: true, bottle: '#2f5a3c', label: '#e9b44c' },
+  soda: { name: 'Soda', col: [228, 242, 248], a: .45, fizz: true, bottle: '#9fc4d8', label: '#fbf3df' },
+  red: { name: 'Red', col: [124, 22, 46], a: .96, bottle: '#2a1c24', label: '#fbf3df' },
+  white: { name: 'White', col: [242, 228, 150], a: .8, bottle: '#8fa86a', label: '#fbf3df' },
+  orange: { name: 'Orange', col: [228, 144, 58], a: .88, bottle: '#b8742c', label: '#fbf3df' },
+  rose: { name: 'Rosé', col: [242, 150, 152], a: .85, bottle: '#e8a0a8', label: '#fbf3df' },
+  bubbly: { name: 'Sparkling', col: [248, 234, 170], a: .76, fizz: true, bottle: '#2f5a3c', label: '#e9b44c' }
+};
+const MENU = {
+  mezcal: { tab: 'Mezcal', title: 'Mezcal with lemon juice', pour: ['mezcal', 'lemon'], opts: [['rim', 'Rim', [['salt', 'Salt'], ['chilli', 'Chilli salt'], ['none', 'No rim']]], ['ice', 'Ice', [['on', 'On the rocks'], ['off', 'No ice']]], ['garnish', 'Garnish', [['lemon', 'Lemon wheel'], ['none', 'None']]]], start: { rim: 'salt', ice: 'on', garnish: 'lemon' } },
+  spritz: { tab: 'Spritz', title: 'Spritz bar', pour: ['aperol', 'campari', 'limoncello', 'elder', 'prosecco', 'soda'], opts: [['garnish', 'Garnish', [['orange', 'Orange slice'], ['lemon', 'Lemon wheel'], ['olive', 'Olive'], ['mint', 'Mint'], ['none', 'None']]]], start: { rim: 'none', ice: 'on', garnish: 'orange' } },
+  wine: { tab: 'Wine', title: 'Wines', pour: ['red', 'white', 'orange', 'rose', 'bubbly'], single: true, opts: [], start: { rim: 'none', ice: 'off', garnish: 'none' } }
+};
+const CAP = 6;
+const IDLE = { j: { dx: .1, tilt: .05 }, f: { dx: .1, tilt: .05 } };
+const GOT = who => ({ j: Object.assign({ dx: .1, tilt: .05 }, who === 'j' ? { eyes: ['happy', 'happy'], mouth: 'grin' } : {}), f: Object.assign({ dx: .1, tilt: .05 }, who === 'f' ? { eyes: ['happy', 'happy'], mouth: 'grin' } : {}) });
+const HX = .6, HY = 1.86;
+const CHEERS = { j: { dx: .16, tilt: .1, expr: 'joy', hands: [{ k: 'fist', x: HX, y: HY, rot: .2, far: 0, from: .1 }] }, f: { dx: .16, tilt: .1, expr: 'joy', hands: [{ k: 'fist', x: HX, y: HY, rot: .2, far: 0, from: .1 }] } };
+let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false, tab = 'mezcal';
+let D = null, served = { j: null, f: null }, pour = null, phase = 'make', pt0 = 0, glad = null, parts = [], rounds = 0;
+const empty = t => Object.assign({ tab: t, parts: {}, total: 0, level: 0 }, MENU[t].start);
+const kindOf = d => (d.tab === 'mezcal' ? 'rocks' : d.tab === 'spritz' ? 'balloon' : d.parts.bubbly ? 'flute' : 'wine');
+function mixOf(d) { let r = 0, g = 0, b = 0, a = 0, n = 0, fizz = false; for (const id in d.parts) { const q = ING[id], k = d.parts[id]; r += q.col[0] * k; g += q.col[1] * k; b += q.col[2] * k; a += q.a * k; n += k; fizz = fizz || !!q.fizz; } return n ? { col: [r / n, g / n, b / n].map(Math.round), a: a / n, fizz } : { col: [255, 255, 255], a: 0, fizz: false }; }
+
+/* ------------------------------------------------------------------ a glass: base at the origin, s tall */
+const SHAPE = { rocks: { top: -.62, bot: -.07, rim: .31, wide: .3 }, balloon: { top: -.94, bot: -.34, rim: .28, wide: .37 }, wine: { top: -.95, bot: -.42, rim: .19, wide: .25 }, flute: { top: -.99, bot: -.38, rim: .105, wide: .125 } };
+function bowl(g, kind, s) { const q = SHAPE[kind]; g.beginPath(); if (kind === 'rocks') { g.moveTo(-q.rim * s, q.top * s); g.lineTo(-q.rim * .84 * s, q.bot * s); g.lineTo(q.rim * .84 * s, q.bot * s); g.lineTo(q.rim * s, q.top * s); } else { const mid = lerp(q.top, q.bot, .45) * s; g.moveTo(-q.rim * s, q.top * s); g.bezierCurveTo(-q.wide * 1.22 * s, mid, -q.wide * .8 * s, q.bot * s, 0, q.bot * s); g.bezierCurveTo(q.wide * .8 * s, q.bot * s, q.wide * 1.22 * s, mid, q.rim * s, q.top * s); } g.closePath(); }
+function wheel(g, x, y, r, col, rind) { g.fillStyle = rind; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); g.fillStyle = col; g.beginPath(); g.arc(x, y, r * .82, 0, TAU); g.fill(); g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = Math.max(.6, r * .07); for (let i = 0; i < 4; i++) { const a = i * Math.PI / 4; g.beginPath(); g.moveTo(x - Math.cos(a) * r * .8, y - Math.sin(a) * r * .8); g.lineTo(x + Math.cos(a) * r * .8, y + Math.sin(a) * r * .8); g.stroke(); } }
+function glass(g, x, y, s, d, t, frac) {
+  const kind = kindOf(d), q = SHAPE[kind], m = mixOf(d), f = clamp(frac == null ? d.level : frac, 0, 1), ly = lerp(q.bot, lerp(q.top, q.bot, .1), f) * s, still = G.RM ? 0 : 1;
+  g.save(); g.translate(x, y); g.lineJoin = 'round'; g.lineCap = 'round';
+  g.fillStyle = 'rgba(20,10,20,.22)'; ell(g, s * .03, s * .01, s * (kind === 'rocks' ? .34 : .24), s * .035); g.fill();
+  if (kind !== 'rocks') { g.fillStyle = 'rgba(236,244,248,.5)'; g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = Math.max(.8, s * .012); ell(g, 0, -s * .012, s * .19, s * .028); g.fill(); g.stroke(); g.fillRect(-s * .016, q.bot * s, s * .032, -q.bot * s - s * .02); }
+  else { g.fillStyle = 'rgba(236,244,248,.55)'; rr(g, -q.rim * .86 * s, q.bot * s, q.rim * 1.72 * s, -q.bot * s, s * .03); g.fill(); }
+  g.fillStyle = 'rgba(236,244,248,.2)'; bowl(g, kind, s); g.fill();
+  g.save(); bowl(g, kind, s); g.clip();
+  if (f > .005) { g.fillStyle = `rgba(${m.col},${m.a})`; g.fillRect(-s, ly, s * 2, q.bot * s - ly + 2); g.fillStyle = 'rgba(255,255,255,.28)'; ell(g, 0, ly, s * .5, s * .022); g.fill(); g.fillStyle = 'rgba(0,0,0,.08)'; g.fillRect(q.wide * .35 * s, ly, s, s); }
+  if (d.ice === 'on') for (const [ix, k, a] of [[-.5, 0, .3], [.3, 1, -.4], [-.05, 2, .15]]) { const sz = s * (kind === 'rocks' ? .2 : .16), cy = Math.min(q.bot * s - sz * (.55 + k * .9 * (f < .15 ? 1 : 0)), ly + sz * (.5 + k * .55)) + Math.sin(t * 1.4 + k) * s * .006 * still; g.save(); g.translate(ix * q.wide * s, Math.min(cy, q.bot * s - sz * .55)); g.rotate(a); g.fillStyle = 'rgba(255,255,255,.42)'; g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = Math.max(.6, s * .01); rr(g, -sz / 2, -sz / 2, sz, sz, sz * .2); g.fill(); g.stroke(); g.restore(); }
+  if (m.fizz && f > .05) for (let i = 0; i < 12; i++) { const u = (t * (.35 + (i % 4) * .08) + i * .37) % 1; g.fillStyle = `rgba(255,255,255,${.75 * (1 - u)})`; g.beginPath(); g.arc(Math.sin(i * 2.4) * q.wide * .7 * s + Math.sin(t * 2 + i) * s * .01 * still, lerp(q.bot * s, ly, G.RM ? (i / 12) : u), s * .012 + (i % 3) * s * .004, 0, TAU); g.fill(); }
+  if (d.garnish === 'olive') { g.strokeStyle = '#8a5c38'; g.lineWidth = Math.max(1, s * .014); g.beginPath(); g.moveTo(-q.rim * .5 * s, q.top * s - s * .1); g.lineTo(q.wide * .3 * s, Math.max(ly + s * .12, q.top * s + s * .2)); g.stroke(); const ox = q.wide * .2 * s, oy = Math.max(ly + s * .07, q.top * s + s * .15); g.fillStyle = '#7a8a3c'; ell(g, ox, oy, s * .05, s * .04); g.fill(); g.fillStyle = '#c8262c'; g.beginPath(); g.arc(ox + s * .03, oy, s * .014, 0, TAU); g.fill(); }
+  g.restore();
+  if (d.garnish === 'olive') { g.strokeStyle = '#8a5c38'; g.lineWidth = Math.max(1, s * .014); g.beginPath(); g.moveTo(-q.rim * .5 * s, q.top * s - s * .1); g.lineTo(-q.rim * .3 * s, q.top * s); g.stroke(); }
+  g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = Math.max(1, s * .014); bowl(g, kind, s); g.stroke(); g.strokeStyle = 'rgba(255,255,255,.4)'; g.lineWidth = Math.max(1, s * .02); g.beginPath(); g.moveTo(-q.rim * .78 * s, lerp(q.top, q.bot, .16) * s); g.lineTo(-q.rim * (kind === 'rocks' ? .7 : .95) * s, lerp(q.top, q.bot, .6) * s); g.stroke();
+  if (d.rim !== 'none') { const rnd = R(5); for (let i = 0; i < 46; i++) { const u = rnd() * 2 - 1; g.fillStyle = d.rim === 'chilli' ? (rnd() < .6 ? '#d8502c' : '#f2c21c') : 'rgba(255,255,255,.95)'; g.beginPath(); g.arc(u * q.rim * s, q.top * s + rnd() * s * .045 - s * .01, s * (.008 + rnd() * .008), 0, TAU); g.fill(); } }
+  if (d.garnish === 'lemon' || d.garnish === 'orange') wheel(g, q.rim * .92 * s, q.top * s - s * .015, s * (kind === 'rocks' ? .13 : .12), d.garnish === 'lemon' ? '#f8e36a' : '#f6a23a', d.garnish === 'lemon' ? '#e9c21c' : '#e8781c');
+  if (d.garnish === 'mint') for (const [a, k] of [[-.9, 1], [-.3, 1.15], [.3, 1], [-.6, .8]]) { g.save(); g.translate(-q.rim * .55 * s, q.top * s + s * .02); g.rotate(a); g.fillStyle = k > 1 ? '#5aa04a' : '#3f8a3c'; g.beginPath(); g.ellipse(0, -s * .07 * k, s * .035 * k, s * .075 * k, 0, 0, TAU); g.fill(); g.restore(); }
+  g.restore();
+}
+function bottle(g, x, y, s, q, tilt) {
+  g.save(); g.translate(x, y); g.rotate(tilt);
+  if (q.squeeze) { g.fillStyle = '#e9c21c'; g.beginPath(); g.ellipse(0, 0, s * .2, s * .16, 0, Math.PI, 0); g.fill(); g.fillStyle = '#f8e36a'; ell(g, 0, 0, s * .18, s * .05); g.fill(); g.restore(); return; }
+  g.fillStyle = q.bottle; rr(g, -s * .13, -s * .5, s * .26, s * .6, s * .05); g.fill(); g.beginPath(); g.moveTo(-s * .13, -s * .46); g.quadraticCurveTo(-s * .12, -s * .66, -s * .045, -s * .72); g.lineTo(-s * .045, -s * .95); g.lineTo(s * .045, -s * .95); g.lineTo(s * .045, -s * .72); g.quadraticCurveTo(s * .12, -s * .66, s * .13, -s * .46); g.fill();
+  g.fillStyle = q.label; g.fillRect(-s * .13, -s * .32, s * .26, s * .24); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(-s * .08, -s * .26, s * .16, s * .03); g.fillRect(-s * .06, -s * .2, s * .12, s * .02); g.fillStyle = '#e9b44c'; g.fillRect(-s * .05, -s * .98, s * .1, s * .06); g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(-s * .1, -s * .48, s * .04, s * .54);
+  g.restore();
+}
+
+/* ------------------------------------------------------------------ layout and the room */
+function layout() {
+  S = Math.min(G.W / 430, G.H / 720); VW = G.W / S; VH = G.H / S; const land = G.W > G.H, pr = $('zpanel').getBoundingClientRect(), cr = cv.getBoundingClientRect();
+  const fw = land ? (pr.left - cr.left) / S : VW, fh = land ? VH : (pr.top - cr.top) / S, top = land ? 58 : 66, bar = land ? fh * .6 : fh * .62;
+  const ph = bar - top + (land ? 18 : 10), pw = Math.min(fw - 16, ph * 4 / 3), gs = Math.min((fh - bar) * (land ? .92 : .96), fw * .34);
+  L = { land, fw, fh, top, bar, px: (fw - pw) / 2, py: top, pw, ph, gx: fw / 2, gy: fh - (land ? 22 : 8), gs, sj: fw / 2 - pw * .37, sf: fw / 2 + pw * .37, sy: bar + (fh - bar) * .34, ss: (fh - bar) * (land ? .46 : .5) };
+  SPR = { room: G.spr(VW, VH, drawRoom, clamp(S * G.DPR, 1, 2.5)) };
+  $('zui').style.fontSize = clamp(16 * S, 13, 18) + 'px';
+}
+function drawRoom(g, w, h) {
+  const r = R(4117), fw = L.fw, bar = L.bar, k = L.land ? 1 : .62;
+  let gr = g.createLinearGradient(0, 0, 0, bar); gr.addColorStop(0, '#1f3a34'); gr.addColorStop(1, '#2c5248'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < w * bar / 2600; i++) dab(g, r() * w, r() * bar, 20 + r() * 60, 8 + r() * 18, r() * 3, r() < .5 ? '#376a5c' : '#17302a', .12); g.globalAlpha = 1;
+  /* two shelves of bottles in front of a mirror */
+  const sx = fw * .5, sw = Math.min(fw - 30, 620 * k + 80), sy = L.top + 6 * k, shh = 62 * k;
+  g.fillStyle = '#3a2a24'; rr(g, sx - sw / 2 - 8, sy - 8, sw + 16, shh * 2 + 26, 8); g.fill(); gr = g.createLinearGradient(0, sy, 0, sy + shh * 2); gr.addColorStop(0, '#5f7f86'); gr.addColorStop(1, '#3f5a62'); g.fillStyle = gr; g.fillRect(sx - sw / 2, sy, sw, shh * 2 + 10);
+  g.fillStyle = 'rgba(255,255,255,.08)'; g.beginPath(); g.moveTo(sx - sw * .3, sy); g.lineTo(sx - sw * .12, sy); g.lineTo(sx - sw * .34, sy + shh * 2 + 10); g.lineTo(sx - sw * .5, sy + shh * 2 + 10); g.fill();
+  const cols = ['#2f5a3c', '#c8262c', '#f08a2c', '#d9cfa8', '#2a1c24', '#8fa86a', '#f2d24a', '#b8742c', '#e8a0a8', '#9fc4d8', '#5a2a6a', '#cfe0a0'];
+  for (let row = 0; row < 2; row++) { const by = sy + shh * (row + 1) + row * 5; g.fillStyle = '#6a4a38'; g.fillRect(sx - sw / 2, by, sw, 5); let x = sx - sw / 2 + 12 * k; while (x < sx + sw / 2 - 14 * k) { const bw = (11 + r() * 8) * k, bh = shh * (.5 + r() * .36), c = cols[Math.floor(r() * cols.length)]; g.fillStyle = c; rr(g, x, by - bh, bw, bh, 2.5 * k); g.fill(); g.fillRect(x + bw * .32, by - bh - bh * .32, bw * .36, bh * .34); g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(x + bw * .12, by - bh * .62, bw * .76, bh * .26); g.fillStyle = 'rgba(255,255,255,.2)'; g.fillRect(x + 1.2, by - bh + 2, 2 * k, bh - 4); x += bw + (4 + r() * 7) * k; } }
+  /* the chalkboard with the menu */
+  if (L.land) { const cx0 = 18, cw = Math.max(0, sx - sw / 2 - 36), cy0 = sy + 4; if (cw > 96) { g.fillStyle = '#6a4a38'; rr(g, cx0 - 5, cy0 - 5, cw + 10, 132, 5); g.fill(); g.fillStyle = '#26302c'; g.fillRect(cx0, cy0, cw, 122); g.fillStyle = '#f4f1e6'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `italic 600 ${Math.min(19, cw * .16)}px ${DISPLAY}`; g.fillText('Menu', cx0 + cw / 2, cy0 + 20); g.font = `600 ${Math.min(13.5, cw * .11)}px ${UI}`; ['Mezcal + lemon', 'Spritz bar', 'Wines'].forEach((t, i) => g.fillText(t, cx0 + cw / 2, cy0 + 52 + i * 24)); g.strokeStyle = 'rgba(244,241,230,.5)'; g.lineWidth = 1; g.beginPath(); g.moveTo(cx0 + cw * .25, cy0 + 35); g.lineTo(cx0 + cw * .75, cy0 + 35); g.stroke(); } }
+  /* the counter */
+  gr = g.createLinearGradient(0, bar, 0, h); gr.addColorStop(0, '#a8703f'); gr.addColorStop(.12, '#8f5a30'); gr.addColorStop(1, '#6e4224'); g.fillStyle = gr; g.fillRect(0, bar, w, h - bar); g.fillStyle = 'rgba(255,220,170,.28)'; g.fillRect(0, bar, w, 4); g.fillStyle = 'rgba(40,20,10,.25)'; g.fillRect(0, bar + 4, w, 3);
+  g.strokeStyle = 'rgba(60,30,14,.2)'; g.lineWidth = 1.4; for (let i = 0; i < 16; i++) { const y = bar + 14 + r() * (h - bar - 20); g.beginPath(); g.moveTo(r() * w, y); g.bezierCurveTo(w * .3, y + (r() - .5) * 14, w * .6, y + (r() - .5) * 14, w, y + (r() - .5) * 10); g.stroke(); }
+}
+SPR = null;
+
+/* ------------------------------------------------------------------ making and serving */
+function setStep() { $('zstep').textContent = phase === 'cheers' ? 'Cheers.' : served.j && !served.f ? 'One down. Now make the second.' : 'Make a drink for each of you.'; const n = D.total; $('zserve').disabled = !n || phase !== 'make'; $('zserve').textContent = served.j ? 'Serve the second' : 'Serve the first'; $('zclear').hidden = !n || phase !== 'make'; }
+function render() {
+  const body = $('zbody'), M = MENU[tab]; body.textContent = '';
+  const chip = (label, sw, pressed, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; if (pressed != null) b.setAttribute('aria-pressed', pressed); if (sw) { const d = document.createElement('span'); d.className = 'sw'; d.style.background = sw; b.append(d); } b.append(label); b.addEventListener('click', fn); return b; };
+  const head = t => { const h = document.createElement('h3'); h.textContent = t; body.append(h); const row = document.createElement('div'); row.className = 'chips'; body.append(row); return row; };
+  let row = head(M.title); for (const id of M.pour) row.append(chip((M.single ? '' : 'Add ') + ING[id].name, `rgb(${ING[id].col})`, M.single ? !!D.parts[id] : null, () => add(id)));
+  for (const [key, title, list] of M.opts) { row = head(title); for (const [id, name] of list) row.append(chip(name, null, D[key] === id, () => { if (phase !== 'make') return; D[key] = id; tone(784, .08, 'sine', .05); render(); })); }
+  for (const b of document.querySelectorAll('#ztabs button')) b.setAttribute('aria-pressed', b.dataset.tab === tab);
+  setStep();
+}
+function add(id) {
+  if (phase !== 'make' || pour) return; const M = MENU[tab]; if (M.single && !D.parts[id]) { D.parts = {}; D.total = 0; D.level = 0; }
+  if (D.total >= CAP) { tone(180, .12, 'square', .04); return; } const n = M.single ? 2 : 1; D.parts[id] = (D.parts[id] || 0) + n; D.total += n; pour = { id, t: 0 }; for (let i = 0; i < 5; i++) tone(520 + i * 60 + D.total * 30, .06, 'sine', .03, i * .09); render();
+}
+function serve() {
+  if (phase !== 'make' || !D.total || pour) return; const who = served.j ? 'f' : 'j'; served[who] = { d: JSON.parse(JSON.stringify(D)), u: 0, frac: D.total / CAP }; glad = { who, t: 0 }; D = empty(tab); tone(659, .12, 'sine', .06); tone(880, .2, 'sine', .05, .1);
+  if (served.j && served.f) { phase = 'toast'; pt0 = 0; } render();
+}
+function again() { served = { j: null, f: null }; phase = 'make'; glad = null; D = empty(tab); $('zend').hidden = true; render(); }
+function update(dt) {
+  D.level = lerp(D.level, D.total / CAP, 1 - Math.exp(-dt * 5)); if (pour) { pour.t += dt; if (pour.t > .85) pour = null; }
+  for (const who of ['j', 'f']) if (served[who]) served[who].u = Math.min(1, served[who].u + dt * 2.2);
+  if (glad) { glad.t += dt; if (glad.t > 1.6) glad = null; }
+  if (phase === 'toast') { pt0 += dt; if (pt0 > 1.1) { phase = 'cheers'; pt0 = 0; setStep(); } }
+  else if (phase === 'cheers') { const was = pt0; pt0 += dt; if (was < .95 && pt0 >= .95) { tone(1760, .25, 'sine', .07); tone(2217, .3, 'sine', .05, .03); if (!G.RM) for (let i = 0; i < 22; i++) { const a = Math.random() * TAU, v = 30 + Math.random() * 110; parts.push({ x: L.px + L.pw / 2, y: L.py + L.ph * .4 + L.ph * .19 * (HY - .5), vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, life: .8 + Math.random() * .7 }); } }
+    if (pt0 > 1.3) for (const who of ['j', 'f']) served[who].frac = Math.max(.12, served[who].frac - dt * .28);
+    if (pt0 > 3.6 && $('zend').hidden && phase === 'cheers') { phase = 'done'; rounds++; $('zend').hidden = false; $('zmore').focus(); setStep(); } }
+  for (const q of parts) { q.life -= dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 120 * dt; } parts = parts.filter(q => q.life > 0);
+}
+function frame(dt) {
+  if (!L || !SPR || !D) return; update(dt); const t = G.time, g = cx, still = G.RM ? 0 : 1;
+  g.setTransform(S * G.DPR, 0, 0, S * G.DPR, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  g.drawImage(SPR.room, 0, 0, VW, VH);
+  /* three lamps over the bar */
+  for (let i = 0; i < 3; i++) { const x = L.fw * (.22 + i * .28), y = L.top - 8 + (i === 1 ? 10 : 0); g.strokeStyle = '#17141c'; g.lineWidth = 2; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, y); g.stroke(); g.fillStyle = '#e9b44c'; g.beginPath(); g.moveTo(x - 16, y + 14); g.quadraticCurveTo(x, y - 10, x + 16, y + 14); g.fill(); g.globalCompositeOperation = 'lighter'; glow(g, x, y + 22, 120, '255,206,130', .2 + .02 * Math.sin(t * 2 + i) * still); g.globalCompositeOperation = 'source-over'; g.fillStyle = '#fff3c8'; ell(g, x, y + 15, 7, 4); g.fill(); }
+  /* the two of them, across the counter */
+  const u = phase === 'cheers' || phase === 'done' ? clamp(pt0 / .95, 0, 1) : 0, P = u > 0 ? (phase === 'done' || u >= 1 ? CHEERS : G.duo.mix(IDLE, CHEERS, u)) : glad ? GOT(glad.who) : IDLE;
+  g.save(); g.translate(L.px, L.py); G.duo.draw(g, L.pw, L.ph, P, t); g.restore();
+  const held = u >= .45, r = L.ph * .19;
+  if (held) for (const [who, sg, bx] of [['j', 1, L.pw * .29], ['f', -1, L.pw * .71]]) { const sv = served[who]; if (!sv) continue; const ha = phase === 'done' ? 1 : sm((u - .45) / .55), k = G.people[who], x = L.px + bx + sg * (.16 + HX) * r - sg * r * .06, y = L.py + L.ph * .4 + HY * r + (1 - ha) * r * 3.6 + r * .3, gs = r * 1.08, lean = sg * (.16 + (u >= 1 ? .14 * Math.max(0, 1 - (pt0 - .95) * 3) : 0));
+    g.save(); g.translate(x, y); g.rotate(lean); glass(g, 0, 0, gs, sv.d, t, sv.frac); const gk = kindOf(sv.d), gy = gk === 'rocks' ? -gs * .22 : -gs * .2, gw = gk === 'rocks' ? gs * .7 : gs * .26; g.fillStyle = k.skin; g.strokeStyle = k.shade; g.lineWidth = Math.max(1, gs * .02); rr(g, -gw / 2, gy - gs * .09, gw, gs * .2, gs * .07); g.fill(); g.stroke(); g.beginPath(); for (let i = 1; i < 4; i++) { g.moveTo(-gw / 2, gy - gs * .09 + i * gs * .05); g.lineTo(gw / 2, gy - gs * .09 + i * gs * .05); } g.globalAlpha = .5; g.stroke(); g.globalAlpha = 1; g.restore(); }
+  /* the counter again over their middles, then what is on it */
+  g.save(); g.beginPath(); g.rect(0, L.bar, VW, VH - L.bar); g.clip(); g.drawImage(SPR.room, 0, 0, VW, VH); g.restore();
+  if (!held) for (const [who, x] of [['j', L.sj], ['f', L.sf]]) { const sv = served[who]; if (!sv) continue; const k = sm(sv.u); g.globalAlpha = k; glass(g, lerp(L.gx, x, k), lerp(L.gy, L.sy, k), lerp(L.gs, L.ss, k), sv.d, t, sv.frac); g.globalAlpha = 1; }
+  /* the glass she is making, and whatever is being poured */
+  if (phase === 'make') { g.fillStyle = '#efe6d2'; rr(g, L.gx - L.gs * .3, L.gy - L.gs * .02, L.gs * .6, L.gs * .06, L.gs * .012); g.fill(); glass(g, L.gx, L.gy - L.gs * .04, L.gs, D, t);
+    if (pour) { const q = ING[pour.id], k = sm(clamp(pour.t / .2, 0, 1)) * (1 - sm(clamp((pour.t - .65) / .2, 0, 1))), kind = kindOf(D), sh = SHAPE[kind], topY = L.gy - L.gs * .04 + sh.top * L.gs, bx = L.gx + L.gs * .42, by = topY - L.gs * .2;
+      if (q.squeeze) { bottle(g, L.gx, by + L.gs * .02, L.gs * .8, q, 0); g.fillStyle = `rgba(${q.col},.9)`; for (let i = 0; i < 4; i++) { const uu = (pour.t * 2.2 + i / 4) % 1; g.beginPath(); g.ellipse(L.gx + (i - 1.5) * L.gs * .04, lerp(by + L.gs * .06, topY + L.gs * .3, uu), L.gs * .014, L.gs * .026, 0, 0, TAU); g.fill(); } }
+      else { g.strokeStyle = `rgba(${q.col},${Math.max(.6, q.a)})`; g.lineWidth = L.gs * .028 * k; g.lineCap = 'round'; if (k > .05) { g.beginPath(); g.moveTo(bx - L.gs * .36, by - L.gs * .06); g.quadraticCurveTo(L.gx, by - L.gs * .04, L.gx, topY + L.gs * .32); g.stroke(); } bottle(g, bx, by, L.gs * .62, q, lerp(-.4, -1.85, k)); } } }
+  for (const q of parts) { g.fillStyle = `rgba(255,236,170,${clamp(q.life, 0, 1)})`; g.beginPath(); g.arc(q.x, q.y, 1.6 + q.life * 2, 0, TAU); g.fill(); }
+  G.paper(g, .32);
+}
+for (const b of document.querySelectorAll('#ztabs button')) b.addEventListener('click', () => { if (phase !== 'make' || tab === b.dataset.tab) return; tab = b.dataset.tab; D = empty(tab); pour = null; render(); });
+$('zserve').addEventListener('click', serve); $('zclear').addEventListener('click', () => { if (phase === 'make') { D = empty(tab); pour = null; render(); } });
+$('zmore').addEventListener('click', again); $('zback').addEventListener('click', () => G.go('map')); $('zleave').addEventListener('click', () => G.go('map'));
+const soundLabel = () => { $('zsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('zsound').setAttribute('aria-pressed', G.sound); };
+$('zsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
+G.scenes.bar = {
+  frame, resize: layout,
+  enter() { active = true; $('zui').hidden = false; soundLabel(); D = empty(tab); served = { j: null, f: null }; phase = 'make'; pour = null; glad = null; parts = []; $('zend').hidden = true; layout(); render(); if (document.fonts && document.fonts.load) { document.fonts.load('italic 600 20px Fraunces').then(() => { if (active) layout(); }).catch(() => { /* the fallback serif is fine */ }); document.fonts.load('700 14px Nunito'); } },
+  leave() { active = false; $('zend').hidden = true; $('zui').hidden = true; },
+  debug: { add, serve, get D() { return D; }, get L() { return L; }, get phase() { return phase; }, get served() { return served; } }
+};
+})();
