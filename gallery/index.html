@@ -966,7 +966,8 @@ function hairFlow(g, x0, y0, o) {
       P.push([x, y, -Math.sin(a) * hw, Math.cos(a) * hw]); x += Math.cos(a) * seg * lMul; y += Math.sin(a) * seg * lMul;
     }
     const side = f => P.map(p => [p[0] + p[2] * f, p[1] + p[3] * f]), A = side(1), B = side(-1).reverse(), e = P[n], d = P[n - 1];
-    g.fillStyle = col; g.beginPath(); g.moveTo(A[0][0], A[0][1]); smooth(A); g.quadraticCurveTo(e[0] + (e[0] - d[0]) * .7, e[1] + (e[1] - d[1]) * .7, B[0][0], B[0][1]); smooth(B); g.closePath(); g.fill();
+    if (o.tip && col === o.col) { const gr = g.createLinearGradient(x0, y0 + o.len * .25, e[0], e[1]); gr.addColorStop(0, col); gr.addColorStop(1, o.tip); g.fillStyle = gr; } else g.fillStyle = col;
+    g.beginPath(); g.moveTo(A[0][0], A[0][1]); smooth(A); g.quadraticCurveTo(e[0] + (e[0] - d[0]) * .7, e[1] + (e[1] - d[1]) * .7, B[0][0], B[0][1]); smooth(B); g.closePath(); g.fill();
     if (strands) { g.lineCap = 'round'; for (const [f, c, w] of strands) { const C = side(f).slice(0, n); g.strokeStyle = c; g.lineWidth = w * o.w / 9; g.beginPath(); g.moveTo(C[0][0], C[0][1]); smooth(C); g.stroke(); } }
   };
   const dark = o.dark || o.col;

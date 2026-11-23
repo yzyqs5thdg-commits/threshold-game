@@ -157,6 +157,7 @@ function bust(g, who, x, y, r, o) {
   }
   g.restore();
   g.strokeStyle = 'rgba(30,20,30,.24)'; g.lineWidth = Math.max(1, r * .04); torso(); g.stroke();
+  if (who === 'f' && !o.scarf && !o.knit) { g.strokeStyle = '#e9b44c'; g.lineWidth = Math.max(.8, r * .028); g.beginPath(); g.moveTo(-r * .29, r * 1.3); g.quadraticCurveTo(0, r * 2.02, r * .29, r * 1.3); g.stroke(); g.fillStyle = '#f2cf62'; g.beginPath(); g.ellipse(0, r * 1.7, r * .06, r * .085, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(120,80,20,.5)'; g.lineWidth = Math.max(.5, r * .012); g.stroke(); }
   g.fillStyle = 'rgba(60,30,30,.12)'; ell(g, 0, r * 1.36, r * .34, r * .14); g.fill();
   g.restore();
 }
@@ -180,11 +181,14 @@ function hand(g, k, kind, u, flip) {
   else { g.beginPath(); for (const x of [-.24, 0, .24]) { g.moveTo(x * u, -.98 * u); g.lineTo(x * u, -1.44 * u); } g.stroke(); }
   g.globalAlpha = 1; g.restore();
 }
-function arm(g, k, o, x0, y0, x1, y1, u) {
+function arm(g, k, o, x0, y0, x1, y1, u, who) {
   const sleeve = !(o.bare || o.off), mx = lerp(x0, x1, .5), my = lerp(y0, y1, .5) + u * .3;
   const path = () => { g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(mx, my, x1, y1); };
   g.lineCap = 'round'; path(); g.strokeStyle = sleeve ? 'rgba(20,16,30,.4)' : k.shade; g.lineWidth = u * (sleeve ? .9 : .74); g.stroke();
   path(); g.strokeStyle = sleeve ? o.c.top : k.skin; g.lineWidth = u * (sleeve ? .78 : .62); g.stroke();
+  /* what they wear on their wrists: her stack of thin gold bangles, and one wide gold cuff */
+  if (who && !sleeve) { g.save(); g.translate(x0, y0); g.rotate(Math.atan2(my - y0, mx - x0)); g.fillStyle = '#e9b44c'; g.strokeStyle = 'rgba(120,80,20,.5)'; g.lineWidth = Math.max(.5, u * .03);
+    if (who === 'j') for (let i = 0; i < 3; i++) { g.beginPath(); g.roundRect(u * (.2 + i * .15), -u * .35, u * .085, u * .7, u * .04); g.fill(); g.stroke(); } else { g.beginPath(); g.roundRect(u * .22, -u * .36, u * .26, u * .72, u * .06); g.fill(); g.stroke(); } g.restore(); }
 }
 
 /* a drink with a straw, and a little card on a lanyard */
@@ -218,7 +222,7 @@ function shot(g, w, h, s, P, t, live) {
   const pR = mk(left === 'j' ? 'f' : 'j', -1, w * .71), pL = mk(left, 1, w * .29), ppl = P.front === pR.who ? [pL, pR] : [pR, pL];
   const hands = q => (q.p.hands || []).map(HND);
   const wrist = (q, H) => { const hu = u * (H.s || 1), px = q.hx + q.sg * H.x * r, py = q.hy + H.y * r + q.drop, a = q.sg * H.rot; return { hu, a, wx: px - Math.sin(a) * hu * .5, wy: py + Math.cos(a) * hu * .5 }; };
-  const armOf = (q, H) => { const W = wrist(q, H); if (H.ax != null) arm(g, q.k, q.o, W.wx, W.wy, q.hx + q.sg * H.ax * r, q.hy + H.ay * r + q.drop * .3, W.hu); else arm(g, q.k, q.o, W.wx, W.wy, q.hx + q.sg * (H.from || 0) * r, h + u, W.hu); };
+  const armOf = (q, H) => { const W = wrist(q, H); if (H.ax != null) arm(g, q.k, q.o, W.wx, W.wy, q.hx + q.sg * H.ax * r, q.hy + H.ay * r + q.drop * .3, W.hu, q.who); else arm(g, q.k, q.o, W.wx, W.wy, q.hx + q.sg * (H.from || 0) * r, h + u, W.hu, q.who); };
   ppl.forEach((q, i) => {
     const p = q.p, blink = live && !G.RM && ((t + (q.who === 'f' ? 1.9 : 0)) % 3.7) < .12;
     let eyes = p.eyes ? (q.sg > 0 ? p.eyes.slice() : [p.eyes[1], p.eyes[0]]) : null; if (eyes && blink) eyes = eyes.map(e => (e === 'open' ? 'blink' : e));
