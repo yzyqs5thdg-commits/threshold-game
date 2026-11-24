@@ -38,6 +38,9 @@ const POSE = Object.fromEntries(POSES.map(p => [p.id, p]));
 const FOUT = [
   { id: 'tank', name: 'Black tank', bare: true, c: { top: '#1f1f25', dark: '#0d0d11' } },
   { id: 'cami', name: 'Cream knit cami', bare: true, c: { top: '#efe6d2', dark: '#cbbfa4' } },
+  { id: 'dots', name: 'Red polka-dot halter', bare: true, dots: true, c: { top: '#8e1e2c', dark: '#641420' } },
+  { id: 'pins', name: 'Black pinstripe top', bare: true, pins: true, c: { top: '#1f1f25', dark: '#0d0d11' } },
+  { id: 'wine', name: 'Burgundy tank', bare: true, c: { top: '#6a2238', dark: '#4a1626' } },
   { id: 'red', name: 'Red top', c: { top: '#b8262c', dark: '#8a171d' } },
   { id: 'knit', name: 'Black sweater', knit: true, c: { top: '#26262d', dark: '#0f0f13' } },
   { id: 'olive', name: 'Olive jacket', jacket: true, c: { top: '#5d6c3e', dark: '#3d4a27' } },
@@ -138,6 +141,7 @@ function bust(g, who, x, y, r, o) {
     g.lineTo(r * .74, r * 1.56); g.quadraticCurveTo(r * .84, r * 2.2, r * 1.14, r * 2.46); g.lineTo(r * 1.18, r * 7); g.lineTo(-r * 1.18, r * 7); g.lineTo(-r * 1.14, r * 2.46); g.quadraticCurveTo(-r * .84, r * 2.2, -r * .74, r * 1.56); g.closePath(); g.fill();
     g.strokeStyle = c.dark; g.lineWidth = Math.max(.8, r * .05); g.stroke();
     if (o.buttons) { g.fillStyle = c.dark; for (const yy of [2.8, 3.2]) { g.beginPath(); g.arc(0, r * yy, r * .06, 0, TAU); g.fill(); } }
+    if (o.dots || o.pins) { g.save(); g.clip(); if (o.dots) { g.fillStyle = '#fbf3df'; for (let yy = 1.6; yy < 4.2; yy += .2) for (let xx = -1.4 + (Math.round(yy * 5) % 2) * .1; xx < 1.5; xx += .2) { g.beginPath(); g.arc(r * xx, r * yy, r * .03, 0, TAU); g.fill(); } } else { g.strokeStyle = 'rgba(244,241,230,.55)'; g.lineWidth = Math.max(.5, r * .014); for (let xx = -1.4; xx < 1.5; xx += .13) { g.beginPath(); g.moveTo(r * xx, r * 1.4); g.lineTo(r * xx, r * 4.4); g.stroke(); } } g.restore(); }
   } else {
     g.fillStyle = c.top; g.fillRect(-r * 2, r * 1.1, r * 4, r * 6);
     if (o.spots) { const rnd = R(77); for (let i = 0; i < 70; i++) { const sx = (rnd() - .5) * r * 4, sy = r * (1.3 + rnd() * 2.2), sr = r * (.06 + rnd() * .05); g.fillStyle = '#6a431e'; ell(g, sx, sy, sr * 1.4, sr); g.fill(); g.fillStyle = '#2a1a10'; ell(g, sx + sr * .3, sy, sr * .7, sr * .5); g.fill(); } }
@@ -157,6 +161,7 @@ function bust(g, who, x, y, r, o) {
   }
   g.restore();
   g.strokeStyle = 'rgba(30,20,30,.24)'; g.lineWidth = Math.max(1, r * .04); torso(); g.stroke();
+  if (who === 'j' && !o.scarf && !o.knit && !o.collar) { g.strokeStyle = '#e9b44c'; g.lineWidth = Math.max(.7, r * .02); for (const dp of [1.62, 1.9]) { g.beginPath(); g.moveTo(-r * .28, r * 1.3); g.quadraticCurveTo(0, r * dp, r * .28, r * 1.3); g.stroke(); } g.fillStyle = '#f2cf62'; g.beginPath(); g.arc(0, r * 1.62, r * .045, 0, TAU); g.fill(); }
   if (who === 'f' && !o.scarf && !o.knit) { g.strokeStyle = '#e9b44c'; g.lineWidth = Math.max(.8, r * .028); g.beginPath(); g.moveTo(-r * .29, r * 1.3); g.quadraticCurveTo(0, r * 2.02, r * .29, r * 1.3); g.stroke(); g.fillStyle = '#f2cf62'; g.beginPath(); g.ellipse(0, r * 1.7, r * .06, r * .085, 0, 0, TAU); g.fill(); g.strokeStyle = 'rgba(120,80,20,.5)'; g.lineWidth = Math.max(.5, r * .012); g.stroke(); }
   g.fillStyle = 'rgba(60,30,30,.12)'; ell(g, 0, r * 1.36, r * .34, r * .14); g.fill();
   g.restore();
@@ -174,6 +179,7 @@ function hand(g, k, kind, u, flip) {
     else if (kind === 'point' || kind === 'gun') { fing(-.36, -1.86, 0); curl([-.12, .12, .36]); if (kind === 'gun') { g.moveTo(.62 * u + Math.cos(.8) * .17 * u, -.74 * u + Math.sin(.8) * .17 * u); g.ellipse(.62 * u, -.74 * u, .17 * u, .46 * u, .8, 0, TAU); } }
     else { fing(-.36, -1.6, 0); fing(-.12, -1.8, 0); fing(.12, -1.76, 0); fing(.36, -1.5, 0); g.moveTo(.6 * u + Math.cos(.45) * .16 * u, -.62 * u + Math.sin(.45) * .16 * u); g.ellipse(.6 * u, -.62 * u, .16 * u, .4 * u, .45, 0, TAU); } };
   shape(); g.strokeStyle = k.shade; g.lineWidth = Math.max(1.2, u * .16); g.stroke(); g.fillStyle = k.skin; g.fill();
+  if (k.nail) { g.fillStyle = k.nail; for (const [x, top, a] of kind === 'peace' ? [[-.3, -1.82, -.24], [-.02, -1.86, .2]] : kind === 'point' || kind === 'gun' ? [[-.36, -1.86, 0]] : kind === 'fist' ? [] : [[-.36, -1.6, 0], [-.12, -1.8, 0], [.12, -1.76, 0], [.36, -1.5, 0]]) { g.save(); g.translate(x * u, -.86 * u); g.rotate(a); g.beginPath(); g.ellipse(0, top * u + 1.01 * u, .075 * u, .12 * u, 0, 0, TAU); g.fill(); g.restore(); } }
   g.strokeStyle = k.shade; g.globalAlpha = .75; g.lineWidth = Math.max(.6, u * .05);
   if (kind === 'peace') { g.beginPath(); g.moveTo(-.14 * u, -1.0 * u); g.lineTo(-.17 * u, -1.24 * u); g.stroke(); }
   if (kind === 'peace' || kind === 'fist' || kind === 'point') { g.globalAlpha = 1; g.fillStyle = k.skin; g.beginPath(); g.ellipse(.1 * u, -.6 * u, .36 * u, .16 * u, -.2, 0, TAU); g.fill(); g.lineWidth = Math.max(.7, u * .07); g.stroke(); }
@@ -186,9 +192,11 @@ function arm(g, k, o, x0, y0, x1, y1, u, who) {
   const path = () => { g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(mx, my, x1, y1); };
   g.lineCap = 'round'; path(); g.strokeStyle = sleeve ? 'rgba(20,16,30,.4)' : k.shade; g.lineWidth = u * (sleeve ? .9 : .74); g.stroke();
   path(); g.strokeStyle = sleeve ? o.c.top : k.skin; g.lineWidth = u * (sleeve ? .78 : .62); g.stroke();
-  /* what they wear on their wrists: her stack of thin gold bangles, and one wide gold cuff */
-  if (who && !sleeve) { g.save(); g.translate(x0, y0); g.rotate(Math.atan2(my - y0, mx - x0)); g.fillStyle = '#e9b44c'; g.strokeStyle = 'rgba(120,80,20,.5)'; g.lineWidth = Math.max(.5, u * .03);
-    if (who === 'j') for (let i = 0; i < 3; i++) { g.beginPath(); g.roundRect(u * (.2 + i * .15), -u * .35, u * .085, u * .7, u * .04); g.fill(); g.stroke(); } else { g.beginPath(); g.roundRect(u * .22, -u * .36, u * .26, u * .72, u * .06); g.fill(); g.stroke(); } g.restore(); }
+  /* what they wear on their wrists: her watch and a stack of beads; a fine gold bangle on the other */
+  if (who && !sleeve) { g.save(); g.translate(x0, y0); g.rotate(Math.atan2(my - y0, mx - x0)); g.lineWidth = Math.max(.5, u * .03);
+    if (who === 'j') { g.fillStyle = '#c9ccd4'; g.strokeStyle = 'rgba(70,70,90,.5)'; g.beginPath(); g.roundRect(u * .2, -u * .36, u * .1, u * .72, u * .04); g.fill(); g.stroke(); g.fillStyle = '#f4f6f8'; g.beginPath(); g.arc(u * .25, 0, u * .15, 0, TAU); g.fill(); g.stroke();
+      ['#8a5c38', '#f4f1e6', '#5a8ab8', '#8a5c38', '#f4f1e6', '#b85a6a'].forEach((c, i) => { g.fillStyle = c; g.beginPath(); g.arc(u * .5, -u * .3 + i * u * .12, u * .062, 0, TAU); g.fill(); }); ['#26252b', '#26252b', '#e9b44c', '#26252b', '#26252b', '#26252b'].forEach((c, i) => { g.fillStyle = c; g.beginPath(); g.arc(u * .64, -u * .3 + i * u * .12, u * .052, 0, TAU); g.fill(); }); }
+    else { g.fillStyle = '#e9b44c'; g.strokeStyle = 'rgba(120,80,20,.5)'; g.beginPath(); g.roundRect(u * .26, -u * .36, u * .1, u * .72, u * .05); g.fill(); g.stroke(); } g.restore(); }
 }
 
 /* a drink with a straw, and a little card on a lanyard */

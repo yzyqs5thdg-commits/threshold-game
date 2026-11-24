@@ -5,10 +5,11 @@
 const G = window.G; if (!G) return;
 const { TAU, R, dab } = G;
 const WHO = {
-  /* Jana: fair skin; long dark-brown hair in big waves that goes auburn towards the ends; a longer oval face; strong arched brows; small gold hoops */
-  j: { skin: '#f7d7bf', shade: '#e0aa8c', hair: '#4f2e20', hairD: '#2f1a12', ends: '#9a5c36', hi: 'rgba(200,136,88,.9)', brow: '#2f1a12', browW: .085, arch: .19, eye: '#4a2a1c', eyeR: [1, .98], lip: '#c9566a', full: 1, blush: '242,128,128', wave: 1, face: [.87, .95], chin: 1, hoop: .1 },
-  /* her friend: warm brown skin; thick black hair, long and softly waved; a rounder face with full cheeks; full dark brows, big dark eyes with long lashes; gold hoops and a gold chain */
-  f: { skin: '#dcab82', shade: '#bf8760', hair: '#17141d', hairD: '#0b0a10', hi: 'rgba(112,104,142,.75)', brow: '#17141d', browW: .092, arch: .1, eye: '#2a1814', eyeR: [1.1, 1.08], lip: '#a8485c', full: 1.2, blush: '214,96,92', wave: .7, face: [.93, .92], cheeks: 1, lash: 1, hoop: .15 }
+  /* Jana, from the photos: fair skin; long hair parted in the middle, brown at the roots and caramel-gold through the lengths, in loose waves;
+     soft cheeks, a straight nose, strong dark arched brows; gold earrings, fine gold chains, a watch and beaded bracelets, dark red nails */
+  j: { skin: '#f7d7bf', shade: '#e0aa8c', hair: '#5c3725', hairD: '#3a2116', ends: '#b47a44', hi: 'rgba(222,170,112,.9)', brow: '#2f1a12', browW: .09, arch: .19, eye: '#4a2a1c', eyeR: [1, .98], lip: '#c9566a', full: 1, blush: '242,128,128', wave: .95, face: [.9, .94], cheeks: 1, longNose: 1, hoop: .1, nail: '#8e1a2a' },
+  /* her friend, from the photos: warm brown skin; thick black hair, long, full and wavy; a slimmer oval face; full dark brows, big dark eyes with long lashes; gold hoops and a gold chain with a pendant */
+  f: { skin: '#dcab82', shade: '#bf8760', hair: '#17141d', hairD: '#0b0a10', ends: '#33241f', hi: 'rgba(112,104,142,.75)', brow: '#17141d', browW: .092, arch: .1, eye: '#2a1814', eyeR: [1.1, 1.08], lip: '#a8485c', full: 1.2, blush: '214,96,92', wave: 1.15, face: [.88, .95], chin: 1, lash: 1, hoop: .14 }
 };
 const OUT = {
   coat: { j: { top: '#27305a', dark: '#1a2144', leg: '#2b3350', shoe: '#f4f0e6', trim: '#f4ead6' }, f: { top: '#cdb48e', dark: '#a98f69', leg: '#26262e', shoe: '#3a2c20', trim: '#a98f69' } },
@@ -139,7 +140,7 @@ function longHair(g, r, len, wv, k, hc) {
   for (let i = 0; i <= N; i++) { const y = r * .8 + (len - r * .9) * i / N; g.lineTo(inn(-1, y), y); }
   ends(-1, inn(-1, len), out(-1, len)); for (let i = N - 1; i >= 0; i--) { const y = y0 + (len - y0) * i / N; g.lineTo(out(-1, y), y); }
   g.closePath(); g.fill();
-  if (k.ends && hc === k.hair) { const gr = g.createLinearGradient(0, r * .5, 0, len); gr.addColorStop(0, 'rgba(154,92,54,0)'); gr.addColorStop(1, k.ends); g.fillStyle = gr; g.fill(); }
+  if (k.ends && hc === k.hair) { const gr = g.createLinearGradient(0, r * .5, 0, len); gr.addColorStop(0, 'rgba(120,80,50,0)'); gr.addColorStop(.45, 'rgba(120,80,50,0)'); gr.addColorStop(1, k.ends); g.fillStyle = gr; g.fill(); }
   for (const d of [-1, 1]) for (const [f, col, lw, a, ys] of [[.16, k.hairD, .09, .55, 1.0], [.4, k.hi, .045, .8, .3], [.6, k.hairD, .04, .45, .5], [.8, k.hi, .035, .6, .8]]) {
     g.strokeStyle = col; g.globalAlpha = a; g.lineWidth = Math.max(.8, r * lw); g.beginPath(); for (let i = 0; i <= N; i++) { const y = r * ys + (len * .97 - r * ys) * i / N, x = mixx(y < r * .8 ? d * r * .5 : inn(d, y), out(d, y), f); if (i) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke(); }
   g.globalAlpha = 1;
@@ -171,8 +172,8 @@ function headFront(g, who, o = {}) {
     g.strokeStyle = k.brow; g.lineWidth = Math.max(1, r * k.browW); for (const d of [-1, 1]) { g.beginPath(); g.moveTo(d * r * .13, -r * .3); g.quadraticCurveTo(d * r * .36, -r * (.32 + k.arch * .62), d * r * .58, -r * .27); g.stroke(); }
   } else { g.fillStyle = `rgba(${k.blush},.42)`; for (const d of [-1, 1]) { ell(g, d * r * .56, r * .52, r * .16, r * .1); g.fill(); } }
   g.strokeStyle = k.shade; g.lineWidth = Math.max(.8, r * .05); g.beginPath();
-  if (k.chin) { g.moveTo(r * .06, r * .2); g.quadraticCurveTo(r * .09, r * .3, r * .07, r * .36); g.quadraticCurveTo(0, r * .44, -r * .06, r * .37); } else { g.moveTo(-r * .08, r * .35); g.quadraticCurveTo(0, r * .44, r * .08, r * .35); }
-  g.stroke(); if (k.cheeks && r > 20) { g.fillStyle = k.shade; for (const d of [-1, 1]) { g.beginPath(); g.arc(d * r * .055, r * .375, r * .018, 0, TAU); g.fill(); } }
+  if (k.longNose) { g.moveTo(r * .06, r * .2); g.quadraticCurveTo(r * .09, r * .3, r * .07, r * .36); g.quadraticCurveTo(0, r * .44, -r * .06, r * .37); } else { g.moveTo(-r * .08, r * .35); g.quadraticCurveTo(0, r * .44, r * .08, r * .35); }
+  g.stroke(); if (!k.longNose && r > 20) { g.fillStyle = k.shade; for (const d of [-1, 1]) { g.beginPath(); g.arc(d * r * .055, r * .375, r * .018, 0, TAU); g.fill(); } }
   mouth(g, 0, r * (k.chin ? .63 : .6), r * .14, k, o.mouth || (expr === 'joy' ? 'joy' : 'smile'), m);
   /* curtain fringe from a centre part */
   g.fillStyle = hc; for (const d of [-1, 1]) { g.beginPath(); g.moveTo(0, -r * 1.02); g.bezierCurveTo(d * r * .7, -r * 1.12, d * r * 1.14, -r * .5, d * r * 1.04, r * .3); g.quadraticCurveTo(d * r * .98, r * .62, d * r * .8, r * .8); g.quadraticCurveTo(d * r * .78, r * .02, d * r * .36, -r * .58); g.quadraticCurveTo(d * r * .12, -r * .72, 0, -r * .74); g.closePath(); g.fill(); }
