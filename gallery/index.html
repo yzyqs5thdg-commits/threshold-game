@@ -106,6 +106,14 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
 #jlfaces[hidden], #jlwater[hidden], #jldo[hidden] { display: none; }
 .jlrow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 #jlwater:disabled { opacity: .5; cursor: default; }
+#jlgrid { position: fixed; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; pointer-events: none; }
+#jlgrid[hidden] { display: none; }
+.jlcard { pointer-events: auto; min-width: 0; border-radius: 10px; padding: 4px 6px; font-size: .78em; font-weight: 700; line-height: 1.2; letter-spacing: 0; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; overflow-wrap: anywhere; box-shadow: 0 4px 12px rgba(28, 39, 72, .4); }
+.jlcard.down { background: repeating-linear-gradient(135deg, #1c2748 0 8px, #2a3868 8px 16px); color: #f2cf62; font-size: 1.4em; }
+.jlcard.q { background: var(--paper); color: var(--ink); }
+.jlcard.a { background: #f8d6de; color: var(--ink); }
+.jlcard.long { font-size: .68em; }
+.jlcard.done { opacity: .72; outline: 2.5px solid var(--ok); outline-offset: -2.5px; cursor: default; }
 #xbar, #bbar, #gbar, #pbar, #qbar, #jlbar { justify-content: flex-end; gap: 10px; padding-block: 12px calc(18px + env(safe-area-inset-bottom, 0px)); }
 .xcard { max-width: 30em; gap: 8px; padding: 18px 20px 20px; }
 .xcard img, .xcard video { display: block; max-width: 100%; max-height: 50vh; border-radius: 8px; background: var(--night); }
@@ -522,9 +530,10 @@ button.small { font-size: .85em; padding: .5em 1em; box-shadow: 0 4px 14px rgba(
       <button class="small" id="jlleave" type="button">Back to the map</button>
     </div>
   </div>
+  <div id="jlgrid" hidden></div>
   <div class="over" id="jlbar">
     <div id="jlfaces"></div>
-    <div class="jlrow"><button id="jlwater" type="button" hidden>Drink water (3 left)</button><button id="jldo" type="button">Take the mugshot</button></div>
+    <div class="jlrow"><button id="jlwater" type="button" hidden>Drink water for a peek (3 left)</button><button id="jldo" type="button">Take the mugshot</button></div>
   </div>
   <div class="over sheet" id="jlend" hidden>
     <div class="paper">
