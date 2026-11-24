@@ -8,7 +8,7 @@ const WHO = {
   /* Jana: fair skin; long dark-brown hair in big waves that goes auburn towards the ends; a longer oval face; strong arched brows; small gold hoops */
   j: { skin: '#f7d7bf', shade: '#e0aa8c', hair: '#4f2e20', hairD: '#2f1a12', ends: '#9a5c36', hi: 'rgba(200,136,88,.9)', brow: '#2f1a12', browW: .085, arch: .19, eye: '#4a2a1c', eyeR: [1, .98], lip: '#c9566a', full: 1, blush: '242,128,128', wave: 1, face: [.87, .95], chin: 1, hoop: .1 },
   /* her friend: warm brown skin; thick black hair, long and softly waved; a rounder face with full cheeks; full dark brows, big dark eyes with long lashes; gold hoops and a gold chain */
-  f: { skin: '#d4a074', shade: '#b27a54', hair: '#17141d', hairD: '#0b0a10', hi: 'rgba(112,104,142,.75)', brow: '#17141d', browW: .092, arch: .1, eye: '#2a1814', eyeR: [1.1, 1.08], lip: '#a8485c', full: 1.2, blush: '214,96,92', wave: .7, face: [.93, .92], cheeks: 1, lash: 1, hoop: .15 }
+  f: { skin: '#dcab82', shade: '#bf8760', hair: '#17141d', hairD: '#0b0a10', hi: 'rgba(112,104,142,.75)', brow: '#17141d', browW: .092, arch: .1, eye: '#2a1814', eyeR: [1.1, 1.08], lip: '#a8485c', full: 1.2, blush: '214,96,92', wave: .7, face: [.93, .92], cheeks: 1, lash: 1, hoop: .15 }
 };
 const OUT = {
   coat: { j: { top: '#27305a', dark: '#1a2144', leg: '#2b3350', shoe: '#f4f0e6', trim: '#f4ead6' }, f: { top: '#cdb48e', dark: '#a98f69', leg: '#26262e', shoe: '#3a2c20', trim: '#a98f69' } },
