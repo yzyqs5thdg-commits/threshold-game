@@ -45,7 +45,25 @@ const QUOTES = [
   ['No matter what you say, I know deep down', 'I \u201ctouch\u201d your soul'],
   ['You\u2019ve stopped writing about me,', 'I\u2019m sad'],
   ['Meher: When you come to India you\u2019re gonna sm fun', 'Lo lu luh x3'],
-  ['I\u2019m so happy. I know we\u2019re not doing anything', 'but I\u2019m so happy we\u2019re here']
+  ['I\u2019m so happy. I know we\u2019re not doing anything', 'but I\u2019m so happy we\u2019re here'],
+  ['Meher: I\u2019m going kill myself', 'Can I watch'],
+  ['Showed me a traumatic meme about killing kids', 'because you have means to make more'],
+  ['Have you ever poured 7 up on people dying from tear gas.', 'No??? Fuck u!!'],
+  ['We will jump off a building together', 'making a Heart'],
+  ['All the explosions impacted my ear drumsss.', 'Clockkk ittttt. Pooja what is this behaviour'],
+  ['I had a pregnancy scare', 'before I had sex'],
+  ['Cried for 2 hours about her hair', 'and spoke to my grandma about it'],
+  ['I think we\u2019re getting harassed a lot', 'in the Bahamas'],
+  ['JUST FUCKING SLAPPED ME', 'AT HEIGHTS'],
+  ['\u201cA package deal\u201d', 'Rich Lauria, Columbia Professor, 2026'],
+  ['Aliya: You both love', 'annoying each other'],
+  ['I\u2019ve been to so many therapist, in different countries Saraha,', 'there\u2019s no help khalas'],
+  ['I kinda wanna make out with someone', 'to get ready for the Bahamas'],
+  ['Slurp (ew).', 'Hey now hey now'],
+  ['Took a picture of herself', 'and said same'],
+  ['Jana zoned out when I was talking.', 'Then laughed at me'],
+  ['I\u2019ve already', 'trauma dumped her'],
+  ['Hit my hand', '\ud83d\ude21\ud83d\ude21\ud83d\ude21']
 ];
 const NEED = 6;
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
