@@ -41,6 +41,10 @@ const GOT = who => ({ j: Object.assign({ dx: .1, tilt: .05 }, who === 'j' ? { ey
 const HX = .6, HY = 1.86;
 const CHEERS = { j: { dx: .16, tilt: .1, expr: 'joy', hands: [{ k: 'fist', x: HX, y: HY, rot: .2, far: 0, from: .1 }] }, f: { dx: .16, tilt: .1, expr: 'joy', hands: [{ k: 'fist', x: HX, y: HY, rot: .2, far: 0, from: .1 }] } };
 let S = 1, VW = 0, VH = 0, L = null, SPR = null, active = false, tab = 'mezcal';
+/* how strong each pour is: enough of these and the evening ends at the jail */
+const STRONG = { mezcal: 1, gin: 1, campari: .6, limoncello: .6, aperol: .5, elder: .4, prosecco: .4, bubbly: .45, red: .45, white: .45, orange: .45, rose: .45 }, LIMIT = 10;
+let drunk = 0, hic = 0;
+const tipsy = () => clamp(drunk / LIMIT, 0, 1);
 let D = null, served = { j: null, f: null }, pour = null, phase = 'make', pt0 = 0, glad = null, parts = [], rounds = 0;
 const empty = t => Object.assign({ tab: t, parts: {}, total: 0, level: 0 }, MENU[t].start);
 const kindOf = d => (d.tab === 'mezcal' ? 'rocks' : d.tab === 'spritz' || d.tab === 'gin' ? 'balloon' : d.parts.bubbly ? 'flute' : 'wine');
@@ -143,7 +147,7 @@ function drawRoom(g, w, h) {
 SPR = null;
 
 /* ------------------------------------------------------------------ making and serving */
-function setStep() { $('zstep').textContent = phase === 'cheers' ? 'Cheers.' : served.j && !served.f ? 'One down. Now make the second.' : 'Make a drink for each of you.'; const n = D.total; $('zserve').disabled = !n || phase !== 'make'; $('zserve').textContent = served.j ? 'Serve the second' : 'Serve the first'; $('zclear').hidden = !n || phase !== 'make'; }
+function setStep() { const tp = Math.round(tipsy() * 100); $('ztipsy').textContent = tp >= 100 ? 'Tipsy: very' : `Tipsy ${tp}%`; $('zstep').textContent = phase === 'cheers' ? 'Cheers.' : served.j && !served.f ? 'One down. Now make the second.' : 'Make a drink for each of you.'; const n = D.total; $('zserve').disabled = !n || phase !== 'make'; $('zserve').textContent = served.j ? 'Serve the second' : 'Serve the first'; $('zclear').hidden = !n || phase !== 'make'; }
 function render() {
   const body = $('zbody'), M = MENU[tab]; body.textContent = '';
   const chip = (label, sw, pressed, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; if (pressed != null) b.setAttribute('aria-pressed', pressed); if (sw) { const d = document.createElement('span'); d.className = 'sw'; d.style.background = sw; b.append(d); } b.append(label); b.addEventListener('click', fn); return b; };
@@ -158,7 +162,7 @@ function add(id) {
   if (D.total >= CAP) { tone(180, .12, 'square', .04); return; } const n = M.single ? 2 : 1; D.parts[id] = (D.parts[id] || 0) + n; D.total += n; pour = { id, t: 0 }; for (let i = 0; i < 5; i++) tone(520 + i * 60 + D.total * 30, .06, 'sine', .03, i * .09); render();
 }
 function serve() {
-  if (phase !== 'make' || !D.total || pour) return; const who = served.j ? 'f' : 'j'; served[who] = { d: JSON.parse(JSON.stringify(D)), u: 0, frac: D.total / CAP }; glad = { who, t: 0 }; D = empty(tab); tone(659, .12, 'sine', .06); tone(880, .2, 'sine', .05, .1);
+  if (phase !== 'make' || !D.total || pour) return; const who = served.j ? 'f' : 'j'; served[who] = { d: JSON.parse(JSON.stringify(D)), u: 0, frac: D.total / CAP }; glad = { who, t: 0 }; for (const id in D.parts) drunk += (STRONG[id] || 0) * D.parts[id]; D = empty(tab); tone(659, .12, 'sine', .06); tone(880, .2, 'sine', .05, .1);
   if (served.j && served.f) { phase = 'toast'; pt0 = 0; } render();
 }
 function again() { served = { j: null, f: null }; phase = 'make'; glad = null; D = empty(tab); $('zend').hidden = true; render(); }
@@ -169,8 +173,9 @@ function update(dt) {
   if (phase === 'toast') { pt0 += dt; if (pt0 > 1.1) { phase = 'cheers'; pt0 = 0; setStep(); } }
   else if (phase === 'cheers') { const was = pt0; pt0 += dt; if (was < .95 && pt0 >= .95) { tone(1760, .25, 'sine', .07); tone(2217, .3, 'sine', .05, .03); if (!G.RM) for (let i = 0; i < 22; i++) { const a = Math.random() * TAU, v = 30 + Math.random() * 110; parts.push({ x: L.px + L.pw / 2, y: L.py + L.ph * .4 + L.ph * .19 * (HY - .5), vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40, life: .8 + Math.random() * .7 }); } }
     if (pt0 > 1.3) for (const who of ['j', 'f']) served[who].frac = Math.max(.12, served[who].frac - dt * .28);
-    if (pt0 > 3.6 && $('zend').hidden && phase === 'cheers') { phase = 'done'; rounds++; $('zend').hidden = false; $('zmore').focus(); setStep(); } }
-  for (const q of parts) { q.life -= dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 120 * dt; } parts = parts.filter(q => q.life > 0);
+    if (pt0 > 3.6 && $('zend').hidden && phase === 'cheers') { phase = 'done'; rounds++; if (drunk >= LIMIT) { $('zbust').hidden = false; $('zjail').focus(); for (let i = 0; i < 8; i++) tone(i % 2 ? 660 : 880, .22, 'sine', .05, i * .24); } else { $('zend').hidden = false; $('zmore').focus(); } setStep(); } }
+  if (tipsy() > .45 && phase === 'make' && !G.RM) { hic -= dt; if (hic <= 0) { hic = 2.4 + Math.random() * 3 - tipsy(); parts.push({ hic: Math.random() < .5 ? .29 : .71, x: 0, y: 0, vx: 0, vy: 0, life: 1.1 }); tone(520, .05, 'sine', .04); tone(760, .07, 'sine', .04, .06); } }
+  for (const q of parts) { q.life -= dt; q.x += q.vx * dt; q.y += q.vy * dt; if (!q.hic) q.vy += 120 * dt; } parts = parts.filter(q => q.life > 0);
 }
 function frame(dt) {
   if (!L || !SPR || !D) return; update(dt); const t = G.time, g = cx, still = G.RM ? 0 : 1;
@@ -187,10 +192,12 @@ function frame(dt) {
     if (L.candle) { const [x, y, ks] = L.candle, fl = 1 + .14 * Math.sin(t * 9) * still; g.globalCompositeOperation = 'lighter'; glow(g, x, y, 46 * ks, '255,190,110', .3 * fl); g.globalCompositeOperation = 'source-over'; g.fillStyle = '#ffd874'; g.beginPath(); g.ellipse(x, y, 2.4 * ks, 5.4 * ks * fl, 0, 0, TAU); g.fill(); g.fillStyle = '#fff6d8'; g.beginPath(); g.ellipse(x, y + 1.4 * ks, 1.2 * ks, 2.6 * ks, 0, 0, TAU); g.fill(); } }
   /* the two of them, across the counter */
   const u = phase === 'cheers' || phase === 'done' ? clamp(pt0 / .95, 0, 1) : 0, P = u > 0 ? (phase === 'done' || u >= 1 ? CHEERS : G.duo.mix(IDLE, CHEERS, u)) : glad ? GOT(glad.who) : IDLE;
+  g.save(); { const lv = tipsy(), sw = (Math.sin(t * 1.3) * .022 + Math.sin(t * .7 + 1) * .012) * lv * still; g.translate(L.px + L.pw / 2, L.bar); g.rotate(sw); g.translate(-L.px - L.pw / 2, -L.bar); }
   g.save(); g.translate(L.px, L.py); G.duo.draw(g, L.pw, L.ph, P, t); g.restore();
   const held = u >= .45, r = L.ph * .19;
   if (held) for (const [who, sg, bx] of [['j', 1, L.pw * .29], ['f', -1, L.pw * .71]]) { const sv = served[who]; if (!sv) continue; const ha = phase === 'done' ? 1 : sm((u - .45) / .55), k = G.people[who], x = L.px + bx + sg * (.16 + HX) * r - sg * r * .06, y = L.py + L.ph * .4 + HY * r + (1 - ha) * r * 3.6 + r * .3, gs = r * 1.08, lean = sg * (.16 + (u >= 1 ? .14 * Math.max(0, 1 - (pt0 - .95) * 3) : 0));
     g.save(); g.translate(x, y); g.rotate(lean); glass(g, 0, 0, gs, sv.d, t, sv.frac); const gk = kindOf(sv.d), gy = gk === 'rocks' ? -gs * .22 : -gs * .2, gw = gk === 'rocks' ? gs * .7 : gs * .26; g.fillStyle = k.skin; g.strokeStyle = k.shade; g.lineWidth = Math.max(1, gs * .02); rr(g, -gw / 2, gy - gs * .09, gw, gs * .2, gs * .07); g.fill(); g.stroke(); g.beginPath(); for (let i = 1; i < 4; i++) { g.moveTo(-gw / 2, gy - gs * .09 + i * gs * .05); g.lineTo(gw / 2, gy - gs * .09 + i * gs * .05); } g.globalAlpha = .5; g.stroke(); g.globalAlpha = 1; g.restore(); }
+  g.restore();
   /* the counter again over their middles, then what is on it */
   g.save(); g.beginPath(); g.rect(0, L.bar, VW, VH - L.bar); g.clip(); g.drawImage(SPR.room, 0, 0, VW, VH); g.restore();
   for (const x of [L.sj, L.sf]) { g.fillStyle = 'rgba(30,14,6,.2)'; ell(g, x + 2, L.sy + 2, L.ss * .3, L.ss * .07); g.fill(); g.fillStyle = '#efe6d2'; ell(g, x, L.sy, L.ss * .28, L.ss * .06); g.fill(); g.strokeStyle = '#c8463a'; g.lineWidth = 1.2; ell(g, x, L.sy, L.ss * .21, L.ss * .042); g.stroke(); }
@@ -200,18 +207,19 @@ function frame(dt) {
     if (pour) { const q = ING[pour.id], k = sm(clamp(pour.t / .2, 0, 1)) * (1 - sm(clamp((pour.t - .65) / .2, 0, 1))), kind = kindOf(D), sh = SHAPE[kind], topY = L.gy - L.gs * .04 + sh.top * L.gs, bx = L.gx + L.gs * .42, by = topY - L.gs * .2;
       if (q.squeeze) { bottle(g, L.gx, by + L.gs * .02, L.gs * .8, q, 0); g.fillStyle = `rgba(${q.col},.9)`; for (let i = 0; i < 4; i++) { const uu = (pour.t * 2.2 + i / 4) % 1; g.beginPath(); g.ellipse(L.gx + (i - 1.5) * L.gs * .04, lerp(by + L.gs * .06, topY + L.gs * .3, uu), L.gs * .014, L.gs * .026, 0, 0, TAU); g.fill(); } }
       else { g.strokeStyle = `rgba(${q.col},${Math.max(.6, q.a)})`; g.lineWidth = L.gs * .028 * k; g.lineCap = 'round'; if (k > .05) { g.beginPath(); g.moveTo(bx - L.gs * .36, by - L.gs * .06); g.quadraticCurveTo(L.gx, by - L.gs * .04, L.gx, topY + L.gs * .32); g.stroke(); } bottle(g, bx, by, L.gs * .62, q, lerp(-.4, -1.85, k)); } } }
-  for (const q of parts) { g.fillStyle = `rgba(255,236,170,${clamp(q.life, 0, 1)})`; g.beginPath(); g.arc(q.x, q.y, 1.6 + q.life * 2, 0, TAU); g.fill(); }
+  for (const q of parts) { if (q.hic) { const x = L.px + L.pw * q.hic + (q.hic < .5 ? 1 : -1) * L.ph * .16, y = L.py + L.ph * .2 - (1.1 - q.life) * 22; g.globalAlpha = clamp(q.life * 2, 0, 1); g.font = `700 ${L.land ? 15 : 13}px ${UI}`; g.textAlign = 'center'; g.textBaseline = 'middle'; const w = g.measureText('hic!').width + 20; g.fillStyle = '#fbf3df'; rr(g, x - w / 2, y - 13, w, 26, 13); g.fill(); g.fillStyle = '#2c2a3d'; g.fillText('hic!', x, y + 1); g.globalAlpha = 1; continue; } g.fillStyle = `rgba(255,236,170,${clamp(q.life, 0, 1)})`; g.beginPath(); g.arc(q.x, q.y, 1.6 + q.life * 2, 0, TAU); g.fill(); }
+  if (!$('zbust').hidden && !G.RM) { g.fillStyle = Math.sin(t * 9) > 0 ? 'rgba(230,50,60,.2)' : 'rgba(60,90,240,.2)'; g.fillRect(0, 0, VW, VH); }
   G.paper(g, .32);
 }
 for (const b of document.querySelectorAll('#ztabs button')) b.addEventListener('click', () => { if (phase !== 'make' || tab === b.dataset.tab) return; tab = b.dataset.tab; D = empty(tab); pour = null; render(); });
 $('zserve').addEventListener('click', serve); $('zclear').addEventListener('click', () => { if (phase === 'make') { D = empty(tab); pour = null; render(); } });
-$('zmore').addEventListener('click', again); $('zback').addEventListener('click', () => G.go('map')); $('zleave').addEventListener('click', () => G.go('map'));
+$('zmore').addEventListener('click', again); $('zjail').addEventListener('click', () => { drunk = 0; G.go('jail', { arrested: true }); }); $('zback').addEventListener('click', () => G.go('map')); $('zleave').addEventListener('click', () => G.go('map'));
 const soundLabel = () => { $('zsound').textContent = G.sound ? 'Sound on' : 'Sound off'; $('zsound').setAttribute('aria-pressed', G.sound); };
 $('zsound').addEventListener('click', () => { G.sound = !G.sound; soundLabel(); });
 G.scenes.bar = {
   frame, resize: layout,
-  enter() { active = true; $('zui').hidden = false; soundLabel(); D = empty(tab); served = { j: null, f: null }; phase = 'make'; pour = null; glad = null; parts = []; $('zend').hidden = true; layout(); render(); if (document.fonts && document.fonts.load) { document.fonts.load('italic 600 20px Fraunces').then(() => { if (active) layout(); }).catch(() => { /* the fallback serif is fine */ }); document.fonts.load('700 14px Nunito'); } },
-  leave() { active = false; $('zend').hidden = true; $('zui').hidden = true; },
-  debug: { add, serve, get D() { return D; }, get L() { return L; }, get phase() { return phase; }, get served() { return served; } }
+  enter() { active = true; $('zui').hidden = false; soundLabel(); D = empty(tab); served = { j: null, f: null }; phase = 'make'; pour = null; glad = null; parts = []; $('zend').hidden = true; $('zbust').hidden = true; layout(); render(); if (document.fonts && document.fonts.load) { document.fonts.load('italic 600 20px Fraunces').then(() => { if (active) layout(); }).catch(() => { /* the fallback serif is fine */ }); document.fonts.load('700 14px Nunito'); } },
+  leave() { active = false; $('zend').hidden = true; $('zbust').hidden = true; $('zui').hidden = true; },
+  debug: { add, serve, get drunk() { return drunk; }, get D() { return D; }, get L() { return L; }, get phase() { return phase; }, get served() { return served; } }
 };
 })();
